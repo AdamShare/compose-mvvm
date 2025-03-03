@@ -1,0 +1,32 @@
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+pluginManagement {
+    repositories {
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "Sample"
+
+include(":apps:subcomponent:app")
+include(":apps:subcomponent:feature:signin")
+include(":external:foundation:collections")
+include(":external:foundation:coroutines")
+include(":external:foundation:coroutines:test")
+include(":external:lib:timber")
+include(":external:lib:mvvm")

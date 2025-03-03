@@ -1,0 +1,71 @@
+package com.share.subcomponent.app.activity
+
+import com.share.external.foundation.coroutines.ManagedCoroutineScope
+import com.share.external.lib.mvvm.activity.ActivityComponentProvider
+import com.share.external.lib.mvvm.activity.ActivityViewModelComponent
+import com.share.external.lib.mvvm.activity.ActivityViewModelComponentProvider
+import com.share.external.lib.mvvm.activity.ActivityViewModelCoroutineScope
+import com.share.external.lib.mvvm.application.ApplicationCoroutineScope
+import com.share.subcomponent.feature.signin.SignInComponent
+import dagger.Module
+import dagger.Provides
+import dagger.Subcomponent
+import javax.inject.Scope
+
+@Scope
+@MustBeDocumented
+@Retention(value = AnnotationRetention.RUNTIME)
+annotation class ActivityViewModelScope
+
+@ActivityViewModelScope
+@Subcomponent(
+    modules = [SampleActivityViewModelModule::class]
+)
+interface SampleActivityViewModelComponent:
+    ActivityViewModelComponent,
+    ActivityComponentProvider<SampleActivityComponent.Factory>
+{
+    @Subcomponent.Factory
+    interface Factory: () -> SampleActivityViewModelComponent
+
+    interface Application {
+        val sampleActivityViewModelComponent: Factory
+    }
+
+    interface Activity: ActivityViewModelComponentProvider<SampleActivityViewModelComponent> {
+        override fun buildViewModelComponent(): SampleActivityViewModelComponent {
+            return (getApplication() as Application).sampleActivityViewModelComponent()
+        }
+    }
+}
+
+@Module(
+    subcomponents = [
+        SampleActivityComponent::class,
+        SignInComponent::class
+    ]
+)
+object SampleActivityViewModelModule {
+    @Provides
+    fun parentScope(o: SampleActivityViewModelCoroutineScope) = o
+
+    @ActivityViewModelScope
+    @Provides
+    fun scope(
+        applicationCoroutineScope: ApplicationCoroutineScope
+    ) = SampleActivityViewModelCoroutineScope(applicationCoroutineScope)
+
+    @Provides
+    fun viewModel(
+        activityComponent: SampleActivityComponent.Factory,
+        componentCoroutineScope: SampleActivityViewModelCoroutineScope,
+    ) = SampleActivityViewModel(
+        activityComponent = activityComponent,
+        componentCoroutineScope = componentCoroutineScope,
+    )
+}
+
+class SampleActivityViewModelCoroutineScope(
+    applicationCoroutineScope: ApplicationCoroutineScope
+): ManagedCoroutineScope(applicationCoroutineScope),
+        SignInComponent.ParentCoroutineScope
