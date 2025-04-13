@@ -25,6 +25,8 @@ interface SampleActivityViewModelComponent:
     ActivityViewModelComponent,
     ActivityComponentProvider<SampleActivityComponent.Factory>
 {
+    val signInComponentFactory: SignInComponent.Factory
+
     @Subcomponent.Factory
     interface Factory: () -> SampleActivityViewModelComponent
 
@@ -47,25 +49,22 @@ interface SampleActivityViewModelComponent:
 )
 object SampleActivityViewModelModule {
     @Provides
-    fun parentScope(o: SampleActivityViewModelCoroutineScope) = o
+    fun activityViewModelCoroutineScope(
+        o: SampleActivityViewModelCoroutineScope
+    ): ActivityViewModelCoroutineScope = o
+
+    @Provides
+    fun signInParentScope(
+        o: SampleActivityViewModelCoroutineScope
+    ): SignInComponent.ParentScope = o
 
     @ActivityViewModelScope
     @Provides
     fun scope(
         applicationCoroutineScope: ApplicationCoroutineScope
     ) = SampleActivityViewModelCoroutineScope(applicationCoroutineScope)
-
-    @Provides
-    fun viewModel(
-        activityComponent: SampleActivityComponent.Factory,
-        componentCoroutineScope: SampleActivityViewModelCoroutineScope,
-    ) = SampleActivityViewModel(
-        activityComponent = activityComponent,
-        componentCoroutineScope = componentCoroutineScope,
-    )
 }
 
-class SampleActivityViewModelCoroutineScope(
-    applicationCoroutineScope: ApplicationCoroutineScope
-): ManagedCoroutineScope(applicationCoroutineScope),
-        SignInComponent.ParentCoroutineScope
+class SampleActivityViewModelCoroutineScope(applicationCoroutineScope: ApplicationCoroutineScope):
+    ActivityViewModelCoroutineScope(applicationCoroutineScope),
+    SignInComponent.ParentScope

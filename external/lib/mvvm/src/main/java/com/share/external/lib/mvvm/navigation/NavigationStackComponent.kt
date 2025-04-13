@@ -1,29 +1,37 @@
 package com.share.external.lib.mvvm.navigation
 
-import androidx.lifecycle.ViewModel
-import com.share.external.foundation.coroutines.CoroutineScopeFactory
-import com.share.external.lib.mvvm.ComponentCoroutineScope
-import com.share.external.lib.mvvm.viewmodel.ViewModelComponent
-import dagger.BindsInstance
-import dagger.Provides
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlin.coroutines.CoroutineContext
+import com.share.external.foundation.coroutines.ManagedCoroutineScope
+import com.share.external.lib.mvvm.navigation.stack.NavigationStack
 
-interface NavStackEntryComponent<CS: ComponentCoroutineScope, VM: ViewModel>: ViewModelComponent<VM> {
-    val coroutineScope: CS
+interface NavStackEntry<Scope: ManagedCoroutineScope, View: ComposableProvider> {
+    val coroutineScope: Scope
 }
 
-interface NavStackEntryComponentFactory<Component, DynamicDependency: CoroutineScopeDynamicDependency> {
-    fun create(@BindsInstance dynamicDependency: DynamicDependency): Component
-}
+class NavStackEntryViewModel(
+    val navStackEntry: NavStackEntry<*, *>,
+    val navigationStack: NavigationStack
+)
 
-interface CoroutineScopeDynamicDependency {
-    val coroutineScopeFactory: CoroutineScopeFactory
-    val context: CoroutineContext get() = Dispatchers.IO
-}
-
-class DefaultCoroutineScopeDynamicDependency(
-    override val coroutineScopeFactory: CoroutineScopeFactory,
-    override val context: CoroutineContext = Dispatchers.IO
-): CoroutineScopeDynamicDependency
+//interface NavStackEntryComponentFactory<Component, DynamicDependency: CoroutineScopeDynamicDependency> {
+//    fun create(@BindsInstance dynamicDependency: DynamicDependency): Component
+//}
+//
+//interface CoroutineScopeDynamicDependency {
+//    val coroutineScopeFactory: CoroutineScopeFactory
+//    val context: CoroutineContext get() = Dispatchers.IO
+//}
+//
+//class DefaultCoroutineScopeDynamicDependency(
+//    override val coroutineScopeFactory: CoroutineScopeFactory,
+//    override val context: CoroutineContext = Dispatchers.IO
+//): CoroutineScopeDynamicDependency
+//
+//
+//class ViewModelComponentScope(
+//    managedCoroutineScope: ManagedCoroutineScope,
+//) {
+//    val viewModelManagedScope = managedCoroutineScope.childManagedScope(
+//        name = "ViewModel",
+//        context = Dispatchers.Main.immediate
+//    )
+//}

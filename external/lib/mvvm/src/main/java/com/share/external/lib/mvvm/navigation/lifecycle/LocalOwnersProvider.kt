@@ -82,7 +82,7 @@ internal class BackStackEntryIdViewModel(handle: SavedStateHandle) : ViewModel()
 
     // we create our own id for each back stack entry to support multiple entries of the same
     // destination. this id will be restored by SavedStateHandle
-    val id: UUID = handle.get<UUID>(idKey) ?: UUID.randomUUID().also { handle.set(idKey, it) }
+    val id: UUID = handle.get<UUID>(idKey) ?: UUID.randomUUID().also { handle[idKey] = it }
 
     lateinit var saveableStateHolderRef: WeakReference<SaveableStateHolder>
 

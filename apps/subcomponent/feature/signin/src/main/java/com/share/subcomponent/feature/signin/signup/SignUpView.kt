@@ -1,4 +1,4 @@
-package com.share.subcomponent.feature.signin
+package com.share.subcomponent.feature.signin.signup
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,23 +18,22 @@ import androidx.compose.ui.unit.dp
 import com.share.external.lib.mvvm.viewmodel.viewModel
 
 @Composable
-fun SignInView(
-    componentFactory: SignInComponent.Factory,
+fun SignUpView(
+    componentFactory: SignUp.Factory,
 ) {
     val viewModel = componentFactory.viewModel()
-    SignInView(
+    SignUpView(
         listener = viewModel,
     )
 }
 
-interface SignInViewListener {
-    fun onClickSignIn()
+interface SignUpViewListener {
     fun onClickSignUp()
 }
 
 @Composable
-fun SignInView(
-    listener: SignInViewListener,
+fun SignUpView(
+    listener: SignUpViewListener,
 ) {
     Column(
         modifier = Modifier
@@ -50,15 +49,8 @@ fun SignInView(
         ) {
             Text(
                 textAlign = TextAlign.Center,
-                text ="Welcome"
+                text ="Create a new account"
             )
-        }
-
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = listener::onClickSignIn
-        ) {
-            Text("Sign In")
         }
 
         Button(
@@ -70,16 +62,15 @@ fun SignInView(
     }
 }
 
-object SignInViewListenerPreview: SignInViewListener {
-    override fun onClickSignIn() {  }
+object SignUpViewListenerPreview: SignUpViewListener {
     override fun onClickSignUp() {  }
 }
 
 @Preview
 @Composable
-fun SignInViewPreview() {
-    SignInView(
-        listener = SignInViewListenerPreview,
+fun SignUpViewPreview() {
+    SignUpView(
+        listener = SignUpViewListenerPreview,
     )
 }
 

@@ -8,7 +8,12 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import javax.inject.Provider
 
 @Composable
-inline fun <reified VM : ViewModel> Provider<VM>.viewModel(): VM {
+inline fun <reified VM : ViewModel> Provider<VM>.getOrCreate(): VM {
+    return viewModel(this)
+}
+
+@Composable
+inline fun <reified VM : ViewModel> (() -> VM).getOrCreate(): VM {
     return viewModel(this)
 }
 
@@ -17,6 +22,11 @@ inline fun <reified VM : ViewModel> viewModel(
     provider: Provider<VM>,
 ): VM = androidx.lifecycle.viewmodel.compose.viewModel(
     factory = provider.toViewModelProviderFactory()
+)
+
+@Composable
+inline fun <reified VM : ViewModel, C: Provider<VM>> (() -> C).viewModel(): VM = viewModel(
+    factory = { invoke().get() }
 )
 
 @Composable

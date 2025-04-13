@@ -13,28 +13,19 @@ import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.foundation.coroutines.childSupervisorJobScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 
 @Stable
 open class ViewModelNavigationStack<K, V>(
-    private val scope: ManagedCoroutineScope,
+    scope: ManagedCoroutineScope,
 ) : NavigationStack<K, V> {
-    constructor(
-        scope: CoroutineScope,
-    ): this(
-        scope = ManagedCoroutineScope(scope.childSupervisorJobScope(
-            name = "root",
-            context = Dispatchers.Main.immediate
-        ))
-    )
 
     private val providers = doublyLinkedMapOf<K, ViewModelStoreContentProvider<K, V>>()
 
-    protected var currentProvider: ViewModelStoreContentProvider<K, V>? by mutableStateOf(providers.values.lastOrNull())
+    protected var currentProvider by mutableStateOf(providers.values.lastOrNull())
         private set
 
-    override var size: Int by mutableIntStateOf(providers.size)
+    override var size by mutableIntStateOf(providers.size)
         protected set
 
     init {
@@ -45,10 +36,6 @@ open class ViewModelNavigationStack<K, V>(
             }
         }
     }
-
-    class NavStackAccess(
-        coroutineScopeFactory: CoroutineScopeFactory,
-    )
 
     override fun push(key: K, content: (NavigationStackScope<K, V>) -> V) {
         TODO("Not yet implemented")

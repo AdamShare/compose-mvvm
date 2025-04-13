@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
-import javax.inject.Provider
 
 fun interface ViewModelFactory<VM> {
     fun create(savedStateHandle: SavedStateHandle): VM

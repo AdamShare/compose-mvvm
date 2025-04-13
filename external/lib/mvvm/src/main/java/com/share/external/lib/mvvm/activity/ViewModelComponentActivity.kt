@@ -23,6 +23,13 @@ abstract class ViewModelComponentActivity<ViewModelComponent: ActivityViewModelC
     private class ComponentViewModel<ViewModelComponent>(
         val component: ViewModelComponent,
         coroutineScope: ActivityViewModelCoroutineScope,
-    ) : ViewModel(coroutineScope)
+    ): ViewModel(
+        AutoCloseable {
+            coroutineScope.cancel(
+                awaitChildrenComplete = false,
+                message = "Activity destroyed",
+            )
+        }
+    )
 }
 

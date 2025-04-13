@@ -5,10 +5,9 @@ import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import kotlinx.coroutines.Dispatchers
 
 open class ManagedViewModel(
-    awaitChildrenComplete: Boolean = true,
-    name: String = "ManagedViewModel",
+    name: String,
     scope: ManagedCoroutineScope,
 ): ViewModel(
     scope.create(name, Dispatchers.Main.immediate),
-    AutoCloseable { scope.cancel(awaitChildrenComplete = awaitChildrenComplete) }
+    AutoCloseable { scope.cancel(awaitChildrenComplete = true) }
 )

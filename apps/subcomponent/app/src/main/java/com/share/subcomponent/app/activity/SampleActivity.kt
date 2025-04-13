@@ -9,6 +9,7 @@ import com.share.external.lib.mvvm.activity.ActivityComponentInject
 import com.share.external.lib.mvvm.activity.ViewModelComponentActivity
 import com.share.external.lib.mvvm.navigation.dialog.LocalDecorViewProperties
 import com.share.external.lib.mvvm.navigation.dialog.decorViewProperties
+import com.share.subcomponent.feature.signin.SignInView
 
 interface SampleActivityComponentInject: ActivityComponentInject<
         SampleActivity,
@@ -44,5 +45,7 @@ class SampleActivity : ViewModelComponentActivity<SampleActivityViewModelCompone
 fun ActivityView(
     viewModelComponent: SampleActivityViewModelComponent,
 ) {
-
+    SignInView(
+        viewModelComponent.signInComponentFactory
+    )
 }
