@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -17,8 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.share.external.lib.mvvm.activity.compareTo
-import com.share.external.lib.mvvm.activity.findActivity
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
@@ -29,60 +26,52 @@ fun DialogContainer(
     content: (@Composable () -> Unit)?
 ) {
     Box {
-        val showFullScreen = content?.let {
-            calculateWindowSizeClass(findActivity()) < properties.minimumSizeClass
-        } ?: false
-
-        if (!showFullScreen) {
-            backgroundContent?.let {
-                Box(modifier = Modifier.zIndex(0f)) {
-                    it.invoke()
-                }
+        backgroundContent?.let {
+            Box(modifier = Modifier.zIndex(0f)) {
+                it.invoke()
             }
+        }
 
-            content?.let { content ->
-                Box(
-                    modifier = Modifier
-                        .zIndex(1f)
-                        .fillMaxSize()
-                        .background(
-                            color = Color(
-                                red = 0f,
-                                green = 0f,
-                                blue = 0f,
-                                alpha = properties.backgroundAlpha
-                            )
+        content?.let { content ->
+            Box(
+                modifier = Modifier
+                    .zIndex(1f)
+                    .fillMaxSize()
+                    .background(
+                        color = Color(
+                            red = 0f,
+                            green = 0f,
+                            blue = 0f,
+                            alpha = properties.backgroundAlpha
                         )
-                        .clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() },
-                            enabled = properties.dismissOnClickOutside,
-                            onClick = onDismiss,
-                        )
-                )
+                    )
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        enabled = properties.dismissOnClickOutside,
+                        onClick = onDismiss,
+                    )
+            )
 
-                val imeBottomInset = WindowInsets.ime.getBottom(LocalDensity.current)
-                val imeSafeSpace = LocalDecorViewProperties.current.height - imeBottomInset.dp
-                Box(
-                    modifier = Modifier
-                        .zIndex(2f)
-                        .fillMaxSize()
-                        .run {
-                            if (imeSafeSpace > properties.minimumHeightIMEPaddingEnabled) {
-                                imePadding()
-                            } else this
-                        },
-                    contentAlignment = properties.contentAlignment,
+            val imeBottomInset = WindowInsets.ime.getBottom(LocalDensity.current)
+            val imeSafeSpace = LocalDecorViewProperties.current.height - imeBottomInset.dp
+            Box(
+                modifier = Modifier
+                    .zIndex(2f)
+                    .fillMaxSize()
+                    .run {
+                        if (imeSafeSpace > properties.minimumHeightIMEPaddingEnabled) {
+                            imePadding()
+                        } else this
+                    },
+                contentAlignment = properties.contentAlignment,
+            ) {
+                DialogSurface(
+                    properties = properties,
                 ) {
-                    DialogSurface(
-                        properties = properties,
-                    ) {
-                        content.invoke()
-                    }
+                    content.invoke()
                 }
             }
-        } else {
-            content?.invoke()
         }
     }
 }

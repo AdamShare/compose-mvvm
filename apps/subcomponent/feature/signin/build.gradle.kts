@@ -38,6 +38,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(projects.external.foundation.coroutines)
+    implementation(projects.external.lib.compose)
     implementation(projects.external.lib.mvvm)
 
     implementation(libs.androidx.activity.compose)

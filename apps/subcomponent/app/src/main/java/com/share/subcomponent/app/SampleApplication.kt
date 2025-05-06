@@ -2,7 +2,7 @@ package com.share.subcomponent.app
 
 import android.app.Application
 import com.share.external.lib.mvvm.application.ApplicationCoroutineScope
-import com.share.external.lib.mvvm.inject
+import com.share.external.lib.mvvm.application.inject
 import com.share.subcomponent.app.activity.SampleActivityViewModelComponent
 import timber.log.Timber
 import javax.inject.Inject

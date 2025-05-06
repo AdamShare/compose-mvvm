@@ -1,6 +1,6 @@
 package com.share.subcomponent.app.activity
 
-import com.share.external.lib.mvvm.Injectable
+import com.share.external.lib.mvvm.application.Injectable
 import com.share.external.lib.mvvm.activity.ActivityComponentFactory
 import com.share.external.lib.mvvm.activity.ActivityScope
 import com.share.external.lib.mvvm.activity.ComponentActivityModule

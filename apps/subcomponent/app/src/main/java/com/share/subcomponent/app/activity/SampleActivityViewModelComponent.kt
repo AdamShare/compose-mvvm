@@ -1,6 +1,5 @@
 package com.share.subcomponent.app.activity
 
-import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.activity.ActivityComponentProvider
 import com.share.external.lib.mvvm.activity.ActivityViewModelComponent
 import com.share.external.lib.mvvm.activity.ActivityViewModelComponentProvider
@@ -25,6 +24,7 @@ interface SampleActivityViewModelComponent:
     ActivityViewModelComponent,
     ActivityComponentProvider<SampleActivityComponent.Factory>
 {
+    val navigationController: ActivityViewNavigationController
     val signInComponentFactory: SignInComponent.Factory
 
     @Subcomponent.Factory
@@ -63,8 +63,17 @@ object SampleActivityViewModelModule {
     fun scope(
         applicationCoroutineScope: ApplicationCoroutineScope
     ) = SampleActivityViewModelCoroutineScope(applicationCoroutineScope)
+
+    @ActivityViewModelScope
+    @Provides
+    fun pageNavigationController(
+        scope: SampleActivityViewModelCoroutineScope,
+    ) = ActivityViewNavigationController(
+        scope = scope.create("ActivityViewNavigationController"),
+    )
 }
 
 class SampleActivityViewModelCoroutineScope(applicationCoroutineScope: ApplicationCoroutineScope):
     ActivityViewModelCoroutineScope(applicationCoroutineScope),
     SignInComponent.ParentScope
+

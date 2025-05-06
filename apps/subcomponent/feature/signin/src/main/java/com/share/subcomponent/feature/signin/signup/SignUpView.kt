@@ -15,16 +15,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.share.external.lib.mvvm.viewmodel.viewModel
+import com.share.external.lib.mvvm.navigation.content.NavigationComposableProvider
+import com.share.external.lib.mvvm.viewmodel.getOrCreate
+import javax.inject.Provider
 
-@Composable
-fun SignUpView(
-    componentFactory: SignUp.Factory,
-) {
-    val viewModel = componentFactory.viewModel()
-    SignUpView(
-        listener = viewModel,
-    )
+class SignUpView(
+    private val viewModelProvider: Provider<SignUpViewModel>,
+): NavigationComposableProvider {
+    @Composable
+    override fun Content() {
+        val viewModel = viewModelProvider.getOrCreate()
+        SignUpView(
+            listener = viewModel,
+        )
+    }
+
+    override val analyticsId: String get() = "SignUp"
 }
 
 interface SignUpViewListener {

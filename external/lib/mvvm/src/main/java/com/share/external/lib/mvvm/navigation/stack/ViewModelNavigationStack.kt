@@ -1,84 +1,118 @@
 package com.share.external.lib.mvvm.navigation.stack
 
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.setValue
+import com.share.external.foundation.collections.DoublyLinkedMap
 import com.share.external.foundation.collections.doublyLinkedMapOf
 import com.share.external.foundation.collections.removeLast
-import com.share.external.foundation.coroutines.CoroutineScopeFactory
 import com.share.external.foundation.coroutines.MainImmediateScope
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
-import com.share.external.foundation.coroutines.childSupervisorJobScope
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.share.external.lib.mvvm.navigation.content.NavigationKey
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
-@Stable
-open class ViewModelNavigationStack<K, V>(
-    scope: ManagedCoroutineScope,
-) : NavigationStack<K, V> {
+/**
+ * Concrete, mutable navigation stack. All public methods forward to
+ * modifications on an internal [DoublyLinkedMap] and trigger Compose
+ * recomposition via a snapshot state.
+ */
+open class ViewModelNavigationStack<V>(
+    private val rootScope: ManagedCoroutineScope,
+) : NavigationBackStack {
+    private val providers = doublyLinkedMapOf<NavigationKey, ViewModelStoreContentProvider<V>>()
 
-    private val providers = doublyLinkedMapOf<K, ViewModelStoreContentProvider<K, V>>()
-
-    protected var currentProvider by mutableStateOf(providers.values.lastOrNull())
+    protected var stack: DoublyLinkedMap<NavigationKey, ViewModelStoreContentProvider<V>> by mutableStateOf(
+        value = providers,
+        policy = neverEqualPolicy()
+    )
         private set
 
-    override var size by mutableIntStateOf(providers.size)
-        protected set
+    override val size: Int get() = providers.size
+
+    protected val last by derivedStateOf { stack.values.lastOrNull() }
 
     init {
-        scope.invokeOnCompletion {
-            // Parent scope may complete off main thread.
+        rootScope.invokeOnCompletion {
+            // Parent scope could complete off main thread.
             MainImmediateScope().launch {
                 removeAll()
             }
         }
     }
 
-    override fun push(key: K, content: (NavigationStackScope<K, V>) -> V) {
-        TODO("Not yet implemented")
+    fun push(key: NavigationKey, content: V, scope: ManagedCoroutineScope) {
+        if (!rootScope.isActive || !scope.isActive) {
+            Timber.tag(TAG).wtf(
+                "Scope is not active pushing $key, $content onto nav stack: $this"
+            )
+            return
+        }
+        val previous = providers[key]
+        providers[key] = ViewModelStoreContentProvider(
+            content = content,
+            scope = scope
+        )
+        updateState()
+        previous?.cancel(
+            awaitChildrenComplete = true,
+            message = "Pushed new content"
+        )
+
+        scope.invokeOnCompletion {
+            MainImmediateScope().launch {
+                remove(key)
+            }
+        }
     }
-
-
-//    override fun push(key: K, content: V) {
-//        if (!scope.isActive) {
-//            Timber.tag(TAG).wtf("Scope is not active pushing $key, $content onto nav stack: $this")
-//        }
-//        val previous = providers[key]
-//        providers[key] = storeFactory(key, content)
-//        updateState()
-//        previous?.owner?.clear()
-//    }
 
     override fun pop(): Boolean {
-        val removed = providers.removeLast()
-        updateState()
-        removed?.owner?.clear()
-        return removed != null
+        return providers.removeLast()?.run {
+            updateState()
+            cancel(
+                awaitChildrenComplete = true,
+                message = "Popped from back stack",
+            )
+        } != null
     }
 
-    override fun popTo(key: K, inclusive: Boolean): Boolean {
+    override fun popTo(key: NavigationKey, inclusive: Boolean): Boolean {
         val removed = providers.removeAllAfter(key, inclusive)
-        updateState()
-        removed.asReversed().forEach { it.owner.clear() }
-        return removed.isNotEmpty()
+        return if (removed.isNotEmpty()) {
+            updateState()
+            removed.asReversed().forEach {
+                it.cancel(
+                    awaitChildrenComplete = true,
+                    message = "Popped from back stack to: $key inclusive: $inclusive"
+                )
+            }
+            true
+        } else false
     }
 
     override fun removeAll() {
-        providers.keys.firstOrNull()?.let { popTo(it, true) }
+        providers.keys.firstOrNull()?.let {
+            popTo(
+                key = it,
+                inclusive = true
+            )
+        }
     }
 
-    override fun remove(key: K) {
-        val removed = providers.remove(key)
-        updateState()
-        removed?.owner?.clear()
+    override fun remove(key: NavigationKey) {
+        providers.remove(key)?.run {
+            updateState()
+            cancel(
+                awaitChildrenComplete = true,
+                message = "Removed from back stack"
+            )
+        }
     }
 
     private fun updateState() {
-        currentProvider = providers.values.lastOrNull()
-        size = providers.size
+        stack = providers
     }
 
     companion object {

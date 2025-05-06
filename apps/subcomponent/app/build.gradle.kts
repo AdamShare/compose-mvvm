@@ -50,7 +50,6 @@ dependencies {
     implementation(projects.apps.subcomponent.feature.signin)
     implementation(projects.external.foundation.coroutines)
     implementation(projects.external.lib.mvvm)
-    implementation(projects.external.lib.timber)
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)

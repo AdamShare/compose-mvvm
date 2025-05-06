@@ -49,11 +49,12 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.window)
     implementation(libs.dagger)
-    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.timber)
 
     implementation(projects.external.foundation.coroutines)
     implementation(projects.external.foundation.collections)
+    implementation(projects.external.lib.compose)
 
     testImplementation(libs.junit)
 

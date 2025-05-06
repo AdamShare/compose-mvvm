@@ -76,9 +76,9 @@ private fun CoroutineScope.childScope(
 ): CoroutineScope {
     val job = childJob(coroutineContext.job)
     val parentName = (coroutineContext[CoroutineName.Key]?.name ?: "").ifBlank {
-        "parent(${System.identityHashCode(coroutineContext.job)})"
+        "parent(${Integer.toHexString(System.identityHashCode(coroutineContext.job))})"
     }
-    val childName = "$parentName->$name(${System.identityHashCode(job)})"
+    val childName = "$parentName->$name(${Integer.toHexString(System.identityHashCode(job))})"
 
     job.invokeOnCompletion { error ->
         Timber.tag(TAG).d(error, "Child scope completed: %s", childName)
@@ -86,4 +86,3 @@ private fun CoroutineScope.childScope(
 
     return CoroutineScope(context + job + CoroutineName(childName))
 }
-

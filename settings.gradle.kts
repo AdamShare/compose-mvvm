@@ -23,10 +23,12 @@ dependencyResolutionManagement {
 
 rootProject.name = "Sample"
 
+include(":apps:dynamic:app")
+include(":apps:dynamic:feature:signin")
 include(":apps:subcomponent:app")
 include(":apps:subcomponent:feature:signin")
 include(":external:foundation:collections")
 include(":external:foundation:coroutines")
 include(":external:foundation:coroutines:test")
-include(":external:lib:timber")
 include(":external:lib:mvvm")
+include(":external:lib:compose")

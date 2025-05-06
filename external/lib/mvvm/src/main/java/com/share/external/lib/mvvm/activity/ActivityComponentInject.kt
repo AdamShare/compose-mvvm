@@ -1,7 +1,7 @@
 package com.share.external.lib.mvvm.activity
 
 import androidx.activity.ComponentActivity
-import com.share.external.lib.mvvm.Injectable
+import com.share.external.lib.mvvm.application.Injectable
 
 interface ActivityComponentInject<
         ActivityType : ComponentActivity,

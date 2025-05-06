@@ -3,6 +3,8 @@ package com.share.subcomponent.app.activity
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import com.share.external.lib.mvvm.activity.ActivityComponentInject
@@ -45,7 +47,23 @@ class SampleActivity : ViewModelComponentActivity<SampleActivityViewModelCompone
 fun ActivityView(
     viewModelComponent: SampleActivityViewModelComponent,
 ) {
-    SignInView(
-        viewModelComponent.signInComponentFactory
-    )
+    viewModelComponent.navigationController.Content {
+        when (it) {
+            is ActivityViewRoute.LoggedIn -> {
+                Text("Logged in as ${it.user}")
+
+                Button(onClick = {
+                    viewModelComponent.navigationController.select(ActivityViewRoute.LoggedOut)
+                }) {
+                    Text("Log Out")
+                }
+            }
+            ActivityViewRoute.LoggedOut -> {
+                SignInView(
+                    viewModelComponent.signInComponentFactory
+                )
+            }
+        }
+    }
 }
+

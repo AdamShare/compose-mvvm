@@ -210,7 +210,7 @@ private class ManagedCoroutineScopeImpl(
             return
         }
 
-        synchronized(activeChildren) {
+        val cancel = synchronized(activeChildren) {
             // If we want to wait for children, and we actually have children:
             if (awaitChildrenComplete && activeChildren.isNotEmpty()) {
                 // Only set up waiting once
@@ -220,15 +220,19 @@ private class ManagedCoroutineScopeImpl(
                         cancellationMessage = message
                     }
                 }
+                false
             } else {
                 // Cancel everything immediately
                 isAwaitingChildrenComplete = false
                 activeChildren.clear()
-                if (message.isBlank()) {
-                    actual.cancel()
-                } else {
-                    actual.cancel(message = message)
-                }
+                true
+            }
+        }
+        if (cancel) {
+            if (message.isBlank()) {
+                actual.cancel()
+            } else {
+                actual.cancel(message = message)
             }
         }
     }
@@ -247,17 +251,22 @@ private class ManagedCoroutineScopeImpl(
     //region Private Helpers
 
     private fun unregisterChild(child: ManagedCoroutineScopeImpl) {
-        synchronized(activeChildren) {
+        val cancel = synchronized(activeChildren) {
             activeChildren.remove(child)
 
             // If we were waiting for children and none remain, cancel now
             if (isActive && isAwaitingChildrenComplete && activeChildren.isEmpty()) {
                 isAwaitingChildrenComplete = false
-                if (cancellationMessage.isBlank()) {
-                    actual.cancel()
-                } else {
-                    actual.cancel(message = cancellationMessage)
-                }
+                true
+            } else {
+                false
+            }
+        }
+        if (cancel) {
+            if (cancellationMessage.isBlank()) {
+                actual.cancel()
+            } else {
+                actual.cancel(message = cancellationMessage)
             }
         }
     }

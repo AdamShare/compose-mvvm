@@ -22,9 +22,11 @@ fun SignInView(
     componentFactory: SignInComponent.Factory,
 ) {
     val viewModel = componentFactory.viewModel()
-    SignInView(
-        listener = viewModel,
-    )
+    viewModel.navigationController.Content {
+        SignInView(
+            listener = viewModel,
+        )
+    }
 }
 
 interface SignInViewListener {

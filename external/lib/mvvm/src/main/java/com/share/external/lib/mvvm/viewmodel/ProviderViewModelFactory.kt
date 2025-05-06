@@ -1,7 +1,6 @@
 package com.share.external.lib.mvvm.viewmodel
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
@@ -27,6 +26,13 @@ inline fun <reified VM : ViewModel> viewModel(
 @Composable
 inline fun <reified VM : ViewModel, C: Provider<VM>> (() -> C).viewModel(): VM = viewModel(
     factory = { invoke().get() }
+)
+
+@Composable
+inline fun <reified VM : ViewModel, C: Provider<VM> , T> ((T) -> C).viewModel(
+    crossinline dependency: () -> T
+): VM = viewModel(
+    factory = { invoke(dependency()).get() }
 )
 
 @Composable
