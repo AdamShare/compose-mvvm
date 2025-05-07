@@ -23,8 +23,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "Sample"
 
-include(":apps:dynamic:app")
-include(":apps:dynamic:feature:signin")
+include(":apps:sample:app")
+include(":apps:sample:feature:signin")
 include(":apps:subcomponent:app")
 include(":apps:subcomponent:feature:signin")
 include(":external:foundation:collections")
