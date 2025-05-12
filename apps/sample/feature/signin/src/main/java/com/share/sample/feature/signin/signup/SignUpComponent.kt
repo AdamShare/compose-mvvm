@@ -1,7 +1,8 @@
 package com.share.sample.feature.signin.signup
 
-import com.share.external.lib.mvvm.navigation.content.ComposableProvider
+import com.share.external.lib.mvvm.navigation.content.View
 import com.share.external.lib.mvvm.navigation.stack.NavigationStackEntry
+import com.share.external.lib.mvvm.navigation.stack.NavigationViewFactory
 import dagger.BindsInstance
 import dagger.Module
 import dagger.Provides
@@ -14,36 +15,40 @@ import javax.inject.Scope
 annotation class SignUpScope
 
 @SignUpScope
-@Subcomponent(modules = [SignUpModule::class])
+@Subcomponent(modules = [SignUpModule::class, SignUpViewModule::class])
 interface SignUpComponent {
     val view: SignUpView
 
+    class Scope(
+        actual: NavigationStackEntry<View>
+    ): NavigationStackEntry<View> by actual
+
+
     @Subcomponent.Factory
-    interface Factory {
-        operator fun invoke(@BindsInstance scope: SignUpNavigationStackEntry): SignUpComponent
+    abstract class Factory: NavigationViewFactory<View> {
+        override val analyticsId: String get() = "SignUp"
+
+        abstract fun create(@BindsInstance scope: Scope): SignUpComponent
+
+        override fun invoke(scope: NavigationStackEntry<View>): View {
+            return create(Scope(scope)).view
+        }
     }
 }
+
+fun SignUpComponent.Factory.view(
+    scope: NavigationStackEntry<View>
+) = create(SignUpComponent.Scope(scope)).view
 
 @Module
 object SignUpModule {
     @SignUpScope
     @Provides
     fun viewModel(
-        scope: SignUpNavigationStackEntry,
+        scope: SignUpComponent.Scope,
     ) = SignUpViewModel(
         scope,
     )
-
-    @SignUpScope
-    @Provides
-    fun view(
-        viewModel: SignUpViewModel,
-    ) = SignUpView(
-        viewModel = viewModel
-    )
 }
 
-class SignUpNavigationStackEntry(
-    actual: NavigationStackEntry<ComposableProvider>
-): NavigationStackEntry<ComposableProvider> by actual
 

@@ -7,7 +7,7 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import com.share.external.foundation.coroutines.MainImmediateScope
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
-import com.share.external.lib.mvvm.navigation.content.ComposableProvider
+import com.share.external.lib.mvvm.navigation.content.View
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
 import com.share.external.lib.mvvm.navigation.stack.ViewModelStoreContentProvider
 import kotlinx.coroutines.launch
@@ -30,7 +30,7 @@ class ScopedViewSwitcher<K : NavigationKey>(
     }
 
     @Composable
-    override fun Content(content: (K, ManagedCoroutineScope) -> ComposableProvider) {
+    override fun Content(content: (K, ManagedCoroutineScope) -> View) {
         val saveableStateHolder = rememberSaveableStateHolder()
 
         val selectedKey = selected
@@ -72,10 +72,10 @@ class ScopedViewSwitcher<K : NavigationKey>(
     }
 
     private class ViewScope<K>(
-        content: ComposableProvider,
+        content: View,
         val key: K,
         scope: ManagedCoroutineScope,
-    ): ViewModelStoreContentProvider<ComposableProvider>(
+    ): ViewModelStoreContentProvider<View>(
         content = content,
         scope = scope,
     )

@@ -17,13 +17,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.share.external.lib.mvvm.activity.calculateWindowSizeClass
 import com.share.external.lib.mvvm.activity.hasCompactSize
-import com.share.external.lib.mvvm.navigation.content.ComposableProvider
+import com.share.external.lib.mvvm.navigation.content.View
 import com.share.external.lib.mvvm.navigation.dialog.DialogProperties
-import com.share.external.lib.mvvm.navigation.content.DisplayMode
+import com.share.external.lib.mvvm.navigation.content.Presentation
+import dagger.Module
+import dagger.Provides
+
+@Module
+object SignUpViewModule {
+    @SignUpScope
+    @Provides
+    fun view(
+        viewModel: SignUpViewModel,
+    ) = SignUpView(
+        viewModel = viewModel
+    )
+}
 
 class SignUpView(
     private val viewModel: SignUpViewModel,
-): ComposableProvider {
+): View {
     @Composable
     override fun Content() {
         SignUpView(
@@ -32,11 +45,11 @@ class SignUpView(
     }
 
     @Composable
-    override fun displayMode(): DisplayMode {
+    override fun preferredPresentation(): Presentation {
         return if (calculateWindowSizeClass().hasCompactSize()) {
-            DisplayMode.FullScreen
+            Presentation.FullScreen
         } else {
-            DisplayMode.Overlay(
+            Presentation.Overlay(
                 properties = DialogProperties(
                     intrinsicHeight = true,
                     intrinsicWidth = true,

@@ -24,11 +24,16 @@ open class ViewModelNavigationStack<V>(
 ) : NavigationBackStack {
     private val providers = doublyLinkedMapOf<NavigationKey, ViewModelStoreContentProvider<V>>()
 
-    protected var stack: DoublyLinkedMap<NavigationKey, ViewModelStoreContentProvider<V>> by mutableStateOf(
+    var stack: DoublyLinkedMap<NavigationKey, ViewModelStoreContentProvider<V>> by mutableStateOf(
         value = providers,
         policy = neverEqualPolicy()
     )
         private set
+
+    fun rootContext(): NavigationStackScope<V> = NavigationStackContext(
+        scope = rootScope,
+        stack = this
+    )
 
     override val size: Int get() = providers.size
 
@@ -50,6 +55,9 @@ open class ViewModelNavigationStack<V>(
             )
             return
         }
+        if (providers.keys.lastOrNull() == key) {
+            return
+        }
         val previous = providers[key]
         providers[key] = ViewModelStoreContentProvider(
             content = content,
@@ -58,7 +66,7 @@ open class ViewModelNavigationStack<V>(
         updateState()
         previous?.cancel(
             awaitChildrenComplete = true,
-            message = "Pushed new content"
+            message = "Pushed new content for key: $key"
         )
 
         scope.invokeOnCompletion {

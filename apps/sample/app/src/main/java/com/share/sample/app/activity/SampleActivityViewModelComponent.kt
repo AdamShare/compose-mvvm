@@ -5,8 +5,8 @@ import com.share.external.lib.mvvm.activity.ActivityViewModelComponent
 import com.share.external.lib.mvvm.activity.ActivityViewModelComponentProvider
 import com.share.external.lib.mvvm.activity.ActivityViewModelCoroutineScope
 import com.share.external.lib.mvvm.application.ApplicationCoroutineScope
+import com.share.sample.feature.signin.OnboardingComponent
 import com.share.sample.feature.signin.SignInComponent
-import dagger.BindsInstance
 import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
@@ -25,8 +25,7 @@ interface SampleActivityViewModelComponent:
     ActivityViewModelComponent,
     ActivityComponentProvider<SampleActivityComponent.Factory>
 {
-    val navigationController: ActivityViewNavigationController
-    val signInComponentFactory: SignInComponent.Factory
+    val view: SampleActivityView
 
     @Subcomponent.Factory
     interface Factory: () -> SampleActivityViewModelComponent
@@ -45,7 +44,7 @@ interface SampleActivityViewModelComponent:
 @Module(
     subcomponents = [
         SampleActivityComponent::class,
-        SignInComponent::class
+        OnboardingComponent::class
     ]
 )
 object SampleActivityViewModelModule {
@@ -61,6 +60,16 @@ object SampleActivityViewModelModule {
         scope: ActivityViewModelCoroutineScope,
     ) = ActivityViewNavigationController(
         scope = scope,
+    )
+
+    @ActivityViewModelScope
+    @Provides
+    fun view(
+        onboarding: OnboardingComponent.Factory,
+        navigationController: ActivityViewNavigationController,
+    ) = SampleActivityView(
+        onboarding = onboarding,
+        navigationController = navigationController,
     )
 }
 

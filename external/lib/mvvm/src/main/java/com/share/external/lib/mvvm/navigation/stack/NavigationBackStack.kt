@@ -9,8 +9,7 @@ import com.share.external.lib.mvvm.navigation.content.NavigationKey
  * This is used to expose a limited interface to nested or delegated navigation stacks,
  * ensuring encapsulation by hiding forward navigation capabilities (e.g., push).
  *
- * All mutation functions are **idempotent** and safe to call repeatedly with the same inputs.
- * They must be invoked on the **main thread**.
+ * Must be invoked on the **main thread**.
  */
 @Stable
 interface NavigationBackStack {
