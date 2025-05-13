@@ -37,8 +37,7 @@ object SignUpViewModule {
 class SignUpView(
     private val viewModel: SignUpViewModel,
 ): View {
-    @Composable
-    override fun Content() {
+    override val content: @Composable () -> Unit = {
         SignUpView(
             listener = viewModel,
         )

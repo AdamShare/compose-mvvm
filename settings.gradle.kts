@@ -24,9 +24,9 @@ dependencyResolutionManagement {
 rootProject.name = "Sample"
 
 include(":apps:sample:app")
-include(":apps:sample:feature:signin")
+include(":apps:sample:feature:onboarding")
 include(":apps:subcomponent:app")
-include(":apps:subcomponent:feature:signin")
+include(":apps:subcomponent:feature:onboarding")
 include(":external:foundation:collections")
 include(":external:foundation:coroutines")
 include(":external:foundation:coroutines:test")

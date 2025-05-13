@@ -2,6 +2,8 @@ package com.share.external.lib.mvvm.navigation.stack
 
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
+import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScope
+import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScopeImpl
 
 /**
  * A navigation context bound to one entry inside the parent stack. Lets the
@@ -20,7 +22,7 @@ internal class NavigationStackEntryContext<V>(
     scope: ManagedCoroutineScope,
     private val stack: ViewModelNavigationStack<V>,
 ): NavigationStackContext<V>(
-    scope = scope,
+    scope = ViewLifecycleScopeImpl(scope),
     stack = stack
 ), NavigationStackEntry<V> {
     override fun remove() {

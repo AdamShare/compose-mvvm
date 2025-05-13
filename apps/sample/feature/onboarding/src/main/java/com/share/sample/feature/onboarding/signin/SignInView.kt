@@ -1,4 +1,4 @@
-package com.share.sample.feature.signin
+package com.share.sample.feature.onboarding.signin
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -46,9 +46,8 @@ class SignInView(
     SignInViewListener,
     SignInEmailTextFieldListener by emailViewModel,
     SignInEmailTextFieldState by emailViewModel {
-        
-    @Composable
-    override fun Content() {
+
+    override val content: @Composable () -> Unit = {
         SignInView(
             listener = this,
             state = this,

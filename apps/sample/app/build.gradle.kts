@@ -47,7 +47,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation(projects.apps.sample.feature.signin)
+    implementation(projects.apps.sample.feature.onboarding)
     implementation(projects.external.foundation.coroutines)
     implementation(projects.external.lib.mvvm)
 

@@ -7,9 +7,11 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import com.share.external.foundation.coroutines.MainImmediateScope
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
-import com.share.external.lib.mvvm.navigation.content.View
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
+import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScope
+import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScopeImpl
 import com.share.external.lib.mvvm.navigation.stack.ViewModelStoreContentProvider
+import com.share.external.lib.mvvm.navigation.stack.ViewModelStoreContentProviderImpl
 import kotlinx.coroutines.launch
 
 class ScopedViewSwitcher<K : NavigationKey>(
@@ -30,13 +32,13 @@ class ScopedViewSwitcher<K : NavigationKey>(
     }
 
     @Composable
-    override fun Content(content: (K, ManagedCoroutineScope) -> View) {
+    override fun Content(content: (K, ManagedCoroutineScope) -> @Composable () -> Unit) {
         val saveableStateHolder = rememberSaveableStateHolder()
 
         val selectedKey = selected
         if (selectedKey != null) {
             if (selectedKey != currentProvider?.key) {
-                val scope = scope.childManagedScope(selectedKey.analyticsId)
+                val scope = ViewLifecycleScopeImpl(scope.childManagedScope(selectedKey.analyticsId))
                 val previous = currentProvider
                 currentProvider = ViewScope(
                     content = content(selectedKey, scope),
@@ -58,7 +60,7 @@ class ScopedViewSwitcher<K : NavigationKey>(
 
         currentProvider?.apply {
             LocalOwnersProvider(saveableStateHolder) {
-                this.content.Content()
+                view()
             }
         }
     }
@@ -72,11 +74,11 @@ class ScopedViewSwitcher<K : NavigationKey>(
     }
 
     private class ViewScope<K>(
-        content: View,
+        content: @Composable () -> Unit,
         val key: K,
-        scope: ManagedCoroutineScope,
-    ): ViewModelStoreContentProvider<View>(
-        content = content,
+        scope: ViewLifecycleScopeImpl,
+    ): ViewModelStoreContentProviderImpl<@Composable () -> Unit>(
+        view = content,
         scope = scope,
     )
 }

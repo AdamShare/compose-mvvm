@@ -29,7 +29,7 @@ class SampleActivity : ViewModelComponentActivity<SampleActivityViewModelCompone
             CompositionLocalProvider(
                 LocalDecorViewProperties provides decorViewProperties(),
             ) {
-                viewModelComponent.view.Content()
+                viewModelComponent.view.content()
             }
         }
     }

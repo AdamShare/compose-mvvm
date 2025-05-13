@@ -7,16 +7,30 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.lifecycle.DefaultViewModelStoreOwner
 import com.share.external.lib.mvvm.navigation.lifecycle.LocalOwnersProvider
+import com.share.external.lib.mvvm.navigation.lifecycle.ObserveViewVisibility
+import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScope
+import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScopeImpl
+import com.share.external.lib.mvvm.navigation.lifecycle.ViewVisibilityObserver
+
+interface ViewModelStoreContentProvider<V>: ManagedCoroutineScope {
+    val view: V
+
+    @Composable
+    fun LocalOwnersProvider(
+        saveableStateHolder: SaveableStateHolder = rememberSaveableStateHolder(),
+        content: @Composable () -> Unit
+    )
+}
 
 /**
  * Bridges Compose owners (ViewModelStoreOwner, SaveableStateHolder, etc.) with
- * the actual [content] so every screen gets proper lifecycle ownership.
+ * the actual [view] so every screen gets proper lifecycle ownership.
  */
 @Immutable
-open class ViewModelStoreContentProvider<V>(
-    val content: V,
-    private val scope: ManagedCoroutineScope,
-): ManagedCoroutineScope by scope {
+internal open class ViewModelStoreContentProviderImpl<V>(
+    override val view: V,
+    private val scope: ViewLifecycleScopeImpl,
+): ViewModelStoreContentProvider<V>, ManagedCoroutineScope by scope {
     private val owner = DefaultViewModelStoreOwner()
 
     override fun cancel(awaitChildrenComplete: Boolean, message: String) {
@@ -28,10 +42,13 @@ open class ViewModelStoreContentProvider<V>(
     }
 
     @Composable
-    fun LocalOwnersProvider(
-        saveableStateHolder: SaveableStateHolder = rememberSaveableStateHolder(),
+    override fun LocalOwnersProvider(
+        saveableStateHolder: SaveableStateHolder,
         content: @Composable () -> Unit
     ) {
-        owner.LocalOwnersProvider(saveableStateHolder, content)
+        owner.LocalOwnersProvider(saveableStateHolder) {
+            scope.ObserveViewVisibility()
+            content()
+        }
     }
 }

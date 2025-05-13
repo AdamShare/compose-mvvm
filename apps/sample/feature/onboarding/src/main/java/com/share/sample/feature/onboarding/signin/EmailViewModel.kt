@@ -1,4 +1,4 @@
-package com.share.sample.feature.signin
+package com.share.sample.feature.onboarding.signin
 
 import com.css.android.compose.runtime.derivedStateObservingOf
 import com.css.android.compose.runtime.mutableStateObservingOf

@@ -21,7 +21,7 @@ fun <V : View> NavigationStackHost(
     var hasFullScreen = false
 
     for (provider in navigationStack.stack.values.asReversed()) {
-        val displayMode = provider.content.preferredPresentation()
+        val displayMode = provider.view.preferredPresentation()
         visibleProviders[provider] = displayMode
         if (displayMode == Presentation.FullScreen) {
             hasFullScreen = true
@@ -41,23 +41,23 @@ fun <V : View> NavigationStackHost(
 
     visibleProviders.keys.reversed().forEach { provider ->
         provider.LocalOwnersProvider(saveableStateHolder) {
-            when (val displayMode = provider.content.preferredPresentation()) {
+            when (val displayMode = provider.view.preferredPresentation()) {
                 Presentation.FullScreen -> {
-                    provider.content.Content()
+                    provider.view.content()
                 }
 
                 is Presentation.Overlay -> {
                     if (displayMode.properties != null) {
                         DialogContainer(
-                            onDismiss = ::removeAll,
+                            onDismiss = ::pop,
                             properties = displayMode.properties,
                             backgroundContent = null,
                             content = {
-                                provider.content.Content()
+                                provider.view.content()
                             }
                         )
                     } else {
-                        provider.content.Content()
+                        provider.view.content()
                     }
                 }
             }

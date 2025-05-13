@@ -1,13 +1,11 @@
-package com.share.sample.feature.signin
+package com.share.sample.feature.onboarding
 
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.View
-import com.share.sample.feature.Onboarding.OnboardingView
-import com.share.sample.feature.Onboarding.OnboardingViewModule
+import com.share.sample.feature.onboarding.signin.SignInComponent
 import dagger.BindsInstance
 import dagger.Module
 import dagger.Subcomponent
-import javax.inject.Qualifier
 import javax.inject.Scope
 
 @Scope

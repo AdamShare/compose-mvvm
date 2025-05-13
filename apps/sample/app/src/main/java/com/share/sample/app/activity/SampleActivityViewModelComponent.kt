@@ -5,8 +5,7 @@ import com.share.external.lib.mvvm.activity.ActivityViewModelComponent
 import com.share.external.lib.mvvm.activity.ActivityViewModelComponentProvider
 import com.share.external.lib.mvvm.activity.ActivityViewModelCoroutineScope
 import com.share.external.lib.mvvm.application.ApplicationCoroutineScope
-import com.share.sample.feature.signin.OnboardingComponent
-import com.share.sample.feature.signin.SignInComponent
+import com.share.sample.feature.onboarding.OnboardingComponent
 import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent

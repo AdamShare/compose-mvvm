@@ -1,4 +1,4 @@
-package com.share.sample.feature.signin
+package com.share.sample.feature.onboarding.signin
 
 import com.share.sample.feature.signin.signup.SignUpComponent
 import com.share.external.lib.mvvm.navigation.content.View

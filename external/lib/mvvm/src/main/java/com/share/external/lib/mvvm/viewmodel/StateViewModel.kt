@@ -2,8 +2,6 @@ package com.share.external.lib.mvvm.viewmodel
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.css.android.compose.runtime.LoggingStateChangeObserver
 import com.css.android.compose.runtime.StateChangeObserver
 import com.css.android.compose.runtime.collectAsStateObserving
@@ -15,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlin.properties.ReadOnlyProperty
 
@@ -28,7 +27,7 @@ import kotlin.properties.ReadOnlyProperty
  *
  * ### Key Features:
  * - Implements [StateChangeObserver] to hook into state change events.
- * - Automatically cancels [viewModelScope] when cleared.
+ * - Automatically cancels [scope] when cleared.
  * - Provides helpers for collecting [Flow] and [StateFlow] into Compose `State` with or without logging.
  *
  * ### Usage:
@@ -48,12 +47,11 @@ import kotlin.properties.ReadOnlyProperty
  *
  * Subclasses can override [onInitialValue] or [onValueChanged] to customize behavior.
  *
- * @property viewModelScope A lifecycle-scoped [CoroutineScope] used for flow collection and async tasks.
+ * @property scope A lifecycle-scoped [CoroutineScope] used for flow collection and async tasks.
  */
 open class StateViewModel(
-    viewModelScope: CoroutineScope,
-    vararg closeables: AutoCloseable
-) : ViewModel(viewModelScope, *closeables), LoggingStateChangeObserver {
+    val scope: CoroutineScope,
+): LoggingStateChangeObserver {
     private val loggingDispatcher = Dispatchers.IO.limitedParallelism(1)
 
     override fun onInitialValue(
@@ -62,7 +60,7 @@ open class StateViewModel(
         value: Any?,
         state: Map<String, Any?>,
     ) {
-        viewModelScope.launch(loggingDispatcher) {
+        scope.launch(loggingDispatcher) {
             super.onInitialValue(
                 instanceId = instanceId,
                 propertyName = propertyName,
@@ -78,7 +76,7 @@ open class StateViewModel(
         value: Any?,
         state: Map<String, Any?>,
     ) {
-        viewModelScope.launch(loggingDispatcher) {
+        scope.launch(loggingDispatcher) {
             super.onValueChanged(
                 instanceId = instanceId,
                 propertyName = propertyName,
@@ -88,57 +86,63 @@ open class StateViewModel(
         }
     }
 
+    override fun addCloseable(closeable: AutoCloseable) {
+        scope.coroutineContext.job.invokeOnCompletion {
+            closeable.close()
+        }
+    }
+
     fun <T : R, R> Flow<T>.collectAsState(initial: T): State<R> {
         return collectAsState(
             initial = initial,
-            coroutineScope = viewModelScope
+            coroutineScope = scope
         )
     }
 
     fun <T : R, R> Flow<T>.collectAsState(): State<R?> {
         return collectAsState(
             initial = null,
-            coroutineScope = viewModelScope
+            coroutineScope = scope
         )
     }
 
     fun <T : R, R> StateFlow<T>.collectAsState(): State<T> {
-        return collectAsState(coroutineScope = viewModelScope)
+        return collectAsState(coroutineScope = scope)
     }
 
     fun <T, R> StateFlow<T>.collectAsState(transform: (T) -> R): State<R> {
         return map(transform).collectAsState(
             initial = transform(value),
-            coroutineScope = viewModelScope
+            coroutineScope = scope
         )
     }
 
     fun <T : R, R> Flow<T>.collectAsStateObserving(initial: T): ReadOnlyProperty<StateChangeObserver, R> {
         return collectAsStateObserving(
             initial = initial,
-            coroutineScope = viewModelScope
+            coroutineScope = scope
         )
     }
 
     fun <T : R, R> Flow<T>.collectAsStateObserving(): ReadOnlyProperty<StateChangeObserver, R?> {
         return collectAsStateObserving(
             initial = null,
-            coroutineScope = viewModelScope
+            coroutineScope = scope
         )
     }
 
     fun <T : R, R> StateFlow<T>.collectAsStateObserving(): ReadOnlyProperty<StateChangeObserver, R> {
-        return collectAsStateObserving(coroutineScope = viewModelScope)
+        return collectAsStateObserving(coroutineScope = scope)
     }
 
     fun <T, R> StateFlow<T>.collectAsStateObserving(transform: (T) -> R): ReadOnlyProperty<StateChangeObserver, R> {
         return map(transform).collectAsStateObserving(
             initial = transform(value),
-            coroutineScope = viewModelScope
+            coroutineScope = scope
         )
     }
 
     fun <T> MutableStateFlow<T>.collectAsMutableState(): MutableState<T> {
-        return collectAsMutableState(coroutineScope = viewModelScope)
+        return collectAsMutableState(coroutineScope = scope)
     }
 }

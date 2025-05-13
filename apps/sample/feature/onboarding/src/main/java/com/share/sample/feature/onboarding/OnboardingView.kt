@@ -1,12 +1,10 @@
-package com.share.sample.feature.Onboarding
+package com.share.sample.feature.onboarding
 
 import androidx.compose.runtime.Composable
 import com.share.external.lib.mvvm.navigation.content.View
 import com.share.external.lib.mvvm.navigation.stack.NavigationStackHost
 import com.share.external.lib.mvvm.navigation.stack.ViewModelNavigationStack
-import com.share.sample.feature.signin.OnboardingComponent
-import com.share.sample.feature.signin.OnboardingScope
-import com.share.sample.feature.signin.SignInComponent
+import com.share.sample.feature.onboarding.signin.SignInComponent
 import dagger.Module
 import dagger.Provides
 
@@ -31,8 +29,7 @@ class OnboardingView(
             navigationStack.rootContext().push(signIn)
         }
 
-    @Composable
-    override fun Content() {
+    override val content: @Composable () -> Unit = {
         NavigationStackHost(
             analyticsId = "OnboardingNavigationStackHost",
             navigationStack = navigationStack,

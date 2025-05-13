@@ -4,18 +4,17 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.share.external.lib.mvvm.navigation.content.View
-import com.share.sample.feature.signin.OnboardingComponent
+import com.share.sample.feature.onboarding.OnboardingComponent
 
 class SampleActivityView(
     private val navigationController: ActivityViewNavigationController,
     private val onboarding: OnboardingComponent.Factory
 ): View {
-    @Composable
-    override fun Content() {
+    override val content = @Composable {
             navigationController.Content { route, scope ->
                 when (route) {
                     is ActivityViewRoute.LoggedIn -> {
-                        View {
+                         {
                             Text("Logged in as ${route.user}")
 
                             Button(onClick = {
@@ -29,7 +28,7 @@ class SampleActivityView(
                     ActivityViewRoute.LoggedOut -> {
                         onboarding(
                             scope = OnboardingComponent.Scope(scope)
-                        )
+                        ).content
                     }
                 }
             }

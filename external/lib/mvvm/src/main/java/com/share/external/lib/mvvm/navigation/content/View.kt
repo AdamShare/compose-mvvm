@@ -4,9 +4,8 @@ package com.share.external.lib.mvvm.navigation.content
 import androidx.compose.runtime.Composable
 import com.share.external.lib.mvvm.navigation.dialog.DialogProperties
 
-fun interface View {
-    @Composable
-    fun Content()
+interface View {
+    val content: @Composable () -> Unit
 
     @Composable
     fun preferredPresentation(): Presentation = Presentation.FullScreen
@@ -14,12 +13,9 @@ fun interface View {
 
 class OverlayView(
     dialogProperties: DialogProperties = DialogProperties(),
-    private val content: @Composable () -> Unit,
+    override val content: @Composable () -> Unit,
 ): View {
     private val presentation = Presentation.Overlay(dialogProperties)
     @Composable
     override fun preferredPresentation(): Presentation = presentation
-
-    @Composable
-    override fun Content() = content()
 }

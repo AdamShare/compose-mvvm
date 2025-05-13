@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.share.sample.feature.signin"
+    namespace = "com.share.sample.feature.onboarding"
     compileSdk = 35
 
     defaultConfig {

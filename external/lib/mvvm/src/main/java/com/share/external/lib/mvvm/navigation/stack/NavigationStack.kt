@@ -2,6 +2,8 @@ package com.share.external.lib.mvvm.navigation.stack
 
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
+import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScope
+import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScopeImpl
 
 /**
  * Entry‑level navigation API used by feature modules to display new screens.
@@ -9,7 +11,7 @@ import com.share.external.lib.mvvm.navigation.content.NavigationKey
  * @param V The type produced by the [content] factory, typically a
  *          `ComposableProvider` or another view abstraction.
  */
-interface NavigationStackScope<V>: NavigationBackStack, ManagedCoroutineScope {
+interface NavigationStackScope<V>: NavigationBackStack, ViewLifecycleScope {
     /** Pushes a new [NavigationKey] and returns the value produced by
      *  [content]. If the key already exists it is **replaced** and the old
      *  entry is cancelled after predictive‑back animations complete.
@@ -26,19 +28,17 @@ interface NavigationViewFactory<V>: (NavigationStackEntry<V>) -> V, NavigationKe
 internal open class NavigationStackContext<V>(
     private val scope: ManagedCoroutineScope,
     private val stack: ViewModelNavigationStack<V>,
-): ManagedCoroutineScope by scope, NavigationBackStack by stack, NavigationStackScope<V> {
+): ViewLifecycleScopeImpl(scope), NavigationBackStack by stack, NavigationStackScope<V> {
     override fun push(key: NavigationKey, content: (NavigationStackEntry<V>) -> V) {
-        val routeScope = scope.childManagedScope(key.analyticsId)
+        val context = NavigationStackEntryContext(
+            key = key,
+            scope = scope.childManagedScope(key.analyticsId),
+            stack = stack
+        )
         stack.push(
             key = key,
-            content = content(
-                NavigationStackEntryContext(
-                    key = key,
-                    scope = routeScope,
-                    stack = stack
-                )
-            ),
-            scope = routeScope
+            content = content(context),
+            scope = context
         )
     }
 }

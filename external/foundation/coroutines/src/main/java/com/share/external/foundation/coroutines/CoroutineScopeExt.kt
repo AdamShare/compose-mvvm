@@ -1,5 +1,6 @@
 package com.share.external.foundation.coroutines
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -81,7 +82,19 @@ private fun CoroutineScope.childScope(
     val childName = "$parentName->$name(${Integer.toHexString(System.identityHashCode(job))})"
 
     job.invokeOnCompletion { error ->
-        Timber.tag(TAG).d(error, "Child scope completed: %s", childName)
+        if (error is CancellationException) {
+            Timber.tag(TAG).d(
+                message = "Child scope completed: %s, cancellation: %S",
+                childName,
+                error.message
+            )
+        } else {
+            Timber.tag(TAG).d(
+                t = error,
+                message = "Child scope completed with error: %s",
+                childName,
+            )
+        }
     }
 
     return CoroutineScope(context + job + CoroutineName(childName))
