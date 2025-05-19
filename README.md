@@ -1,5 +1,6 @@
 WIP
 
+```
 [ Application Scope (Singleton Component) ]
 |
 v
@@ -22,4 +23,4 @@ v
 |
 v
 [ Composable A (reads View Scope A state) ]
-
+```
