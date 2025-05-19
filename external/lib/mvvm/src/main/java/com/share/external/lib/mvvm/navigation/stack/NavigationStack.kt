@@ -2,8 +2,8 @@ package com.share.external.lib.mvvm.navigation.stack
 
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
+import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycle
 import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScope
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScopeImpl
 
 /**
  * Entry‑level navigation API used by feature modules to display new screens.
@@ -11,7 +11,7 @@ import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScopeImpl
  * @param V The type produced by the [content] factory, typically a
  *          `ComposableProvider` or another view abstraction.
  */
-interface NavigationStackScope<V>: NavigationBackStack, ViewLifecycleScope {
+interface NavigationStackScope<V>: NavigationBackStack, ViewLifecycle, ManagedCoroutineScope {
     /** Pushes a new [NavigationKey] and returns the value produced by
      *  [content]. If the key already exists it is **replaced** and the old
      *  entry is cancelled after predictive‑back animations complete.
@@ -28,7 +28,7 @@ interface NavigationViewFactory<V>: (NavigationStackEntry<V>) -> V, NavigationKe
 internal open class NavigationStackContext<V>(
     private val scope: ManagedCoroutineScope,
     private val stack: ViewModelNavigationStack<V>,
-): ViewLifecycleScopeImpl(scope), NavigationBackStack by stack, NavigationStackScope<V> {
+): ViewLifecycleScope(scope), NavigationBackStack by stack, NavigationStackScope<V> {
     override fun push(key: NavigationKey, content: (NavigationStackEntry<V>) -> V) {
         val context = NavigationStackEntryContext(
             key = key,

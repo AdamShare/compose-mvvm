@@ -7,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 
 open class ViewModel(
     override val scope: CoroutineScope,
-) : ScopedStateProvider, LoggingStateChangeObserver {
+) : StateProvider, LoggingStateChangeObserver {
   constructor(
       name: String,
       scope: CoroutineScopeFactory,

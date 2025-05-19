@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlin.properties.ReadOnlyProperty
 
-interface ScopedStateProvider: CoroutineScopeProvider {
+interface StateProvider: CoroutineScopeProvider {
     fun <T : R, R> Flow<T>.collectAsState(initial: T): State<R> {
         return collectAsState(
             initial = initial,

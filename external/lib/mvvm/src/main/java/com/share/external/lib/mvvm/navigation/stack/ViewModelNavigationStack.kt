@@ -12,7 +12,6 @@ import com.share.external.foundation.coroutines.MainImmediateScope
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
 import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScope
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScopeImpl
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -54,7 +53,7 @@ open class ViewModelNavigationStack<V>(
         }
     }
 
-    internal fun push(key: NavigationKey, content: V, scope: ViewLifecycleScopeImpl) {
+    internal fun push(key: NavigationKey, content: V, scope: ViewLifecycleScope) {
         if (!rootScope.isActive || !scope.isActive) {
             Timber.tag(TAG).wtf(
                 "Scope is not active pushing $key, $content onto nav stack: $this"

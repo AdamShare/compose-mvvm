@@ -5,26 +5,30 @@ import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 
 /**
- * A coroutine scope tied to the logical lifecycle of a view within a navigation context.
+ * Interface representing a view's logical lifecycle, exposing [viewAppearanceEvents]
+ * to observe when a view becomes visible or hidden.
  *
- * - The scope survives activity recreation (e.g., due to rotation).
- * - It is cancelled only when the view is removed from the screen entirely or the app is backgrounded.
- * - Visibility changes are communicated via [viewAppearanceEvents].
+ * This is useful for triggering lifecycle-aware behavior at the view level,
+ * independent of activity or fragment lifecycle events.
  */
-interface ViewLifecycleScope : ManagedCoroutineScope {
+interface ViewLifecycle {
     val viewAppearanceEvents: ViewAppearanceEvents
 }
 
 /**
- * Default implementation of [ViewLifecycleScope], delegating coroutine management
- * to a provided [ManagedCoroutineScope] while managing view appearance events internally.
+ * Concrete implementation of [ViewLifecycle] that also acts as a [ManagedCoroutineScope].
+ *
+ * Provides a [viewAppearanceEvents] stream which emits visibility state of the view.
+ * Typically scoped to a navigation back stack entry or similar view-level construct.
+ *
+ * This scope continues across configuration/context changes and only cancels
+ * when the view is removed from the back stack or the app moves to the background.
  */
-internal open class ViewLifecycleScopeImpl(
+internal open class ViewLifecycleScope(
     actual: ManagedCoroutineScope,
-) : ViewLifecycleScope, ManagedCoroutineScope by actual {
+) : ViewLifecycle, ManagedCoroutineScope by actual {
     override val viewAppearanceEvents = ViewAppearanceEventsImpl()
 }
 

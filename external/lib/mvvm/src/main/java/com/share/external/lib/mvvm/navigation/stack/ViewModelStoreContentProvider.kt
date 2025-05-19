@@ -8,7 +8,7 @@ import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.lifecycle.DefaultViewModelStoreOwner
 import com.share.external.lib.mvvm.navigation.lifecycle.LocalOwnersProvider
 import com.share.external.lib.mvvm.navigation.lifecycle.ObserveViewVisibility
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScopeImpl
+import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScope
 
 interface ViewModelStoreContentProvider<V>: ManagedCoroutineScope {
     val view: V
@@ -27,7 +27,7 @@ interface ViewModelStoreContentProvider<V>: ManagedCoroutineScope {
 @Immutable
 internal open class ViewModelStoreContentProviderImpl<V>(
     override val view: V,
-    private val scope: ViewLifecycleScopeImpl,
+    private val scope: ViewLifecycleScope,
 ): ViewModelStoreContentProvider<V>, ManagedCoroutineScope by scope {
     private val owner = DefaultViewModelStoreOwner()
 
