@@ -32,6 +32,7 @@ class OnboardingView(
     override val content: @Composable () -> Unit = {
         NavigationStackHost(
             analyticsId = "OnboardingNavigationStackHost",
+            backHandlerEnabled = navigationStack.size > 1,
             navigationStack = navigationStack,
         ) { }
     }

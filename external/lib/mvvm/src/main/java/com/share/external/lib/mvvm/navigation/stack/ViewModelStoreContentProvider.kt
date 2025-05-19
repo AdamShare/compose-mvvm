@@ -8,9 +8,7 @@ import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.lifecycle.DefaultViewModelStoreOwner
 import com.share.external.lib.mvvm.navigation.lifecycle.LocalOwnersProvider
 import com.share.external.lib.mvvm.navigation.lifecycle.ObserveViewVisibility
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScope
 import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScopeImpl
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewVisibilityObserver
 
 interface ViewModelStoreContentProvider<V>: ManagedCoroutineScope {
     val view: V
@@ -47,7 +45,7 @@ internal open class ViewModelStoreContentProviderImpl<V>(
         content: @Composable () -> Unit
     ) {
         owner.LocalOwnersProvider(saveableStateHolder) {
-            scope.ObserveViewVisibility()
+            scope.viewAppearanceEvents.ObserveViewVisibility()
             content()
         }
     }

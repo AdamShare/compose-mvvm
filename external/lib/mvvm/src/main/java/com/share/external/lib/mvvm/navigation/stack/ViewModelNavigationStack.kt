@@ -37,9 +37,13 @@ open class ViewModelNavigationStack<V>(
         stack = this
     )
 
-    override val size: Int get() = providers.size
+    override val size: Int by derivedStateOf {
+        stack.size
+    }
 
-    protected val last by derivedStateOf { stack.values.lastOrNull() }
+    protected val last by derivedStateOf {
+        stack.values.lastOrNull()
+    }
 
     init {
         rootScope.invokeOnCompletion {

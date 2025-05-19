@@ -40,6 +40,9 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.timber)
     implementation(libs.androidx.runtime.android)
+    
+    implementation(projects.external.foundation.coroutines)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -1,4 +1,4 @@
-package com.css.android.compose.runtime
+package com.share.compose.runtime
 
 /**
  * Observes Compose snapshot state changes within a ViewModel or other lifecycle-aware owner.
@@ -13,16 +13,7 @@ package com.css.android.compose.runtime
  * and is automatically notified when properties delegate to helpers like [mutableStateObservingOf]
  * or [derivedStateObservingOf].
  */
-interface StateChangeObserver {
-
-    /**
-     * Registers a cleanup hook to be invoked when the observer lifecycle ends.
-     *
-     * This is typically used to remove the observer from internal caches when a ViewModel is cleared.
-     *
-     * @param closeable A handle that will be invoked exactly once on lifecycle disposal.
-     */
-    fun addCloseable(closeable: AutoCloseable)
+interface StateChangeObserver: com.share.external.foundation.coroutines.CloseableRegistry {
 
     /**
      * Called the first time a property's value is initialized and observed.

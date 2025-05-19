@@ -38,9 +38,9 @@ class DefaultViewModelStoreOwner :
     SavedStateRegistryOwner {
     private val defaultFactory by lazy {
         SavedStateViewModelFactory(
-            null,
-            this,
-            null,
+            application = null,
+            owner = this,
+            defaultArgs = null,
         )
     }
     internal val id = UUID.randomUUID().toString()

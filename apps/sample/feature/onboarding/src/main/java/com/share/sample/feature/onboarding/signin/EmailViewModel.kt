@@ -1,13 +1,14 @@
 package com.share.sample.feature.onboarding.signin
 
-import com.css.android.compose.runtime.derivedStateObservingOf
-import com.css.android.compose.runtime.mutableStateObservingOf
+import android.util.Patterns
+import com.share.compose.runtime.derivedStateObservingOf
+import com.share.compose.runtime.mutableStateObservingOf
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
-import com.share.external.lib.mvvm.viewmodel.ManagedViewModel
+import com.share.external.lib.mvvm.viewmodel.ViewModel
 
 class EmailViewModel(
     scope: ManagedCoroutineScope,
-): ManagedViewModel(
+): ViewModel(
     name = TAG,
     scope = scope
 ), SignInEmailTextFieldState, SignInEmailTextFieldListener {
@@ -16,7 +17,7 @@ class EmailViewModel(
 
     override val emailHasErrors by derivedStateObservingOf {
         if (email.isNotEmpty()) {
-            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+            !Patterns.EMAIL_ADDRESS.matcher(email).matches()
         } else {
             false
         }

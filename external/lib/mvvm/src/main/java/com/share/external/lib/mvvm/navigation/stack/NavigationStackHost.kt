@@ -13,6 +13,7 @@ import timber.log.Timber
 fun <V : View> NavigationStackHost(
     analyticsId: String,
     navigationStack: ViewModelNavigationStack<V>,
+    backHandlerEnabled: Boolean = true,
     defaultContent: @Composable () -> Unit,
 ) = navigationStack.run {
     val saveableStateHolder = rememberSaveableStateHolder()
@@ -33,7 +34,7 @@ fun <V : View> NavigationStackHost(
         defaultContent()
     }
 
-    if (visibleProviders.isNotEmpty()) {
+    if (backHandlerEnabled && visibleProviders.isNotEmpty()) {
         BackHandler {
             pop()
         }

@@ -1,5 +1,6 @@
-package com.css.android.compose.runtime
+package com.share.compose.runtime
 
+import com.share.external.foundation.coroutines.CloseableRegistry
 import timber.log.Timber
 
 /**
@@ -8,7 +9,7 @@ import timber.log.Timber
  * Logs include the instance identifier, property name, and full state snapshot on update.
  * This can be used for debugging or development-time introspection.
  */
-interface LoggingStateChangeObserver : StateChangeObserver {
+interface LoggingStateChangeObserver : StateChangeObserver, CloseableRegistry {
 
     override fun onInitialValue(instanceId: String, propertyName: String, value: Any?, state: Map<String, Any?>) {
         Timber.tag(TAG).v("%s(initialized: %s=%s)", instanceId, propertyName, value)
