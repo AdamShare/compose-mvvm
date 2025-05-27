@@ -7,11 +7,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
- * Interface representing a view's logical lifecycle, exposing [viewAppearanceEvents]
- * to observe when a view becomes visible or hidden.
+ * Interface representing a view's logical lifecycle, exposing [viewAppearanceEvents] to observe when a view becomes
+ * visible or hidden.
  *
- * This is useful for triggering lifecycle-aware behavior at the view level,
- * independent of activity or fragment lifecycle events.
+ * This is useful for triggering lifecycle-aware behavior at the view level, independent of activity or fragment
+ * lifecycle events.
  */
 interface ViewLifecycle {
     val viewAppearanceEvents: ViewAppearanceEvents
@@ -20,31 +20,28 @@ interface ViewLifecycle {
 /**
  * Concrete implementation of [ViewLifecycle] that also acts as a [ManagedCoroutineScope].
  *
- * Provides a [viewAppearanceEvents] stream which emits visibility state of the view.
- * Typically scoped to a navigation back stack entry or similar view-level construct.
+ * Provides a [viewAppearanceEvents] stream which emits visibility state of the view. Typically scoped to a navigation
+ * back stack entry or similar view-level construct.
  *
- * This scope continues across configuration/context changes and only cancels
- * when the view is removed from the back stack or the app moves to the background.
+ * This scope continues across configuration/context changes and only cancels when the view is removed from the back
+ * stack or the app moves to the background.
  */
-internal open class ViewLifecycleScope(
-    actual: ManagedCoroutineScope,
-) : ViewLifecycle, ManagedCoroutineScope by actual {
+internal open class ViewLifecycleScope(actual: ManagedCoroutineScope) : ViewLifecycle, ManagedCoroutineScope by actual {
     override val viewAppearanceEvents = ViewAppearanceEventsImpl()
 }
 
 /**
  * Concrete implementation of [ViewAppearanceEvents] backed by a [MutableStateFlow].
  *
- * Use [onVisible] and [onHidden] to control visibility state manually.
- * Emits true when the view is visible and false when hidden.
+ * Use [onVisible] and [onHidden] to control visibility state manually. Emits true when the view is visible and false
+ * when hidden.
  *
- * These states are not tied to activity lifecycle directly but represent view-level
- * visibility based on navigation state and app foreground/background events.
+ * These states are not tied to activity lifecycle directly but represent view-level visibility based on navigation
+ * state and app foreground/background events.
  */
 @OptIn(ExperimentalForInheritanceCoroutinesApi::class)
-internal class ViewAppearanceEventsImpl(
-    private val visibility: MutableStateFlow<Boolean> = MutableStateFlow(false)
-) : ViewAppearanceEvents, StateFlow<Boolean> by visibility {
+internal class ViewAppearanceEventsImpl(private val visibility: MutableStateFlow<Boolean> = MutableStateFlow(false)) :
+    ViewAppearanceEvents, StateFlow<Boolean> by visibility {
     fun onVisible() {
         visibility.value = true
     }
@@ -55,8 +52,8 @@ internal class ViewAppearanceEventsImpl(
 }
 
 /**
- * Composable that observes Compose view lifecycle and forwards visibility changes
- * to this [ViewAppearanceEventsImpl] instance.
+ * Composable that observes Compose view lifecycle and forwards visibility changes to this [ViewAppearanceEventsImpl]
+ * instance.
  *
  * Automatically calls [onVisible] and [onHidden] when the view is shown or hidden.
  *
@@ -64,8 +61,5 @@ internal class ViewAppearanceEventsImpl(
  */
 @Composable
 internal fun ViewAppearanceEventsImpl.ObserveViewVisibility() {
-    ViewVisibilityObserver(
-        onVisible = ::onVisible,
-        onHidden = ::onHidden
-    )
+    ViewVisibilityObserver(onVisible = ::onVisible, onHidden = ::onHidden)
 }

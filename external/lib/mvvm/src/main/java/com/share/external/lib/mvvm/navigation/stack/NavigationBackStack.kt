@@ -6,8 +6,8 @@ import com.share.external.lib.mvvm.navigation.content.NavigationKey
 /**
  * Contract for a minimal navigation back stack that supports only **backward navigation**.
  *
- * This is used to expose a limited interface to nested or delegated navigation stacks,
- * ensuring encapsulation by hiding forward navigation capabilities (e.g., push).
+ * This is used to expose a limited interface to nested or delegated navigation stacks, ensuring encapsulation by hiding
+ * forward navigation capabilities (e.g., push).
  *
  * Must be invoked on the **main thread**.
  */
@@ -24,8 +24,7 @@ interface NavigationBackStack {
     /**
      * Pops the top-most entry from the stack.
      *
-     * @return `true` if the stack was mutated (i.e., an element was removed),
-     *         `false` if the stack was already empty.
+     * @return `true` if the stack was mutated (i.e., an element was removed), `false` if the stack was already empty.
      */
     fun pop(): Boolean
 

@@ -13,8 +13,8 @@ internal object StateChangeObserverRegistry {
     private val registry = ConcurrentHashMap<StateChangeObserver, ObserverState>()
 
     /**
-     * Sentinel used to represent an uninitialized property within the registry.
-     * Useful for detecting first-time mutations.
+     * Sentinel used to represent an uninitialized property within the registry. Useful for detecting first-time
+     * mutations.
      */
     object UNINITIALIZED
 
@@ -34,19 +34,15 @@ internal object StateChangeObserverRegistry {
     /**
      * Records and dispatches a property value update for the given observer.
      *
-     * This will track the value in the registry and invoke either [StateChangeObserver.onInitialValue]
-     * or [StateChangeObserver.onValueChanged] depending on whether this property was previously observed.
+     * This will track the value in the registry and invoke either [StateChangeObserver.onInitialValue] or
+     * [StateChangeObserver.onValueChanged] depending on whether this property was previously observed.
      *
      * @param observer The registered observer instance.
      * @param instanceId The unique ID for the observing instance (typically class@hash).
      * @param propertyName The name of the property being updated.
      * @param value The new value to record.
      */
-    fun logUpdatedState(
-        observer: StateChangeObserver,
-        propertyName: String,
-        value: Any?
-    ) {
+    fun logUpdatedState(observer: StateChangeObserver, propertyName: String, value: Any?) {
         val state = registry.getOrPut(observer) { ObserverState(observer = observer) }
         val properties: Map<String, Any?>
         val isUpdate: Boolean
@@ -62,35 +58,27 @@ internal object StateChangeObserverRegistry {
                 instanceId = state.observerId,
                 propertyName = propertyName,
                 value = value,
-                state = properties
+                state = properties,
             )
         } else {
             observer.onInitialValue(
                 instanceId = state.observerId,
                 propertyName = propertyName,
                 value = value,
-                state = properties
+                state = properties,
             )
         }
     }
 
-    private data class ObserverState(
-        val observerId: String,
-        val properties: MutableMap<String, Any?>
-    ) {
-        constructor(observer: StateChangeObserver) : this(
-            observerId = observer.instanceId(),
-            properties = mutableMapOf()
-        )
+    private data class ObserverState(val observerId: String, val properties: MutableMap<String, Any?>) {
+        constructor(
+            observer: StateChangeObserver
+        ) : this(observerId = observer.instanceId(), properties = mutableMapOf())
     }
 }
 
-/**
- * Generates a string representation of an instance in the format `ClassName@HexIdentity`.
- */
+/** Generates a string representation of an instance in the format `ClassName@HexIdentity`. */
 fun Any.instanceId(): String = "${javaClass.simpleName}@${identityHexString()}"
 
-/**
- * Computes the identity-based hex string (same as Object.toString()).
- */
+/** Computes the identity-based hex string (same as Object.toString()). */
 fun Any.identityHexString(): String = Integer.toHexString(System.identityHashCode(this))

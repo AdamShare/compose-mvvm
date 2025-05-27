@@ -14,15 +14,11 @@ inline fun <reified T> Flow<T>.emit(vararg values: T) {
 }
 
 inline fun <reified T> Flow<T>.emitAll(flow: Flow<T>) {
-    coEvery { collect(any()) } coAnswers {
-        flow.collect(firstArg())
-    }
+    coEvery { collect(any()) } coAnswers { flow.collect(firstArg()) }
 }
 
 inline fun <reified T> StateFlow<T>.emitAll(stateFlow: Flow<T>) {
-    every { value } coAnswers {
-        stateFlow.first()
-    }
+    every { value } coAnswers { stateFlow.first() }
 
     emitAll(flow = stateFlow)
 }
@@ -32,11 +28,11 @@ inline fun <reified T> StateFlow<T>.emit(vararg values: T) {
 }
 
 inline fun <reified T : Any> MockKMatcherScope.anyResult(): Result<T> = Result.success(any())
-inline fun <reified T : Any> MockKMatcherScope.anyFailure(): Result<T> = Result.failure(any())
-inline fun <reified T : Any> MockKMatcherScope.captureSuccess(
-    lst: CapturingSlot<T>
-): Result<T> = Result.success(capture(lst))
 
-inline fun <reified T : Any, reified E : Throwable> MockKMatcherScope.captureFailure(
-    lst: CapturingSlot<E>
-): Result<T> = Result.failure(capture(lst))
+inline fun <reified T : Any> MockKMatcherScope.anyFailure(): Result<T> = Result.failure(any())
+
+inline fun <reified T : Any> MockKMatcherScope.captureSuccess(lst: CapturingSlot<T>): Result<T> =
+    Result.success(capture(lst))
+
+inline fun <reified T : Any, reified E : Throwable> MockKMatcherScope.captureFailure(lst: CapturingSlot<E>): Result<T> =
+    Result.failure(capture(lst))

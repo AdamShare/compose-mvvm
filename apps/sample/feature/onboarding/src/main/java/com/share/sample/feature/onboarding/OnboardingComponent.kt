@@ -8,22 +8,14 @@ import dagger.Module
 import dagger.Subcomponent
 import javax.inject.Scope
 
-@Scope
-@MustBeDocumented
-@Retention(value = AnnotationRetention.RUNTIME)
-annotation class OnboardingScope
+@Scope @MustBeDocumented @Retention(value = AnnotationRetention.RUNTIME) annotation class OnboardingScope
 
 @OnboardingScope
-@Subcomponent(modules = [
-    OnboardingModule::class,
-    OnboardingViewModule::class
-])
+@Subcomponent(modules = [OnboardingModule::class, OnboardingViewModule::class])
 interface OnboardingComponent {
     val view: OnboardingView
 
-    class Scope(
-        actual: ManagedCoroutineScope,
-    ): ManagedCoroutineScope by actual
+    class Scope(actual: ManagedCoroutineScope) : ManagedCoroutineScope by actual
 
     @Subcomponent.Factory
     abstract class Factory {
@@ -35,7 +27,4 @@ interface OnboardingComponent {
     }
 }
 
-@Module(
-    subcomponents = [SignInComponent::class]
-)
-object OnboardingModule
+@Module(subcomponents = [SignInComponent::class]) object OnboardingModule

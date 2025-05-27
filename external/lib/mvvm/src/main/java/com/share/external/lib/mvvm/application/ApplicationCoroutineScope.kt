@@ -5,6 +5,5 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
-class ApplicationCoroutineScope: CoroutineScope by CoroutineScope(
-    context = SupervisorJob() + Dispatchers.IO + CoroutineName("Application")
-)
+class ApplicationCoroutineScope :
+    CoroutineScope by CoroutineScope(context = SupervisorJob() + Dispatchers.IO + CoroutineName("Application"))

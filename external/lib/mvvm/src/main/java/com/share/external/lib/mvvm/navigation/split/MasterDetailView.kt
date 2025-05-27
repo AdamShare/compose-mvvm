@@ -40,7 +40,7 @@ fun MasterDetailView(
         trailingBackground,
         showDetail,
         master,
-        detail
+        detail,
     )
 }
 
@@ -68,12 +68,8 @@ fun MasterDetailView(
         showDetail = showDetail.value,
         enableBack = showDetail.value && !splitView,
         onClickBack = { showDetail.value = false },
-        master = {
-            master(showDetail)
-        },
-        detail = {
-            detail(showDetail)
-        }
+        master = { master(showDetail) },
+        detail = { detail(showDetail) },
     )
 }
 
@@ -98,31 +94,25 @@ fun MasterDetailView(
     if (splitView) {
         Row(modifier = modifier) {
             Box(
-                modifier = Modifier.background(leadBackground)
-                    .fillMaxWidth(maxWidthFraction)
-                    .fillMaxHeight(),
+                modifier = Modifier.background(leadBackground).fillMaxWidth(maxWidthFraction).fillMaxHeight(),
                 content = masterContent,
             )
             if (divider) {
                 VerticalDivider()
             }
-            Box(
-                modifier = Modifier.background(trailingBackground)
-                    .weight(1f)
-                    .fillMaxSize(),
-                content = detailContent,
-            )
+            Box(modifier = Modifier.background(trailingBackground).weight(1f).fillMaxSize(), content = detailContent)
         }
     } else {
         BackHandler(enableBack, onClickBack)
         Box(
-            modifier = modifier.background(
-                if (showDetail) {
-                    trailingBackground
-                } else {
-                    leadBackground
-                }
-            ),
+            modifier =
+                modifier.background(
+                    if (showDetail) {
+                        trailingBackground
+                    } else {
+                        leadBackground
+                    }
+                ),
             content = if (showDetail) detail else master,
         )
     }

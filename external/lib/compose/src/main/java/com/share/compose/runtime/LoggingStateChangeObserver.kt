@@ -6,8 +6,8 @@ import timber.log.Timber
 /**
  * Default implementation of [StateChangeObserver] that logs state changes using Timber.
  *
- * Logs include the instance identifier, property name, and full state snapshot on update.
- * This can be used for debugging or development-time introspection.
+ * Logs include the instance identifier, property name, and full state snapshot on update. This can be used for
+ * debugging or development-time introspection.
  */
 interface LoggingStateChangeObserver : StateChangeObserver, CloseableRegistry {
 

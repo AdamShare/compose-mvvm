@@ -1,5 +1,6 @@
 package com.share.external.lib.mvvm.navigation.stack
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,78 +17,50 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 /**
- * Concrete, mutable navigation stack. All public methods forward to
- * modifications on an internal [DoublyLinkedMap] and trigger Compose
- * recomposition via a snapshot state.
+ * Concrete, mutable navigation stack. All public methods forward to modifications on an internal [DoublyLinkedMap] and
+ * trigger Compose recomposition via a snapshot state.
  */
-open class ViewModelNavigationStack<V>(
-    private val rootScope: ManagedCoroutineScope,
-) : NavigationBackStack {
+@Stable
+open class ViewModelNavigationStack<V>(private val rootScope: ManagedCoroutineScope) : NavigationBackStack {
     private val providers = doublyLinkedMapOf<NavigationKey, ViewModelStoreContentProvider<V>>()
 
-    var stack: DoublyLinkedMap<NavigationKey, ViewModelStoreContentProvider<V>> by mutableStateOf(
-        value = providers,
-        policy = neverEqualPolicy()
-    )
+    var stack: DoublyLinkedMap<NavigationKey, ViewModelStoreContentProvider<V>> by
+        mutableStateOf(value = providers, policy = neverEqualPolicy())
         private set
 
-    fun rootContext(): NavigationStackScope<V> = NavigationStackContext(
-        scope = rootScope,
-        stack = this
-    )
+    fun rootContext(): NavigationStackScope<V> = NavigationStackContext(scope = rootScope, stack = this)
 
-    override val size: Int by derivedStateOf {
-        stack.size
-    }
+    override val size: Int by derivedStateOf { stack.size }
 
-    protected val last by derivedStateOf {
-        stack.values.lastOrNull()
-    }
+    protected val last by derivedStateOf { stack.values.lastOrNull() }
 
     init {
         rootScope.invokeOnCompletion {
             // Parent scope could complete off main thread.
-            MainImmediateScope().launch {
-                removeAll()
-            }
+            MainImmediateScope().launch { removeAll() }
         }
     }
 
     internal fun push(key: NavigationKey, content: V, scope: ViewLifecycleScope) {
         if (!rootScope.isActive || !scope.isActive) {
-            Timber.tag(TAG).wtf(
-                "Scope is not active pushing $key, $content onto nav stack: $this"
-            )
+            Timber.tag(TAG).wtf("Scope is not active pushing $key, $content onto nav stack: $this")
             return
         }
         if (providers.keys.lastOrNull() == key) {
             return
         }
         val previous = providers[key]
-        providers[key] = ViewModelStoreContentProviderImpl(
-            view = content,
-            scope = scope
-        )
+        providers[key] = ViewModelStoreContentProviderImpl(view = content, scope = scope)
         updateState()
-        previous?.cancel(
-            awaitChildrenComplete = true,
-            message = "Pushed new content for key: $key"
-        )
+        previous?.cancel(awaitChildrenComplete = true, message = "Pushed new content for key: $key")
 
-        scope.invokeOnCompletion {
-            MainImmediateScope().launch {
-                remove(key)
-            }
-        }
+        scope.invokeOnCompletion { MainImmediateScope().launch { remove(key) } }
     }
 
     override fun pop(): Boolean {
         return providers.removeLast()?.run {
             updateState()
-            cancel(
-                awaitChildrenComplete = true,
-                message = "Popped from back stack",
-            )
+            cancel(awaitChildrenComplete = true, message = "Popped from back stack")
         } != null
     }
 
@@ -98,7 +71,7 @@ open class ViewModelNavigationStack<V>(
             removed.asReversed().forEach {
                 it.cancel(
                     awaitChildrenComplete = true,
-                    message = "Popped from back stack to: $key inclusive: $inclusive"
+                    message = "Popped from back stack to: $key inclusive: $inclusive",
                 )
             }
             true
@@ -106,21 +79,13 @@ open class ViewModelNavigationStack<V>(
     }
 
     override fun removeAll() {
-        providers.keys.firstOrNull()?.let {
-            popTo(
-                key = it,
-                inclusive = true
-            )
-        }
+        providers.keys.firstOrNull()?.let { popTo(key = it, inclusive = true) }
     }
 
     override fun remove(key: NavigationKey) {
         providers.remove(key)?.run {
             updateState()
-            cancel(
-                awaitChildrenComplete = true,
-                message = "Removed from back stack"
-            )
+            cancel(awaitChildrenComplete = true, message = "Removed from back stack")
         }
     }
 
@@ -131,4 +96,27 @@ open class ViewModelNavigationStack<V>(
     companion object {
         const val TAG = "ViewModelNavigationStack"
     }
+}
+
+fun <V> Map<NavigationKey, ViewModelStoreContentProvider<V>>.logEntries(
+    analyticsId: String,
+    tag: String,
+    metadata: (ViewModelStoreContentProvider<V>) -> String? = { null },
+) {
+    Timber.tag(tag)
+        .d(
+            "%s",
+            object {
+                override fun toString(): String = buildString {
+                    append("Backstack $analyticsId[")
+                    entries.forEachIndexed { i, (key, provider) ->
+                        append("{${key.analyticsId}")
+                        metadata(provider)?.let { append(": $it") }
+                        append("}")
+                        if (i < size - 1) append(" ⇨ ")
+                    }
+                    append("]")
+                }
+            },
+        )
 }

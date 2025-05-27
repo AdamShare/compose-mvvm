@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-
 /**
  * Collects a [Flow] and exposes the latest emitted value as a Compose [State].
  *
@@ -26,35 +25,28 @@ import kotlinx.coroutines.launch
 fun <T : R, R> Flow<T>.collectAsState(
     initial: T,
     coroutineScope: CoroutineScope,
-    policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy()
+    policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy(),
 ): State<R> {
     val state = mutableStateOf(value = initial, policy = policy)
-    coroutineScope.launch {
-        collect { state.value = it }
-    }
+    coroutineScope.launch { collect { state.value = it } }
     return state
 }
 
 /**
  * Collects a [StateFlow] and exposes it as Compose [State], using [referentialEqualityPolicy].
  *
- * This is optimized for reference-based updates and avoids unnecessary recomposition when
- * the instance remains stable.
+ * This is optimized for reference-based updates and avoids unnecessary recomposition when the instance remains stable.
  *
  * @param coroutineScope The scope used to collect the flow.
  * @return A Compose [State] reflecting the current and future values of the [StateFlow].
  */
 fun <T> StateFlow<T>.collectAsState(coroutineScope: CoroutineScope): State<T> {
-    return collectAsState(
-        initial = value,
-        coroutineScope = coroutineScope,
-        policy = referentialEqualityPolicy()
-    )
+    return collectAsState(initial = value, coroutineScope = coroutineScope, policy = referentialEqualityPolicy())
 }
 
 /**
- * Binds a [MutableStateFlow] to a [MutableState] interface, enabling read/write interaction
- * in Compose-like patterns, including two-way bindings and `by` delegation.
+ * Binds a [MutableStateFlow] to a [MutableState] interface, enabling read/write interaction in Compose-like patterns,
+ * including two-way bindings and `by` delegation.
  *
  * Writes to this delegate will update the backing flow directly.
  *
@@ -62,25 +54,20 @@ fun <T> StateFlow<T>.collectAsState(coroutineScope: CoroutineScope): State<T> {
  * @return A [MutableState] that acts as a proxy to the [MutableStateFlow].
  */
 fun <T> MutableStateFlow<T>.collectAsMutableState(coroutineScope: CoroutineScope): MutableState<T> {
-    return MutableStateFlowState(
-        flow = this,
-        coroutineScope = coroutineScope
-    )
+    return MutableStateFlowState(flow = this, coroutineScope = coroutineScope)
 }
 
 /**
  * Internal proxy that adapts a [MutableStateFlow] to behave like a [MutableState].
  *
- * This provides seamless integration of flow-backed values into Compose-style `var` properties.
- * Changes to the delegate will write directly to the backing flow.
+ * This provides seamless integration of flow-backed values into Compose-style `var` properties. Changes to the delegate
+ * will write directly to the backing flow.
  *
  * @param flow The underlying [MutableStateFlow] to synchronize with.
  * @param coroutineScope The coroutine scope used to collect updates from the flow.
  */
-private class MutableStateFlowState<T>(
-    private val flow: MutableStateFlow<T>,
-    coroutineScope: CoroutineScope,
-) : MutableState<T> {
+private class MutableStateFlowState<T>(private val flow: MutableStateFlow<T>, coroutineScope: CoroutineScope) :
+    MutableState<T> {
 
     private val state: State<T> = flow.collectAsState(coroutineScope)
 

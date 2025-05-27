@@ -6,7 +6,5 @@ import javax.inject.Singleton
 
 @Module
 object ApplicationCoroutineScopeModule {
-    @Singleton
-    @Provides
-    fun applicationScope(): ApplicationCoroutineScope = ApplicationCoroutineScope()
+    @Singleton @Provides fun applicationScope(): ApplicationCoroutineScope = ApplicationCoroutineScope()
 }

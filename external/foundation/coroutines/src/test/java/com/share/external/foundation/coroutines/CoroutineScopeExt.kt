@@ -23,24 +23,12 @@ class CoroutineScopeExtTest {
         val scope = CoroutineScope(SupervisorJob() + CoroutineName("Parent"))
         val scope1 = scope.childSupervisorJobScope("Test Scope 1")
         val scope2 = scope1.childSupervisorJobScope("Test Scope 2")
-        assertEquals(
-            scope1.coroutineContext[CoroutineName.Key]?.name,
-            "Parent.Test Scope 1"
-        )
-        assertEquals(
-            scope2.coroutineContext[CoroutineName.Key]?.name,
-            "Parent.Test Scope 1.Test Scope 2"
-        )
+        assertEquals(scope1.coroutineContext[CoroutineName.Key]?.name, "Parent.Test Scope 1")
+        assertEquals(scope2.coroutineContext[CoroutineName.Key]?.name, "Parent.Test Scope 1.Test Scope 2")
 
-        val scope2LaunchJob = scope2.launch {
-            awaitCancellation()
-        }
-        val scope1LaunchJob = scope1.launch {
-            awaitCancellation()
-        }
-       val scopeLaunchJob = scope.launch {
-            awaitCancellation()
-        }
+        val scope2LaunchJob = scope2.launch { awaitCancellation() }
+        val scope1LaunchJob = scope1.launch { awaitCancellation() }
+        val scopeLaunchJob = scope.launch { awaitCancellation() }
 
         scope.cancel()
 
@@ -55,15 +43,9 @@ class CoroutineScopeExtTest {
         val scope1 = scope.childSupervisorJobScope("Test Scope 1")
         val scope2 = scope1.childSupervisorJobScope("Test Scope 2")
 
-        val scope2LaunchJob = scope2.launch {
-            awaitCancellation()
-        }
-        val scope1LaunchJob = scope1.launch {
-            awaitCancellation()
-        }
-        val scopeLaunchJob = scope.launch {
-            awaitCancellation()
-        }
+        val scope2LaunchJob = scope2.launch { awaitCancellation() }
+        val scope1LaunchJob = scope1.launch { awaitCancellation() }
+        val scopeLaunchJob = scope.launch { awaitCancellation() }
 
         scope2.cancel()
 
@@ -84,15 +66,9 @@ class CoroutineScopeExtTest {
         val scope1 = scope.childSupervisorJobScope("Test Scope 1")
         val scope2 = scope1.childSupervisorJobScope("Test Scope 2")
 
-        val scope2LaunchJob = scope2.launch {
-            awaitCancellation()
-        }
-        val scope1LaunchJob = scope1.launch {
-            awaitCancellation()
-        }
-        val scopeLaunchJob = scope.launch {
-            awaitCancellation()
-        }
+        val scope2LaunchJob = scope2.launch { awaitCancellation() }
+        val scope1LaunchJob = scope1.launch { awaitCancellation() }
+        val scopeLaunchJob = scope.launch { awaitCancellation() }
 
         scope1.cancel()
 

@@ -11,65 +11,41 @@ import dagger.Provides
 import dagger.Subcomponent
 import javax.inject.Scope
 
-@Scope
-@MustBeDocumented
-@Retention(value = AnnotationRetention.RUNTIME)
-annotation class ActivityViewModelScope
+@Scope @MustBeDocumented @Retention(value = AnnotationRetention.RUNTIME) annotation class ActivityViewModelScope
 
 @ActivityViewModelScope
-@Subcomponent(
-    modules = [SampleActivityViewModelModule::class]
-)
-interface SampleActivityViewModelComponent:
-    ActivityViewModelComponent,
-    ActivityComponentProvider<SampleActivityComponent.Factory>
-{
+@Subcomponent(modules = [SampleActivityViewModelModule::class])
+interface SampleActivityViewModelComponent :
+    ActivityViewModelComponent, ActivityComponentProvider<SampleActivityComponent.Factory> {
     val view: SampleActivityView
 
-    @Subcomponent.Factory
-    interface Factory: () -> SampleActivityViewModelComponent
+    @Subcomponent.Factory interface Factory : () -> SampleActivityViewModelComponent
 
     interface Application {
         val sampleActivityViewModelComponent: Factory
     }
 
-    interface Activity: ActivityViewModelComponentProvider<SampleActivityViewModelComponent> {
+    interface Activity : ActivityViewModelComponentProvider<SampleActivityViewModelComponent> {
         override fun buildViewModelComponent(): SampleActivityViewModelComponent {
             return (getApplication() as Application).sampleActivityViewModelComponent()
         }
     }
 }
 
-@Module(
-    subcomponents = [
-        SampleActivityComponent::class,
-        OnboardingComponent::class
-    ]
-)
+@Module(subcomponents = [SampleActivityComponent::class, OnboardingComponent::class])
 object SampleActivityViewModelModule {
     @ActivityViewModelScope
     @Provides
-    fun scope(
-        applicationCoroutineScope: ApplicationCoroutineScope
-    ) = ActivityViewModelCoroutineScope(applicationCoroutineScope)
+    fun scope(applicationCoroutineScope: ApplicationCoroutineScope) =
+        ActivityViewModelCoroutineScope(applicationCoroutineScope)
 
     @ActivityViewModelScope
     @Provides
-    fun pageNavigationController(
-        scope: ActivityViewModelCoroutineScope,
-    ) = ActivityViewNavigationController(
-        scope = scope,
-    )
+    fun pageNavigationController(scope: ActivityViewModelCoroutineScope) =
+        ActivityViewNavigationController(scope = scope)
 
     @ActivityViewModelScope
     @Provides
-    fun view(
-        onboarding: OnboardingComponent.Factory,
-        navigationController: ActivityViewNavigationController,
-    ) = SampleActivityView(
-        onboarding = onboarding,
-        navigationController = navigationController,
-    )
+    fun view(onboarding: OnboardingComponent.Factory, navigationController: ActivityViewNavigationController) =
+        SampleActivityView(onboarding = onboarding, navigationController = navigationController)
 }
-
-

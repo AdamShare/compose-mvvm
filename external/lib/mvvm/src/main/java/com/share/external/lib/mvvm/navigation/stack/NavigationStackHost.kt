@@ -4,112 +4,93 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import com.share.external.lib.mvvm.navigation.content.View
-import com.share.external.lib.mvvm.navigation.content.Presentation
-import com.share.external.lib.mvvm.navigation.content.NavigationKey
-import com.share.external.lib.mvvm.navigation.dialog.DialogContainer
-import timber.log.Timber
+import com.share.external.lib.mvvm.navigation.content.ViewPresentation
+import com.share.external.lib.mvvm.navigation.modal.ModalContainer
+import com.share.external.lib.mvvm.navigation.modal.ModalProperties
 
 /**
- * Hosts a navigation stack of [View]s and renders the appropriate content based on their [Presentation] mode.
+ * Hosts a navigation stack of [View]s and renders the appropriate content based on their [ViewPresentation.Style].
  *
- * This composable is responsible for rendering a stack of views managed by a [ViewModelNavigationStack].
- * Each view is associated with a [ViewModelStoreContentProvider], which controls the view’s lifecycle and
- * presentation. Views can be presented in either full screen or overlay mode.
+ * This composable observes a [ViewModelNavigationStack] and renders at most one full-screen view and one modal view at
+ * any given time. Views are presented in order from the top of the stack (i.e., most recently pushed) and updated
+ * automatically as the stack changes.
  *
- * Behavior:
- * - Renders all currently visible views in the stack in reverse order (i.e., top of the stack is drawn last).
- * - Displays a [defaultContent] composable underneath the stack if no full-screen content is present.
- * - Handles back navigation using [BackHandler], popping the stack if [backHandlerEnabled] is true and the stack is not empty.
- * - Uses [rememberSaveableStateHolder] to preserve state across recompositions for each view.
- * - Supports overlay presentation via [DialogContainer] if the view prefers an overlay presentation mode with dialog properties.
+ * ### Behavior
+ * - Renders the first view in the stack marked as [ViewPresentation.Style.FullScreen].
+ * - Renders the first view in the stack marked as [ViewPresentation.Style.Modal], **if it appears before** the
+ *   full-screen view. Modal content is layered above the full-screen or [defaultContent].
+ * - If no full-screen view is found, [defaultContent] is displayed.
+ * - Supports modal presentation with layout and interaction behavior defined via [ModalProperties].
+ * - Handles system back navigation via [BackHandler] when [backHandlerEnabled] is true.
+ * - Preserves state across recompositions for all rendered views using [rememberSaveableStateHolder].
+ * - Logs view appearance state changes using [analyticsId] for debugging or analytics purposes.
  *
- * @param analyticsId A string identifier used to log changes to the visible backstack.
- * @param navigationStack The stack of views to render, maintained via a [ViewModelNavigationStack].
- * @param backHandlerEnabled Enables hardware/system back button support for stack popping if true.
- * @param defaultContent Composable content shown underneath the view stack if no full-screen views are present.
- *
+ * @param analyticsId A string identifier used to log changes to the visible back stack.
+ * @param navigationStack The stack of views to render, maintained via [ViewModelNavigationStack].
+ * @param backHandlerEnabled Enables system back button support to pop the stack when true.
+ * @param defaultContent Composable content shown when no full-screen view is present.
  * @see View
- * @see Presentation
- * @see DialogContainer
+ * @see ViewPresentation
+ * @see ModalContainer
  * @see ViewModelNavigationStack
  * @see ViewModelStoreContentProvider
  */
 @Composable
-fun <V : View> NavigationStackHost(
+fun <V> NavigationStackHost(
     analyticsId: String,
     navigationStack: ViewModelNavigationStack<V>,
     backHandlerEnabled: Boolean = true,
     defaultContent: @Composable () -> Unit,
-) = navigationStack.run {
-    val saveableStateHolder = rememberSaveableStateHolder()
+) where V : View, V : ViewPresentation {
+    navigationStack.run {
+        val saveableStateHolder = rememberSaveableStateHolder()
 
-    val visibleProviders = mutableMapOf<ViewModelStoreContentProvider<V>, Presentation>()
-    var hasFullScreen = false
+        var fullScreen: ViewModelStoreContentProvider<V>? = null
+        var modal: ViewModelStoreContentProvider<V>? = null
+        var properties: ModalProperties? = null
 
-    for (provider in navigationStack.stack.values.asReversed()) {
-        val displayMode = provider.view.preferredPresentation()
-        visibleProviders[provider] = displayMode
-        if (displayMode == Presentation.FullScreen) {
-            hasFullScreen = true
-            break
-        }
-    }
-
-    if (!hasFullScreen) {
-        defaultContent()
-    }
-
-    if (backHandlerEnabled && visibleProviders.isNotEmpty()) {
-        BackHandler {
-            pop()
-        }
-    }
-
-    visibleProviders.keys.reversed().forEach { provider ->
-        provider.LocalOwnersProvider(saveableStateHolder) {
-            when (val displayMode = provider.view.preferredPresentation()) {
-                Presentation.FullScreen -> {
-                    provider.view.content()
+        for (provider in navigationStack.stack.values.asReversed()) {
+            when (val displayMode = provider.view.preferredPresentationStyle()) {
+                ViewPresentation.Style.FullScreen -> {
+                    fullScreen = provider
+                    break
                 }
-
-                is Presentation.Overlay -> {
-                    if (displayMode.properties != null) {
-                        DialogContainer(
-                            onDismiss = ::pop,
-                            properties = displayMode.properties,
-                            backgroundContent = null,
-                            content = {
-                                provider.view.content()
-                            }
-                        )
-                    } else {
-                        provider.view.content()
+                is ViewPresentation.Style.Modal -> {
+                    if (modal == null) {
+                        modal = provider
+                        properties = displayMode.properties
                     }
                 }
             }
         }
-    }
 
-    logBackstack(analyticsId, stack, visibleProviders)
-}
-
-private fun <V> logBackstack(
-    analyticsId: String,
-    backstack: Map<NavigationKey, ViewModelStoreContentProvider<V>>,
-    rendered: Map<ViewModelStoreContentProvider<V>, Presentation>,
-) {
-    Timber.tag(TAG).d("%s", object {
-        override fun toString(): String = buildString {
-            append("Backstack $analyticsId[")
-            backstack.entries.forEachIndexed { i, (key, provider) ->
-                append("{${key.analyticsId}")
-                rendered[provider]?.let { append(": ${it.javaClass.simpleName}") }
-                append("}")
-                if (i < backstack.size - 1) append(" ⇨ ")
-            }
-            append("]")
+        if (backHandlerEnabled && (fullScreen ?: modal) != null) {
+            BackHandler(onBack = ::pop)
         }
-    })
+
+        fullScreen?.run { LocalOwnersProvider(saveableStateHolder = saveableStateHolder, content = view.content) }
+            ?: defaultContent()
+
+        modal?.run {
+            LocalOwnersProvider(
+                saveableStateHolder = saveableStateHolder,
+                content =
+                    if (properties != null) {
+                        { ModalContainer(onDismiss = ::pop, properties = properties, content = view.content) }
+                    } else {
+                        view.content
+                    },
+            )
+        }
+
+        stack.logEntries(analyticsId = analyticsId, tag = TAG) {
+            if (fullScreen == it) {
+                "FullScreen"
+            } else if (modal == it) {
+                "Modal"
+            } else null
+        }
+    }
 }
 
 private const val TAG = "NavigationStackHost"

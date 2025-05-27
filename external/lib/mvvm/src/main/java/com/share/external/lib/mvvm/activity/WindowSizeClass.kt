@@ -14,23 +14,15 @@ fun calculateWindowSizeClass(): WindowSizeClass {
 }
 
 enum class WindowSizeClassMin {
-    /**
-     * [WindowSizeClass] has [WindowHeightSizeClass.Compact] or [WindowWidthSizeClass.Compact].
-     */
+    /** [WindowSizeClass] has [WindowHeightSizeClass.Compact] or [WindowWidthSizeClass.Compact]. */
     Compact,
-    /**
-     * [WindowSizeClass] has [WindowHeightSizeClass.Medium] or [WindowWidthSizeClass.Medium].
-     */
+    /** [WindowSizeClass] has [WindowHeightSizeClass.Medium] or [WindowWidthSizeClass.Medium]. */
     Medium,
-    /**
-     * [WindowSizeClass] has [WindowHeightSizeClass.Expanded] or [WindowWidthSizeClass.Expanded].
-     */
-    Expanded
+    /** [WindowSizeClass] has [WindowHeightSizeClass.Expanded] or [WindowWidthSizeClass.Expanded]. */
+    Expanded,
 }
 
-/**
- * Width or height is a compact size.
- */
+/** Width or height is a compact size. */
 fun WindowSizeClass.hasCompactSize(): Boolean {
     return min() == WindowSizeClassMin.Compact
 }

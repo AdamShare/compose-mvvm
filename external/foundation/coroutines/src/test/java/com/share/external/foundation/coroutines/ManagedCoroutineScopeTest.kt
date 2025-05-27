@@ -16,9 +16,7 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ManagedCoroutineScopeTest {
-    /**
-     * 1) Child is active if the parent is active, but becomes inactive when the parent cancels immediately.
-     */
+    /** 1) Child is active if the parent is active, but becomes inactive when the parent cancels immediately. */
     @Test
     fun `childManagedScope active if parent is active`() = runTest {
         // Use backgroundScope as the underlying scope
@@ -31,9 +29,7 @@ class ManagedCoroutineScopeTest {
         val childWorkScope = child.create("ChildWork")
 
         // Launch a coroutine that awaits cancellation (so it stays active until cancelled)
-        val job = childWorkScope.launch {
-            awaitCancellation()
-        }
+        val job = childWorkScope.launch { awaitCancellation() }
 
         // Initially, they're all active
         assertTrue("Expected parent to be active", parent.isActive)
@@ -54,9 +50,7 @@ class ManagedCoroutineScopeTest {
         assertFalse("Job should be cancelled", job.isActive)
     }
 
-    /**
-     * 2) If the parent is already inactive at creation time, the child is immediately cancelled.
-     */
+    /** 2) If the parent is already inactive at creation time, the child is immediately cancelled. */
     @Test
     fun `childManagedScope is cancelled if parent is already inactive`() = runTest {
         val parent = ManagedCoroutineScope(backgroundScope)
@@ -73,10 +67,7 @@ class ManagedCoroutineScopeTest {
         assertFalse("ChildWork scope is also inactive", childWorkScope.isActive)
     }
 
-    /**
-     * 3) cancel with awaitChildrenComplete = true defers the parent's cancellation
-     * until all children complete.
-     */
+    /** 3) cancel with awaitChildrenComplete = true defers the parent's cancellation until all children complete. */
     @Test
     fun `cancel awaits children completion`() = runTest {
         val dispatcher = StandardTestDispatcher(testScheduler)
@@ -87,10 +78,11 @@ class ManagedCoroutineScopeTest {
 
         // Launch a job that takes some simulated time
         var didFinish = false
-        val job = childWorkScope.launch {
-            delay(2)
-            didFinish = true
-        }
+        val job =
+            childWorkScope.launch {
+                delay(2)
+                didFinish = true
+            }
 
         // Now request parent cancellation but wait for children
         parent.cancel(awaitChildrenComplete = true, message = "Awaiting child")
@@ -121,8 +113,8 @@ class ManagedCoroutineScopeTest {
     }
 
     /**
-     * 4) Multiple children with staggered completion. The parent defers its own cancellation
-     * until all children explicitly cancel or complete their jobs.
+     * 4) Multiple children with staggered completion. The parent defers its own cancellation until all children
+     *    explicitly cancel or complete their jobs.
      */
     @Test
     fun `multiple children with staggered completion`() = runTest {
@@ -142,11 +134,11 @@ class ManagedCoroutineScopeTest {
         var fastDone = false
         var slowDone = false
         fastWork.launch {
-            delay(2)      // some small "work"
+            delay(2) // some small "work"
             fastDone = true
         }
         slowWork.launch {
-            delay(5)      // a slightly longer "work"
+            delay(5) // a slightly longer "work"
             slowDone = true
         }
 
@@ -186,8 +178,8 @@ class ManagedCoroutineScopeTest {
     }
 
     /**
-     * 5) Subsequent cancel calls can do an immediate cancel only if we're not already
-     * locked into "await children" mode and haven't fully cancelled yet.
+     * 5) Subsequent cancel calls can do an immediate cancel only if we're not already locked into "await children" mode
+     *    and haven't fully cancelled yet.
      */
     @Test
     fun `subsequent cancel calls do not override 'awaitChildrenComplete' if still waiting`() = runTest {
@@ -212,7 +204,7 @@ class ManagedCoroutineScopeTest {
         // Because the parent is already waiting, this second call does nothing
         assertTrue(
             "Parent remains active, ignoring the second call, because it was already awaiting children",
-            parent.isActive
+            parent.isActive,
         )
         assertTrue("Child is still active", child.isActive)
 

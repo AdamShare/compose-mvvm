@@ -1,5 +1,8 @@
 package com.share.external.foundation.coroutines.test
 
+import java.util.concurrent.atomic.AtomicInteger
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filter
@@ -7,13 +10,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.withTimeoutOrNull
-import java.util.concurrent.atomic.AtomicInteger
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 
-class TestFlow<T>(
-    private val actual: MutableStateFlow<List<T>>,
-) : MutableStateFlow<List<T>> by actual {
+class TestFlow<T>(private val actual: MutableStateFlow<List<T>>) : MutableStateFlow<List<T>> by actual {
     private val current = AtomicInteger(0)
 
     suspend fun hasNext(timeout: Duration = 100.milliseconds): Boolean {
@@ -36,28 +34,16 @@ class TestFlow<T>(
 
     suspend fun next(): Event<T> {
         val index = current.incrementAndGet() - 1
-        return Event(
-            index = index,
-            value = get(index)
-        )
+        return Event(index = index, value = get(index))
     }
 
     suspend fun get(index: Int): T = first { it.size > index }[index]
 
-    data class Event<T>(
-        val index: Int,
-        val value: T,
-    )
+    data class Event<T>(val index: Int, val value: T)
 }
 
-fun <T> Flow<T>.test(
-    testScope: TestScope,
-): TestFlow<T> {
+fun <T> Flow<T>.test(testScope: TestScope): TestFlow<T> {
     val flow = MutableStateFlow<List<T>>(listOf())
-    testScope.backgroundScope.launch {
-        collect {
-            flow.value += it
-        }
-    }
+    testScope.backgroundScope.launch { collect { flow.value += it } }
     return TestFlow(flow)
 }

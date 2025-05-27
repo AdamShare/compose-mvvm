@@ -6,29 +6,28 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.CompositionLocalProvider
 import com.share.external.lib.mvvm.activity.ActivityComponentInject
 import com.share.external.lib.mvvm.activity.ViewModelComponentActivity
-import com.share.external.lib.mvvm.navigation.dialog.LocalDecorViewProperties
-import com.share.external.lib.mvvm.navigation.dialog.decorViewProperties
+import com.share.external.lib.mvvm.navigation.modal.LocalDecorViewProperties
+import com.share.external.lib.mvvm.navigation.modal.decorViewProperties
 
-interface SampleActivityComponentInject: ActivityComponentInject<
+interface SampleActivityComponentInject :
+    ActivityComponentInject<
         SampleActivity,
         SampleActivityComponent,
         SampleActivityComponent.Factory,
-        SampleActivityViewModelComponent
-        >
+        SampleActivityViewModelComponent,
+    >
 
-class SampleActivity : ViewModelComponentActivity<SampleActivityViewModelComponent>(),
+class SampleActivity :
+    ViewModelComponentActivity<SampleActivityViewModelComponent>(),
     SampleActivityComponentInject,
-    SampleActivityViewModelComponent.Activity
-{
+    SampleActivityViewModelComponent.Activity {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         inject()
         enableEdgeToEdge()
         setContent {
-            CompositionLocalProvider(
-                LocalDecorViewProperties provides decorViewProperties(),
-            ) {
+            CompositionLocalProvider(LocalDecorViewProperties provides decorViewProperties()) {
                 viewModelComponent.view.content()
             }
         }

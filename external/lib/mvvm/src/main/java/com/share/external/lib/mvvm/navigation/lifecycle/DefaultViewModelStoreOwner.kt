@@ -32,16 +32,9 @@ import java.lang.ref.WeakReference
 import java.util.UUID
 
 @Immutable
-class DefaultViewModelStoreOwner :
-    ViewModelStoreOwner,
-    HasDefaultViewModelProviderFactory,
-    SavedStateRegistryOwner {
+class DefaultViewModelStoreOwner : ViewModelStoreOwner, HasDefaultViewModelProviderFactory, SavedStateRegistryOwner {
     private val defaultFactory by lazy {
-        SavedStateViewModelFactory(
-            application = null,
-            owner = this,
-            defaultArgs = null,
-        )
+        SavedStateViewModelFactory(application = null, owner = this, defaultArgs = null)
     }
     internal val id = UUID.randomUUID().toString()
     private val lifecycleRegistry = LifecycleRegistry(this)
@@ -50,6 +43,7 @@ class DefaultViewModelStoreOwner :
     override val lifecycle: Lifecycle = lifecycleRegistry
     override val savedStateRegistry: SavedStateRegistry
         get() = savedStateRegistryController.savedStateRegistry
+
     override val defaultViewModelProviderFactory: ViewModelProvider.Factory = defaultFactory
     override val defaultViewModelCreationExtras: CreationExtras
         get() {
@@ -80,39 +74,31 @@ class DefaultViewModelStoreOwner :
     }
 }
 
-/**
- * Provides scoping to compose for [DefaultViewModelStoreOwner]
- */
+/** Provides scoping to compose for [DefaultViewModelStoreOwner] */
 @Composable
 fun DefaultViewModelStoreOwner.LocalOwnersProvider(
     saveableStateHolder: SaveableStateHolder = rememberSaveableStateHolder(),
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     key(id) {
         val currentLifecycleOwner = LocalLifecycleOwner.current
         DisposableEffect(this, currentLifecycleOwner) {
-            val observer = LifecycleEventObserver { _, event ->
-                onParentStateChange(event.targetState)
-            }
+            val observer = LifecycleEventObserver { _, event -> onParentStateChange(event.targetState) }
             currentLifecycleOwner.lifecycle.addObserver(observer)
-            onDispose {
-                currentLifecycleOwner.lifecycle.removeObserver(observer)
-            }
+            onDispose { currentLifecycleOwner.lifecycle.removeObserver(observer) }
         }
 
         CompositionLocalProvider(
             LocalViewModelStoreOwner provides this,
             LocalLifecycleOwner provides this,
-            LocalSavedStateRegistryOwner provides this
+            LocalSavedStateRegistryOwner provides this,
         ) {
             saveableStateHolder.SaveableStateProvider(content)
         }
     }
 }
 
-/**
- * Logic copied from androidx navigation
- */
+/** Logic copied from androidx navigation */
 @Composable
 private fun SaveableStateHolder.SaveableStateProvider(content: @Composable () -> Unit) {
     val viewModel = androidx.lifecycle.viewmodel.compose.viewModel<BackStackEntryIdViewModel>()
@@ -125,9 +111,7 @@ private fun SaveableStateHolder.SaveableStateProvider(content: @Composable () ->
     SaveableStateProvider(viewModel.id, content)
 }
 
-/**
- * Logic copied from androidx navigation
- */
+/** Logic copied from androidx navigation */
 internal class BackStackEntryIdViewModel(handle: SavedStateHandle) : ViewModel() {
     private val idKey = "SaveableStateHolder_BackStackEntryKey"
 

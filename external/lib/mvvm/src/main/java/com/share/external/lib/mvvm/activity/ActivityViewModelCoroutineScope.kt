@@ -5,12 +5,7 @@ import com.share.external.foundation.coroutines.childSupervisorJobScope
 import com.share.external.lib.mvvm.application.ApplicationCoroutineScope
 import kotlinx.coroutines.Dispatchers
 
-open class ActivityViewModelCoroutineScope(
-    parent: ApplicationCoroutineScope,
-    name: String = "ActivityViewModel",
-): ManagedCoroutineScope by ManagedCoroutineScope(
-    parent.childSupervisorJobScope(
-        name = name,
-        context = Dispatchers.IO
+open class ActivityViewModelCoroutineScope(parent: ApplicationCoroutineScope, name: String = "ActivityViewModel") :
+    ManagedCoroutineScope by ManagedCoroutineScope(
+        parent.childSupervisorJobScope(name = name, context = Dispatchers.IO)
     )
-)

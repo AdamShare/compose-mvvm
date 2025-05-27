@@ -4,14 +4,12 @@ import android.app.Application
 import com.share.external.lib.mvvm.application.ApplicationCoroutineScope
 import com.share.external.lib.mvvm.application.inject
 import com.share.sample.app.activity.SampleActivityViewModelComponent
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
-class SampleApplication: Application(), SampleActivityViewModelComponent.Application {
-    @Inject
-    lateinit var applicationCoroutineScope: ApplicationCoroutineScope
-    @Inject
-    override lateinit var sampleActivityViewModelComponent: SampleActivityViewModelComponent.Factory
+class SampleApplication : Application(), SampleActivityViewModelComponent.Application {
+    @Inject lateinit var applicationCoroutineScope: ApplicationCoroutineScope
+    @Inject override lateinit var sampleActivityViewModelComponent: SampleActivityViewModelComponent.Factory
 
     override fun onCreate() {
         super.onCreate()

@@ -7,6 +7,5 @@ import dagger.Provides
 
 @Module
 object ComponentActivityModule {
-    @Provides
-    fun activity(activity: ComponentActivity): Activity = activity
+    @Provides fun activity(activity: ComponentActivity): Activity = activity
 }

@@ -1,4 +1,4 @@
-package com.share.sample.feature.signin.signup
+package com.share.sample.feature.onboarding.signin.signup
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,43 +17,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.share.external.lib.mvvm.activity.calculateWindowSizeClass
 import com.share.external.lib.mvvm.activity.hasCompactSize
-import com.share.external.lib.mvvm.navigation.content.View
-import com.share.external.lib.mvvm.navigation.dialog.DialogProperties
-import com.share.external.lib.mvvm.navigation.content.Presentation
+import com.share.external.lib.mvvm.navigation.content.Screen
+import com.share.external.lib.mvvm.navigation.content.ViewPresentation
+import com.share.external.lib.mvvm.navigation.modal.ModalProperties
 import dagger.Module
 import dagger.Provides
 
 @Module
 object SignUpViewModule {
-    @SignUpScope
-    @Provides
-    fun view(
-        viewModel: SignUpViewModel,
-    ) = SignUpView(
-        viewModel = viewModel
-    )
+    @SignUpScope @Provides fun view(viewModel: SignUpViewModel) = SignUpView(viewModel = viewModel)
 }
 
-class SignUpView(
-    private val viewModel: SignUpViewModel,
-): View {
-    override val content: @Composable () -> Unit = {
-        SignUpView(
-            listener = viewModel,
-        )
-    }
+class SignUpView(private val viewModel: SignUpViewModel) : Screen {
+    override val content: @Composable () -> Unit = { SignUpView(listener = viewModel) }
 
     @Composable
-    override fun preferredPresentation(): Presentation {
+    override fun preferredPresentationStyle(): ViewPresentation.Style {
         return if (calculateWindowSizeClass().hasCompactSize()) {
-            Presentation.FullScreen
+            ViewPresentation.Style.FullScreen
         } else {
-            Presentation.Overlay(
-                properties = DialogProperties(
-                    intrinsicHeight = true,
-                    intrinsicWidth = true,
-                )
-            )
+            ViewPresentation.Style.Modal(properties = ModalProperties(intrinsicHeight = true, intrinsicWidth = true))
         }
     }
 }
@@ -63,45 +46,25 @@ interface SignUpViewListener {
 }
 
 @Composable
-fun SignUpView(
-    listener: SignUpViewListener,
-) {
+fun SignUpView(listener: SignUpViewListener) {
     Column(
-        modifier = Modifier
-            .background(Color.White)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = Modifier.background(Color.White).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f, true),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                textAlign = TextAlign.Center,
-                text ="Create a new account"
-            )
+        Box(modifier = Modifier.fillMaxWidth().weight(1f, true), contentAlignment = Alignment.Center) {
+            Text(textAlign = TextAlign.Center, text = "Create a new account")
         }
 
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = listener::onClickSignUp
-        ) {
-            Text("Sign Up")
-        }
+        Button(modifier = Modifier.fillMaxWidth(), onClick = listener::onClickSignUp) { Text("Sign Up") }
     }
 }
 
-object SignUpViewListenerPreview: SignUpViewListener {
-    override fun onClickSignUp() {  }
+object SignUpViewListenerPreview : SignUpViewListener {
+    override fun onClickSignUp() {}
 }
 
 @Preview
 @Composable
 fun SignUpViewPreview() {
-    SignUpView(
-        listener = SignUpViewListenerPreview,
-    )
+    SignUpView(listener = SignUpViewListenerPreview)
 }
-

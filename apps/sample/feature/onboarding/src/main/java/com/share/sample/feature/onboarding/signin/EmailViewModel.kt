@@ -6,12 +6,8 @@ import com.share.compose.runtime.mutableStateObservingOf
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.viewmodel.ViewModel
 
-class EmailViewModel(
-    scope: ManagedCoroutineScope,
-): ViewModel(
-    name = TAG,
-    scope = scope
-), SignInEmailTextFieldState, SignInEmailTextFieldListener {
+class EmailViewModel(scope: ManagedCoroutineScope) :
+    ViewModel(name = TAG, scope = scope), SignInEmailTextFieldState, SignInEmailTextFieldListener {
     override var email by mutableStateObservingOf("")
         private set
 

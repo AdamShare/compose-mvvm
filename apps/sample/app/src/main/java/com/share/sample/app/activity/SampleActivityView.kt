@@ -8,29 +8,26 @@ import com.share.sample.feature.onboarding.OnboardingComponent
 
 class SampleActivityView(
     private val navigationController: ActivityViewNavigationController,
-    private val onboarding: OnboardingComponent.Factory
-): View {
-    override val content = @Composable {
+    private val onboarding: OnboardingComponent.Factory,
+) : View {
+    override val content =
+        @Composable {
             navigationController.Content { route, scope ->
                 when (route) {
                     is ActivityViewRoute.LoggedIn -> {
-                         {
+                        {
                             Text("Logged in as ${route.user}")
 
-                            Button(onClick = {
-                                navigationController.selected = ActivityViewRoute.LoggedOut
-                            }) {
+                            Button(onClick = { navigationController.selected = ActivityViewRoute.LoggedOut }) {
                                 Text("Log Out")
                             }
                         }
                     }
 
                     ActivityViewRoute.LoggedOut -> {
-                        onboarding(
-                            scope = OnboardingComponent.Scope(scope)
-                        ).content
+                        onboarding(scope = OnboardingComponent.Scope(scope)).content
                     }
                 }
             }
-    }
+        }
 }

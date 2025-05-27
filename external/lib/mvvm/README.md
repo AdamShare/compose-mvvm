@@ -41,9 +41,9 @@ interface NavigationBackStack {
 }
 ```
 
-* **Purpose** – Smallest contract required for *back* behaviour.  
+* **Purpose** – Smallest contract required for *back* behaviour.
 * **Thread-safety** – Implementations must be **main-thread** only; mutations
-  are **not** synchronised.  
+  are **not** synchronised.
 * **Error handling** – All mutations are *idempotent*; methods silently return
   `false` if the key cannot be found.
 
@@ -90,7 +90,7 @@ class MainActivity : ComponentActivity() {
 Represents a **single element** in the stack and extends both `NavigationStack`
 (to allow nested pushes) and `ManagedCoroutineScope`.
 
-* `remove()` – eliminate current entry, independent of position.  
+* `remove()` – eliminate current entry, independent of position.
 * `popUpTo()` – convenience wrapper around `popTo`.
 
 `NavigationContext` is the concrete implementation used internally; it is
@@ -109,11 +109,11 @@ open class ViewModelStoreContentProvider<V>(
 ```
 
 * Wraps a **DefaultViewModelStoreOwner** so every screen gets its own
-  `ViewModelStore`.  
+  `ViewModelStore`.
 * Exposes `LocalOwnersProvider` composable that installs:
-  * `ViewModelStoreOwner`
-  * `SavedStateRegistryOwner`
-  * `SaveableStateHolder`
+    * `ViewModelStoreOwner`
+    * `SavedStateRegistryOwner`
+    * `SaveableStateHolder`
 * `cancel()` clears the store **before** cancelling the scope to prevent memory
   leaks.
 
@@ -125,10 +125,10 @@ Concrete, state-driven implementation that backs `NavigationStackController`.
 
 ⚙️ **Internals**
 
-| Field | Type | Purpose |
-|-------|------|---------|
+| Field       | Type                                                               | Purpose                                        |
+|-------------|--------------------------------------------------------------------|------------------------------------------------|
 | `providers` | `DoublyLinkedMap<NavigationKey, ViewModelStoreContentProvider<V>>` | Maintains deterministic order & O(1) removals. |
-| `stack` | `State<DoublyLinkedMap<…>>` | `@Composable` state used by controller. |
+| `stack`     | `State<DoublyLinkedMap<…>>`                                        | `@Composable` state used by controller.        |
 
 ### Key operations
 
@@ -150,10 +150,10 @@ fun Content(defaultContent: @Composable () -> Unit)
 
 1. **Collects** the current `stack` via `derivedStateOf`.
 2. Determines *visible providers*:
-   * stops once it hits first `DisplayMode.FullScreen`.
+    * stops once it hits first `DisplayMode.FullScreen`.
 3. Renders:
-   * `defaultContent()` if no full-screen provider.
-   * One or more overlays via `DialogContainer`.
+    * `defaultContent()` if no full-screen provider.
+    * One or more overlays via `DialogContainer`.
 4. Installs `BackHandler { pop() }` when stack is not empty.
 5. Logs human-readable back-stack on every recomposition (Timber).
 
@@ -212,11 +212,11 @@ fun onShowSettings(ctx: NavigationContext<ComposableProvider>) {
 
 ## 10. Glossary
 
-| Term | Meaning |
-|------|---------|
-| **NavigationKey** | Immutable descriptor used as map key & analytics ID. |
-| **ComposableProvider** | Functional interface producing a screen `@Composable`. |
-| **ManagedCoroutineScope** | Custom scope that supports *awaitChildrenComplete*. |
+| Term                      | Meaning                                                |
+|---------------------------|--------------------------------------------------------|
+| **NavigationKey**         | Immutable descriptor used as map key & analytics ID.   |
+| **ComposableProvider**    | Functional interface producing a screen `@Composable`. |
+| **ManagedCoroutineScope** | Custom scope that supports *awaitChildrenComplete*.    |
 
 ---
 

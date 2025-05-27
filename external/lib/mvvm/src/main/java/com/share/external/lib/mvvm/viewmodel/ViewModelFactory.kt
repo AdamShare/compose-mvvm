@@ -14,18 +14,13 @@ fun interface ViewModelFactory<VM> {
 }
 
 @MainThread
-inline fun <reified VM : ViewModel> ComponentActivity.viewModel(
-    factory: ViewModelFactory<VM>
-): Lazy<VM> = viewModels(
-    factoryProducer = { factory.toViewModelProviderFactory() }
-)
+inline fun <reified VM : ViewModel> ComponentActivity.viewModel(factory: ViewModelFactory<VM>): Lazy<VM> =
+    viewModels(factoryProducer = { factory.toViewModelProviderFactory() })
 
 fun <VM : ViewModel> ViewModelFactory<VM>.toViewModelProviderFactory(): ViewModelProvider.Factory {
     return object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(
-            modelClass: Class<T>,
-            extras: CreationExtras,
-        ): T = create(extras.createSavedStateHandle()) as T
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T =
+            create(extras.createSavedStateHandle()) as T
     }
 }

@@ -1,5 +1,7 @@
 package com.share.external.foundation.coroutines.test
 
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -11,20 +13,17 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
-/**
- * A JUnit [TestRule] that sets the Main dispatcher to [testDispatcher]
- * for the duration of the test.
- */
+/** A JUnit [TestRule] that sets the Main dispatcher to [testDispatcher] for the duration of the test. */
 @OptIn(ExperimentalCoroutinesApi::class)
-class TestScopeRule private constructor(
+class TestScopeRule
+private constructor(
     private val overrideMainDispatcher: Boolean,
     private val scope: TestScope,
     private val testDispatcher: TestDispatcher,
 ) : TestWatcher(), CoroutineScope by scope {
-    val backgroundScope: CoroutineScope get() = scope.backgroundScope
+    val backgroundScope: CoroutineScope
+        get() = scope.backgroundScope
 
     constructor(
         overrideMainDispatcher: Boolean = false,
@@ -45,10 +44,7 @@ class TestScopeRule private constructor(
         Dispatchers.resetMain()
     }
 
-    fun runTest(
-        timeout: Duration = 10.seconds,
-        testBody: suspend TestScope.() -> Unit
-    ) {
+    fun runTest(timeout: Duration = 10.seconds, testBody: suspend TestScope.() -> Unit) {
         scope.runTest(timeout, testBody)
     }
 }
