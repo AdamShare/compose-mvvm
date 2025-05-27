@@ -15,7 +15,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
 /**
  * Creates a derived [State] that observes changes and reports them via [StateChangeObserverRegistry].
@@ -60,6 +59,18 @@ fun <T : R, R> StateFlow<T>.collectAsStateObserving(
     return collectAsStateObserving(
         initial = value,
         coroutineScope = coroutineScope,
+        policy = referentialEqualityPolicy(),
+    )
+}
+
+fun <T : R, R> StateFlow<T>.collectAsStateObserving(
+    coroutineScope: CoroutineScope,
+    active: Flow<Boolean>,
+): ReadOnlyProperty<StateChangeObserver, R> {
+    return collectAsStateObserving(
+        initial = value,
+        coroutineScope = coroutineScope,
+        active = active,
         policy = referentialEqualityPolicy(),
     )
 }
@@ -117,12 +128,34 @@ fun <T : R, R> Flow<T>.collectAsStateObserving(
     coroutineScope: CoroutineScope,
     policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy(),
 ): ReadOnlyProperty<StateChangeObserver, R> {
-    val mutableState = mutableStateOf(policy = policy, value = initial)
-    coroutineScope.launch { collect { mutableState.value = it } }
+    val state = collectAsState(
+        initial = initial,
+        coroutineScope = coroutineScope,
+        policy = policy
+    )
     return derivedStateObservingOf(
         policy = neverEqualPolicy() // Comparison already done in mutableStateOf policy
     ) {
-        mutableState.value
+        state.value
+    }
+}
+
+fun <T : R, R> Flow<T>.collectAsStateObserving(
+    initial: T,
+    coroutineScope: CoroutineScope,
+    active: Flow<Boolean>,
+    policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy(),
+): ReadOnlyProperty<StateChangeObserver, R> {
+    val state = collectAsState(
+        initial = initial,
+        coroutineScope = coroutineScope,
+        active = active,
+        policy = policy
+    )
+    return derivedStateObservingOf(
+        policy = neverEqualPolicy() // Comparison already done in mutableStateOf policy
+    ) {
+        state.value
     }
 }
 

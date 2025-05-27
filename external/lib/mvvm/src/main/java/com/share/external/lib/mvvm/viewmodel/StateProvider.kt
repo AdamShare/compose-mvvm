@@ -7,11 +7,11 @@ import com.share.compose.runtime.collectAsMutableState
 import com.share.compose.runtime.collectAsState
 import com.share.compose.runtime.collectAsStateObserving
 import com.share.external.foundation.coroutines.CoroutineScopeProvider
-import kotlin.properties.ReadOnlyProperty
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlin.properties.ReadOnlyProperty
 
 interface StateProvider : CoroutineScopeProvider {
     fun <T : R, R> Flow<T>.collectAsState(initial: T): State<R> {
@@ -50,3 +50,4 @@ interface StateProvider : CoroutineScopeProvider {
         return collectAsMutableState(coroutineScope = scope)
     }
 }
+

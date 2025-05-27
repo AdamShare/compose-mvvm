@@ -10,6 +10,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 /**
@@ -28,7 +30,26 @@ fun <T : R, R> Flow<T>.collectAsState(
     policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy(),
 ): State<R> {
     val state = mutableStateOf(value = initial, policy = policy)
-    coroutineScope.launch { collect { state.value = it } }
+    coroutineScope.launch {
+        collect { state.value = it }
+    }
+    return state
+}
+
+fun <T : R, R> Flow<T>.collectAsState(
+    initial: T,
+    coroutineScope: CoroutineScope,
+    active: Flow<Boolean>,
+    policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy(),
+): State<R> {
+    val state = mutableStateOf(value = initial, policy = policy)
+    coroutineScope.launch {
+        active.collectLatest {
+            if (it) {
+                collect { state.value = it }
+            }
+        }
+    }
     return state
 }
 
@@ -42,6 +63,10 @@ fun <T : R, R> Flow<T>.collectAsState(
  */
 fun <T> StateFlow<T>.collectAsState(coroutineScope: CoroutineScope): State<T> {
     return collectAsState(initial = value, coroutineScope = coroutineScope, policy = referentialEqualityPolicy())
+}
+
+fun <T> StateFlow<T>.collectAsState(coroutineScope: CoroutineScope, active: Flow<Boolean>): State<T> {
+    return collectAsState(initial = value, coroutineScope = coroutineScope, policy = referentialEqualityPolicy(), active = active)
 }
 
 /**
