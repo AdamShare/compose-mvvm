@@ -11,4 +11,3 @@ open class ViewModel(override val scope: CoroutineScope) : StateProvider, Loggin
         scope: CoroutineScopeFactory,
     ) : this(scope = scope.create(name = name, context = Dispatchers.Main.immediate))
 }
-

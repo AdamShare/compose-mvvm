@@ -17,5 +17,5 @@ open class ViewLifecycleViewModel(override val scope: CoroutineScope, viewLifecy
     constructor(
         name: String,
         scope: NavigationStackScope<*>,
-        ): this(scope = scope.create(name = name, context = Dispatchers.Main.immediate), viewLifecycle = scope)
+    ) : this(scope = scope.create(name = name, context = Dispatchers.Main.immediate), viewLifecycle = scope)
 }

@@ -6,12 +6,12 @@ import com.share.compose.runtime.collectAsState
 import com.share.compose.runtime.collectAsStateObserving
 import com.share.external.foundation.coroutines.CoroutineScopeProvider
 import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycle
+import kotlin.properties.ReadOnlyProperty
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
-import kotlin.properties.ReadOnlyProperty
 
-interface ViewStateProvider: CoroutineScopeProvider, ViewLifecycle {
+interface ViewStateProvider : CoroutineScopeProvider, ViewLifecycle {
     fun <T : R, R> Flow<T>.collectAsStateWhileVisible(initial: T): State<R> {
         return collectAsState(initial = initial, coroutineScope = scope, active = viewAppearanceEvents)
     }
@@ -25,7 +25,8 @@ interface ViewStateProvider: CoroutineScopeProvider, ViewLifecycle {
     }
 
     fun <T, R> StateFlow<T>.collectAsStateWhileVisible(transform: (T) -> R): State<R> {
-        return map(transform).collectAsState(initial = transform(value), coroutineScope = scope, active = viewAppearanceEvents)
+        return map(transform)
+            .collectAsState(initial = transform(value), coroutineScope = scope, active = viewAppearanceEvents)
     }
 
     fun <T : R, R> Flow<T>.collectAsStateWhileVisibleObserving(initial: T): ReadOnlyProperty<StateChangeObserver, R> {
@@ -40,7 +41,10 @@ interface ViewStateProvider: CoroutineScopeProvider, ViewLifecycle {
         return collectAsStateObserving(coroutineScope = scope, active = viewAppearanceEvents)
     }
 
-    fun <T, R> StateFlow<T>.collectAsStateWhileVisibleObserving(transform: (T) -> R): ReadOnlyProperty<StateChangeObserver, R> {
-        return map(transform).collectAsStateObserving(initial = transform(value), coroutineScope = scope, active = viewAppearanceEvents)
+    fun <T, R> StateFlow<T>.collectAsStateWhileVisibleObserving(
+        transform: (T) -> R
+    ): ReadOnlyProperty<StateChangeObserver, R> {
+        return map(transform)
+            .collectAsStateObserving(initial = transform(value), coroutineScope = scope, active = viewAppearanceEvents)
     }
 }
