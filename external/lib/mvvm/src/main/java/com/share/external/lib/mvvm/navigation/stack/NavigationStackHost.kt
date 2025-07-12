@@ -5,6 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import com.share.external.lib.mvvm.navigation.content.View
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
+import com.share.external.lib.mvvm.navigation.lifecycle.ViewProvider
+import com.share.external.lib.mvvm.navigation.lifecycle.VisibilityScopedView
 import com.share.external.lib.mvvm.navigation.modal.ModalContainer
 import com.share.external.lib.mvvm.navigation.modal.ModalProperties
 
@@ -41,16 +43,16 @@ fun <V> NavigationStackHost(
     navigationStack: ViewModelNavigationStack<V>,
     backHandlerEnabled: Boolean = true,
     defaultContent: @Composable () -> Unit,
-) where V : View, V : ViewPresentation {
+) where V : ViewProvider, V : ViewPresentation {
     navigationStack.run {
         val saveableStateHolder = rememberSaveableStateHolder()
 
-        var fullScreen: ViewModelStoreContentProvider<V>? = null
-        var modal: ViewModelStoreContentProvider<V>? = null
+        var fullScreen: ViewPresentationProviderViewModelStoreContentProvider<V>? = null
+        var modal: ViewPresentationProviderViewModelStoreContentProvider<V>? = null
         var properties: ModalProperties? = null
 
         for (provider in navigationStack.stack.values.asReversed()) {
-            when (val displayMode = provider.view.preferredPresentationStyle()) {
+            when (val displayMode = provider.preferredPresentationStyle()) {
                 ViewPresentation.Style.FullScreen -> {
                     fullScreen = provider
                     break
@@ -68,15 +70,18 @@ fun <V> NavigationStackHost(
             BackHandler(onBack = ::pop)
         }
 
-        fullScreen?.run { LocalOwnersProvider(saveableStateHolder = saveableStateHolder, content = view.content) }
-            ?: defaultContent()
+        fullScreen?.run {
+            LocalOwnersProvider(saveableStateHolder = saveableStateHolder, content = view.content)
+        } ?: defaultContent()
 
         modal?.run {
             LocalOwnersProvider(
                 saveableStateHolder = saveableStateHolder,
                 content =
                     if (properties != null) {
-                        { ModalContainer(onDismiss = ::pop, properties = properties, content = view.content) }
+                        {
+                            ModalContainer(onDismiss = ::pop, properties = properties, content = view.content)
+                        }
                     } else {
                         view.content
                     },

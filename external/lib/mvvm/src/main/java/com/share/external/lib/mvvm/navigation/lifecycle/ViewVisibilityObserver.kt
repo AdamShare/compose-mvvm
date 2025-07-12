@@ -4,7 +4,10 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -34,9 +37,12 @@ import com.share.external.lib.mvvm.activity.findActivity
  */
 @SuppressLint("RememberReturnType")
 @Composable
-fun ViewVisibilityObserver(onVisible: () -> Unit, onHidden: () -> Unit) {
+fun <R> viewVisibilityObserver(onVisible: () -> R, onHidden: () -> Unit): R {
     val activity = findActivity<Activity>()
-    remember {
+    var isVisible by remember {
+        mutableStateOf(true)
+    }
+    val visible = remember {
         // Run on initial composition as DisposableEffect is delayed.
         onVisible()
     }
@@ -55,9 +61,15 @@ fun ViewVisibilityObserver(onVisible: () -> Unit, onHidden: () -> Unit) {
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
-                Lifecycle.Event.ON_RESUME -> onVisible()
+                Lifecycle.Event.ON_RESUME -> {
+                    if (!isVisible) {
+                        isVisible = true
+                        onVisible()
+                    }
+                }
                 Lifecycle.Event.ON_PAUSE ->
-                    if (!activity.isChangingConfigurations) {
+                    if (!activity.isChangingConfigurations && isVisible) {
+                        isVisible = false
                         onHidden()
                     }
                 else -> Unit
@@ -66,4 +78,5 @@ fun ViewVisibilityObserver(onVisible: () -> Unit, onHidden: () -> Unit) {
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
+    return visible
 }

@@ -2,8 +2,10 @@ package com.share.external.lib.mvvm.navigation.stack
 
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
+import com.share.external.lib.mvvm.navigation.content.ViewPresentation
 import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycle
 import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScope
+import com.share.external.lib.mvvm.navigation.lifecycle.ViewProvider
 
 interface NavigationStack<V>: NavigationBackStack {
     /**
@@ -27,10 +29,12 @@ interface NavigationStackScope<V> : NavigationStack<V>, ViewLifecycle, ManagedCo
 internal open class NavigationStackContext<V>(
     private val scope: ManagedCoroutineScope,
     private val stack: ViewModelNavigationStack<V>,
-) : ViewLifecycleScope(scope), NavigationBackStack by stack, NavigationStackScope<V> {
+) : ViewLifecycleScope(scope),
+    NavigationBackStack by stack,
+    NavigationStackScope<V> where V: ViewProvider, V: ViewPresentation {
     override fun push(key: NavigationKey, content: (NavigationStackEntry<V>) -> V) {
         val context =
             NavigationStackEntryContext(key = key, scope = scope.childManagedScope(key.analyticsId), stack = stack)
-        stack.push(key = key, content = { content(context) }, scope = context)
+        stack.push(key = key, viewProvider = content(context), scope = context)
     }
 }

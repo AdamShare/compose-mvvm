@@ -61,5 +61,5 @@ internal class ViewAppearanceEventsImpl(private val visibility: MutableStateFlow
  */
 @Composable
 internal fun ViewAppearanceEventsImpl.ObserveViewVisibility() {
-    ViewVisibilityObserver(onVisible = ::onVisible, onHidden = ::onHidden)
+    viewVisibilityObserver(onVisible = ::onVisible, onHidden = ::onHidden)
 }

@@ -4,6 +4,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.share.external.lib.mvvm.navigation.content.View
+import com.share.external.lib.mvvm.navigation.lifecycle.ViewProvider
 import com.share.sample.feature.onboarding.OnboardingComponent
 
 class SampleActivityView(
@@ -14,8 +15,8 @@ class SampleActivityView(
         @Composable {
             navigationController.Content { route, scope ->
                 when (route) {
-                    is ActivityViewRoute.LoggedIn -> {
-                        {
+                    is ActivityViewRoute.LoggedIn -> ViewProvider {
+                        View {
                             Text("Logged in as ${route.user}")
 
                             Button(onClick = { navigationController.selected = ActivityViewRoute.LoggedOut }) {
@@ -25,7 +26,7 @@ class SampleActivityView(
                     }
 
                     ActivityViewRoute.LoggedOut -> {
-                        onboarding(scope = OnboardingComponent.Scope(scope)).content
+                        onboarding(scope = OnboardingComponent.Scope(scope))
                     }
                 }
             }

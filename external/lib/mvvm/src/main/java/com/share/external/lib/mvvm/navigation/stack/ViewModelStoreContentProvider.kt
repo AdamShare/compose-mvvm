@@ -1,14 +1,10 @@
 package com.share.external.lib.mvvm.navigation.stack
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
-import com.share.external.lib.mvvm.navigation.lifecycle.DefaultViewModelStoreOwner
-import com.share.external.lib.mvvm.navigation.lifecycle.LocalOwnersProvider
-import com.share.external.lib.mvvm.navigation.lifecycle.ObserveViewVisibility
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScope
+import com.share.external.lib.mvvm.navigation.lifecycle.VisibilityScopedView
 
 /**
  * A container that bridges a [view] and its associated [ViewModelStore], [CoroutineScope], and [SaveableStateHolder]
@@ -41,37 +37,4 @@ interface ViewModelStoreContentProvider<V> : ManagedCoroutineScope {
         saveableStateHolder: SaveableStateHolder = rememberSaveableStateHolder(),
         content: @Composable () -> Unit,
     )
-}
-
-/**
- * Default implementation of [ViewModelStoreContentProvider] that wires a [view] to its [ViewModelStoreOwner],
- * [CoroutineScope], and lifecycle visibility events.
- *
- * This class ensures that:
- * - The [view] has a retained [ViewModelStore] scoped to its lifecycle.
- * - Lifecycle visibility is tracked via [ViewAppearanceEvents].
- * - Coroutine scope is tied to the view's appearance and cancelled appropriately.
- *
- * @param view The view instance to be hosted.
- * @param scope The view-scoped lifecycle and coroutine scope.
- */
-@Immutable
-internal open class ViewModelStoreContentProviderImpl<V>(view: () -> V, private val scope: ViewLifecycleScope) :
-    ViewModelStoreContentProvider<V>, ManagedCoroutineScope by scope {
-    private val owner = DefaultViewModelStoreOwner()
-
-    override val view: V by lazy(mode = LazyThreadSafetyMode.NONE, initializer = view)
-
-    override fun cancel(awaitChildrenComplete: Boolean, message: String) {
-        owner.clear()
-        scope.cancel(awaitChildrenComplete = awaitChildrenComplete, message = message)
-    }
-
-    @Composable
-    override fun LocalOwnersProvider(saveableStateHolder: SaveableStateHolder, content: @Composable () -> Unit) {
-        owner.LocalOwnersProvider(saveableStateHolder) {
-            scope.viewAppearanceEvents.ObserveViewVisibility()
-            content()
-        }
-    }
 }

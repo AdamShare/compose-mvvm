@@ -12,7 +12,10 @@ import com.share.external.foundation.collections.removeLast
 import com.share.external.foundation.coroutines.MainImmediateScope
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
+import com.share.external.lib.mvvm.navigation.content.ViewPresentation
 import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScope
+import com.share.external.lib.mvvm.navigation.lifecycle.ViewProvider
+import com.share.external.lib.mvvm.navigation.lifecycle.VisibilityScopedView
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -42,16 +45,16 @@ import timber.log.Timber
 open class ViewModelNavigationStack<V>(
     private val rootScope: ManagedCoroutineScope,
     initialStack: (NavigationStack<V>) -> Unit = {},
-) : NavigationBackStack {
-    private val providers = doublyLinkedMapOf<NavigationKey, ViewModelStoreContentProvider<V>>()
+) : NavigationBackStack where V: ViewProvider, V: ViewPresentation {
+    private val providers = doublyLinkedMapOf<NavigationKey, ViewPresentationProviderViewModelStoreContentProvider<V>>()
 
-    var stack: DoublyLinkedMap<NavigationKey, ViewModelStoreContentProvider<V>> by
+    internal var stack: DoublyLinkedMap<NavigationKey, ViewPresentationProviderViewModelStoreContentProvider<V>> by
         mutableStateOf(value = providers, policy = neverEqualPolicy())
         private set
 
     override val size: Int by derivedStateOf { stack.size }
 
-    protected val last by derivedStateOf { stack.values.lastOrNull() }
+    internal val last by derivedStateOf { stack.values.lastOrNull() }
 
     private var shouldUpdateState: Boolean = false
     private var transactionRefCount: Int = 0
@@ -70,16 +73,16 @@ open class ViewModelNavigationStack<V>(
 
     fun rootNavigationScope(): NavigationStackScope<V> = NavigationStackContext(scope = rootScope, stack = this)
 
-    internal fun push(key: NavigationKey, content: () -> V, scope: ViewLifecycleScope) {
+    internal fun push(key: NavigationKey, viewProvider: V, scope: ViewLifecycleScope) {
         if (!rootScope.isActive || !scope.isActive) {
-            Timber.tag(TAG).wtf("Scope is not active pushing $key, $content onto nav stack: $this")
+            Timber.tag(TAG).wtf("Scope is not active pushing $key, $viewProvider onto nav stack: $this")
             return
         }
         if (providers.keys.lastOrNull() == key) {
             return
         }
         val previous = providers[key]
-        val provider = ViewModelStoreContentProviderImpl(view = content, scope = scope)
+        val provider = ViewPresentationProviderViewModelStoreContentProvider(viewProvider = viewProvider, scope = scope)
         providers[key] = provider
 
         transactionFinished.add {
@@ -160,10 +163,10 @@ open class ViewModelNavigationStack<V>(
     }
 }
 
-fun <V> Map<NavigationKey, ViewModelStoreContentProvider<V>>.logEntries(
+fun <T> Map<NavigationKey, T>.logEntries(
     analyticsId: String,
     tag: String,
-    metadata: (ViewModelStoreContentProvider<V>) -> String? = { null },
+    metadata: (T) -> String? = { null },
 ) {
     Timber.tag(tag)
         .d(

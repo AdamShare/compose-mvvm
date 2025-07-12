@@ -8,11 +8,11 @@ fun <K, V> doublyLinkedMapOf(vararg pairs: Pair<K, V>): DoublyLinkedHashMap<K, V
     return map
 }
 
-interface DoublyLinkedMap<K, V> : Map<K, V> {
+interface DoublyLinkedMap<K, out V> : Map<K, V> {
     override val keys: KeySet<K>
     override val values: Values<V>
 
-    interface Values<V> : Collection<V> {
+    interface Values<out V> : Collection<V> {
         fun lastOrNull(): V?
 
         fun asReversed(): Iterator<V>

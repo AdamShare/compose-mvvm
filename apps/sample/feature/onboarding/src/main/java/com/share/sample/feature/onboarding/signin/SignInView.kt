@@ -18,6 +18,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.share.external.lib.mvvm.navigation.content.Screen
+import com.share.external.lib.mvvm.navigation.content.View
+import com.share.external.lib.mvvm.navigation.lifecycle.ViewManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.stack.NavigationStackScope
 import com.share.sample.feature.onboarding.signin.signup.SignUpComponent
 import dagger.Module
@@ -41,7 +43,9 @@ class SignInView(
     SignInEmailTextFieldListener by emailViewModel,
     SignInEmailTextFieldState by emailViewModel {
 
-    override val content: @Composable () -> Unit = { SignInView(listener = this, state = this) }
+    override fun create(scope: ViewManagedCoroutineScope) = View {
+        SignInView(listener = this, state = this)
+    }
 
     override fun onClickSignIn() {}
 

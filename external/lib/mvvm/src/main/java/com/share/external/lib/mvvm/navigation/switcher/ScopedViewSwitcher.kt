@@ -9,7 +9,8 @@ import com.share.external.foundation.coroutines.MainImmediateScope
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
 import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScope
-import com.share.external.lib.mvvm.navigation.stack.ViewModelStoreContentProviderImpl
+import com.share.external.lib.mvvm.navigation.lifecycle.ViewProvider
+import com.share.external.lib.mvvm.navigation.stack.ViewProviderViewModelStoreContentProvider
 import kotlinx.coroutines.launch
 
 class ScopedViewSwitcher<K : NavigationKey>(private val scope: ManagedCoroutineScope, defaultKey: K? = null) :
@@ -26,7 +27,7 @@ class ScopedViewSwitcher<K : NavigationKey>(private val scope: ManagedCoroutineS
     }
 
     @Composable
-    override fun Content(content: (K, ManagedCoroutineScope) -> @Composable () -> Unit) {
+    override fun Content(content: (K, ManagedCoroutineScope) -> ViewProvider) {
         val saveableStateHolder = rememberSaveableStateHolder()
 
         val selectedKey = selected
@@ -42,7 +43,7 @@ class ScopedViewSwitcher<K : NavigationKey>(private val scope: ManagedCoroutineS
             currentProvider = null
         }
 
-        currentProvider?.apply { LocalOwnersProvider(saveableStateHolder) { view() } }
+        currentProvider?.apply { LocalOwnersProvider(saveableStateHolder) { view.content() } }
     }
 
     private fun clear() {
@@ -50,6 +51,6 @@ class ScopedViewSwitcher<K : NavigationKey>(private val scope: ManagedCoroutineS
         currentProvider = null
     }
 
-    private class ViewScope<K>(content: @Composable () -> Unit, val key: K, scope: ViewLifecycleScope) :
-        ViewModelStoreContentProviderImpl<@Composable () -> Unit>(view = { content }, scope = scope)
+    private class ViewScope<K>(content: ViewProvider, val key: K, scope: ViewLifecycleScope) :
+        ViewProviderViewModelStoreContentProvider<ViewProvider>(viewProvider = content, scope = scope)
 }

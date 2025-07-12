@@ -18,7 +18,9 @@ import androidx.compose.ui.unit.dp
 import com.share.external.lib.mvvm.activity.calculateWindowSizeClass
 import com.share.external.lib.mvvm.activity.hasCompactSize
 import com.share.external.lib.mvvm.navigation.content.Screen
+import com.share.external.lib.mvvm.navigation.content.View
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
+import com.share.external.lib.mvvm.navigation.lifecycle.ViewManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.modal.ModalProperties
 import dagger.Module
 import dagger.Provides
@@ -29,7 +31,9 @@ object SignUpViewModule {
 }
 
 class SignUpView(private val viewModel: SignUpViewModel) : Screen {
-    override val content: @Composable () -> Unit = { SignUpView(listener = viewModel) }
+    override fun create(scope: ViewManagedCoroutineScope) = View {
+            SignUpView(listener = viewModel)
+        }
 
     @Composable
     override fun preferredPresentationStyle(): ViewPresentation.Style {
