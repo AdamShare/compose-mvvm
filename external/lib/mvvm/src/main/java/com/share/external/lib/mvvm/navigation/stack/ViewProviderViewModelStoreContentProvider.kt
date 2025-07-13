@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
+import com.share.external.lib.mvvm.navigation.content.NavigationKey
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
 import com.share.external.lib.mvvm.navigation.lifecycle.DefaultViewModelStoreOwner
 import com.share.external.lib.mvvm.navigation.lifecycle.LocalOwnersProvider
@@ -11,6 +12,8 @@ import com.share.external.lib.mvvm.navigation.lifecycle.ObserveViewVisibility
 import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScope
 import com.share.external.lib.mvvm.navigation.lifecycle.ViewProvider
 import com.share.external.lib.mvvm.navigation.lifecycle.VisibilityScopedView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 /**
  * Default implementation of [ViewModelStoreContentProvider] that wires a [view] to its [ViewModelStoreOwner],
@@ -27,15 +30,16 @@ import com.share.external.lib.mvvm.navigation.lifecycle.VisibilityScopedView
 @Immutable
 internal open class ViewProviderViewModelStoreContentProvider<V>(
     protected val viewProvider: V,
-    protected val scope: ViewLifecycleScope
+    protected val scope: ViewLifecycleScope,
 ) : ManagedCoroutineScope by scope,
     ViewModelStoreContentProvider<VisibilityScopedView<V>>
         where V: ViewProvider {
+            private val tag = viewProvider.javaClass.simpleName
 
     private val owner = DefaultViewModelStoreOwner()
 
     override val view: VisibilityScopedView<V> = VisibilityScopedView(
-        parentScope = scope,
+        scopeFactory = { scope.create(tag, Dispatchers.Main.immediate)  },
         viewProvider = viewProvider
     )
 
@@ -55,12 +59,13 @@ internal open class ViewProviderViewModelStoreContentProvider<V>(
 
 @Immutable
 internal open class ViewPresentationProviderViewModelStoreContentProvider<V>(
+    navigationKey: NavigationKey,
     viewProvider: V,
-    scope: ViewLifecycleScope
+    scope: ViewLifecycleScope,
 ) : ViewProviderViewModelStoreContentProvider<V>(
     viewProvider = viewProvider,
-    scope = scope
-), ViewPresentation where V: ViewProvider, V: ViewPresentation {
+    scope = scope,
+), NavigationKey by navigationKey, ViewPresentation where V: ViewProvider, V: ViewPresentation {
     @Composable
     override fun preferredPresentationStyle(): ViewPresentation.Style = viewProvider.preferredPresentationStyle()
 }

@@ -19,7 +19,7 @@ import javax.inject.Scope
 @SignInScope
 @Subcomponent(modules = [SignInModule::class, SignInViewModule::class])
 interface SignInComponent {
-    val view: SignInView
+    val viewProvider: SignInViewProvider
 
     class Scope(actual: NavigationStackScope<Screen>) : NavigationStackScope<Screen> by actual
 
@@ -31,7 +31,7 @@ interface SignInComponent {
         abstract fun create(@BindsInstance scope: Scope): SignInComponent
 
         override fun invoke(scope: NavigationStackEntry<Screen>): Screen {
-            return create(Scope(scope)).view
+            return create(Scope(scope)).viewProvider
         }
     }
 }

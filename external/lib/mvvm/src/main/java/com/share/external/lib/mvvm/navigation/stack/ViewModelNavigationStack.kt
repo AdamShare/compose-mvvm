@@ -1,14 +1,13 @@
 package com.share.external.lib.mvvm.navigation.stack
 
+import android.os.Build
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.setValue
-import com.share.external.foundation.collections.DoublyLinkedMap
-import com.share.external.foundation.collections.doublyLinkedMapOf
-import com.share.external.foundation.collections.removeLast
+import androidx.compose.ui.graphics.vector.Path
 import com.share.external.foundation.coroutines.MainImmediateScope
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
@@ -18,6 +17,7 @@ import com.share.external.lib.mvvm.navigation.lifecycle.ViewProvider
 import com.share.external.lib.mvvm.navigation.lifecycle.VisibilityScopedView
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.LinkedHashMap
 
 /**
  * Concrete, mutable navigation stack that manages [ViewModelStoreContentProvider] instances keyed by [NavigationKey].
@@ -46,15 +46,15 @@ open class ViewModelNavigationStack<V>(
     private val rootScope: ManagedCoroutineScope,
     initialStack: (NavigationStack<V>) -> Unit = {},
 ) : NavigationBackStack where V: ViewProvider, V: ViewPresentation {
-    private val providers = doublyLinkedMapOf<NavigationKey, ViewPresentationProviderViewModelStoreContentProvider<V>>()
+    private val providers = linkedMapOf<NavigationKey, ViewPresentationProviderViewModelStoreContentProvider<V>>()
 
-    internal var stack: DoublyLinkedMap<NavigationKey, ViewPresentationProviderViewModelStoreContentProvider<V>> by
-        mutableStateOf(value = providers, policy = neverEqualPolicy())
+    internal var stack: List<ViewPresentationProviderViewModelStoreContentProvider<V>> by
+        mutableStateOf(value = providers.values.toList(), policy = neverEqualPolicy())
         private set
 
     override val size: Int by derivedStateOf { stack.size }
 
-    internal val last by derivedStateOf { stack.values.lastOrNull() }
+    internal val last by derivedStateOf { stack.lastOrNull() }
 
     private var shouldUpdateState: Boolean = false
     private var transactionRefCount: Int = 0
@@ -82,7 +82,11 @@ open class ViewModelNavigationStack<V>(
             return
         }
         val previous = providers[key]
-        val provider = ViewPresentationProviderViewModelStoreContentProvider(viewProvider = viewProvider, scope = scope)
+        val provider = ViewPresentationProviderViewModelStoreContentProvider(
+            navigationKey = key,
+            viewProvider = viewProvider,
+            scope = scope,
+        )
         providers[key] = provider
 
         transactionFinished.add {
@@ -152,18 +156,18 @@ open class ViewModelNavigationStack<V>(
         if (transactionRefCount > 0) {
             shouldUpdateState = true
         } else {
-            stack = providers
+            stack = providers.values.toList()
             transactionFinished.forEach { it() }
             transactionFinished.clear()
         }
     }
 
     companion object {
-        const val TAG = "ViewModelNavigationStack"
+        const val TAG = "NavigationStack"
     }
 }
 
-fun <T> Map<NavigationKey, T>.logEntries(
+fun <T: NavigationKey> List<T>.logEntries(
     analyticsId: String,
     tag: String,
     metadata: (T) -> String? = { null },
@@ -174,8 +178,8 @@ fun <T> Map<NavigationKey, T>.logEntries(
             object {
                 override fun toString(): String = buildString {
                     append("Backstack $analyticsId[")
-                    entries.forEachIndexed { i, (key, provider) ->
-                        append("{${key.analyticsId}")
+                    this@logEntries.forEachIndexed { i, provider ->
+                        append("{${provider.analyticsId}")
                         metadata(provider)?.let { append(": $it") }
                         append("}")
                         if (i < size - 1) append(" ⇨ ")
@@ -184,4 +188,50 @@ fun <T> Map<NavigationKey, T>.logEntries(
                 }
             },
         )
+}
+
+
+private fun <K, V>LinkedHashMap<K, V>.removeAllAfter(key: K, inclusive: Boolean = false): List<V> {
+    if (!containsKey(key)) {
+        return listOf()
+    }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+        val removed = mutableListOf<V>()
+        val reversedEntrySet = sequencedEntrySet().reversed().iterator()
+        var element = reversedEntrySet.next()
+        while (element.key != key) {
+            removed.add(element.value)
+            reversedEntrySet.remove()
+            element = reversedEntrySet.next()
+        }
+        if (inclusive) {
+            removed.add(element.value)
+            reversedEntrySet.remove()
+        }
+        return removed.asReversed()
+    } else {
+        val entries = entries
+        val removed = mutableListOf<V>()
+        val reversedEntrySet = entries.reversed().iterator()
+        var element = reversedEntrySet.next()
+        while (element.key != key) {
+            removed.add(element.value)
+            entries.remove(element = element)
+            element = reversedEntrySet.next()
+        }
+        if (inclusive) {
+            removed.add(element.value)
+            entries.remove(element = element)
+        }
+        return removed.asReversed()
+    }
+}
+
+fun <K, V> LinkedHashMap<K, V>.removeLast(): V? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+        if (isEmpty()) null else sequencedValues().removeLast()
+    } else {
+        keys.lastOrNull()?.let { remove(it) }
+    }
 }

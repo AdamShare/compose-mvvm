@@ -4,15 +4,7 @@ import androidx.compose.runtime.Stable
 import com.share.external.foundation.coroutines.CoroutineScopeFactory
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.View
-
-@Stable
-class ViewManagedCoroutineScope(
-    private val actual: ManagedCoroutineScope,
-): CoroutineScopeFactory by actual {
-    internal fun cancel(message: String) {
-        actual.cancel(message = message)
-    }
-}
+import kotlinx.coroutines.CoroutineScope
 
 @Stable
 fun interface ViewProvider {
@@ -21,5 +13,5 @@ fun interface ViewProvider {
      * Scope will cancel when the view is out of scope and a new scope is provided on each call.
      * Similar conceptually to [collectAsStateWithLifecycle].
      */
-    fun create(scope: ViewManagedCoroutineScope): View
+    fun create(scope: CoroutineScope): View
 }

@@ -20,20 +20,18 @@ import com.share.external.lib.mvvm.activity.hasCompactSize
 import com.share.external.lib.mvvm.navigation.content.Screen
 import com.share.external.lib.mvvm.navigation.content.View
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.modal.ModalProperties
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.CoroutineScope
 
 @Module
 object SignUpViewModule {
-    @SignUpScope @Provides fun view(viewModel: SignUpViewModel) = SignUpView(viewModel = viewModel)
+    @SignUpScope @Provides fun screen(viewModel: SignUpViewModel) = SignUpScreen(viewModel = viewModel)
 }
 
-class SignUpView(private val viewModel: SignUpViewModel) : Screen {
-    override fun create(scope: ViewManagedCoroutineScope) = View {
-            SignUpView(listener = viewModel)
-        }
+class SignUpScreen(private val viewModel: SignUpViewModel) : Screen {
+    override fun create(scope: CoroutineScope) = SignUpView(listener = viewModel)
 
     @Composable
     override fun preferredPresentationStyle(): ViewPresentation.Style {
@@ -49,17 +47,20 @@ interface SignUpViewListener {
     fun onClickSignUp()
 }
 
-@Composable
-fun SignUpView(listener: SignUpViewListener) {
-    Column(
-        modifier = Modifier.background(Color.White).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        Box(modifier = Modifier.fillMaxWidth().weight(1f, true), contentAlignment = Alignment.Center) {
-            Text(textAlign = TextAlign.Center, text = "Create a new account")
-        }
+class SignUpView(
+    listener: SignUpViewListener,
+): View {
+    override val content: @Composable () -> Unit = {
+        Column(
+            modifier = Modifier.background(Color.White).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Box(modifier = Modifier.fillMaxWidth().weight(1f, true), contentAlignment = Alignment.Center) {
+                Text(textAlign = TextAlign.Center, text = "Create a new account")
+            }
 
-        Button(modifier = Modifier.fillMaxWidth(), onClick = listener::onClickSignUp) { Text("Sign Up") }
+            Button(modifier = Modifier.fillMaxWidth(), onClick = listener::onClickSignUp) { Text("Sign Up") }
+        }
     }
 }
 
@@ -70,5 +71,5 @@ object SignUpViewListenerPreview : SignUpViewListener {
 @Preview
 @Composable
 fun SignUpViewPreview() {
-    SignUpView(listener = SignUpViewListenerPreview)
+    SignUpView(listener = SignUpViewListenerPreview).content()
 }

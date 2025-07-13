@@ -49,7 +49,6 @@ dependencies {
     implementation(libs.timber)
 
     implementation(projects.external.foundation.coroutines)
-    implementation(projects.external.foundation.collections)
     implementation(projects.external.lib.compose)
 
     testImplementation(libs.junit)

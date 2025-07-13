@@ -2,6 +2,8 @@ package com.share.external.lib.mvvm.navigation.stack
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import com.share.external.lib.mvvm.navigation.content.View
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
@@ -51,7 +53,7 @@ fun <V> NavigationStackHost(
         var modal: ViewPresentationProviderViewModelStoreContentProvider<V>? = null
         var properties: ModalProperties? = null
 
-        for (provider in navigationStack.stack.values.asReversed()) {
+        for (provider in navigationStack.stack.asReversed()) {
             when (val displayMode = provider.preferredPresentationStyle()) {
                 ViewPresentation.Style.FullScreen -> {
                     fullScreen = provider
@@ -88,12 +90,14 @@ fun <V> NavigationStackHost(
             )
         }
 
-        stack.logEntries(analyticsId = analyticsId, tag = TAG) {
-            if (fullScreen == it) {
-                "FullScreen"
-            } else if (modal == it) {
-                "Modal"
-            } else null
+        LaunchedEffect(stack) {
+            stack.logEntries(analyticsId = analyticsId, tag = TAG) {
+                if (fullScreen == it) {
+                    "FullScreen"
+                } else if (modal == it) {
+                    "Modal"
+                } else null
+            }
         }
     }
 }

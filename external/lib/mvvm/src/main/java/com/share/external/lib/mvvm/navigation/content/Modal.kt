@@ -1,9 +1,9 @@
 package com.share.external.lib.mvvm.navigation.content
 
 import androidx.compose.runtime.Composable
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.lifecycle.ViewProvider
 import com.share.external.lib.mvvm.navigation.modal.ModalProperties
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * A [Screen] that is presented as a modal overlay with configurable [ModalProperties].
@@ -20,7 +20,7 @@ class Modal(
 
     constructor(
         modalProperties: ModalProperties = ModalProperties(),
-        view: (ViewManagedCoroutineScope) -> View,
+        view: (CoroutineScope) -> View,
     ): this(
         modalProperties = modalProperties,
         viewProvider = ViewProvider { scope -> view(scope) }

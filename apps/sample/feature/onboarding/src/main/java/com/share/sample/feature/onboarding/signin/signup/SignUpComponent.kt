@@ -12,9 +12,9 @@ import javax.inject.Scope
 @Scope @MustBeDocumented @Retention(value = AnnotationRetention.RUNTIME) annotation class SignUpScope
 
 @SignUpScope
-@Subcomponent(modules = [SignUpModule::class, SignUpViewModule::class])
+@Subcomponent(modules = [SignUpViewModelModule::class, SignUpViewModule::class])
 interface SignUpComponent {
-    val view: SignUpView
+    val screen: SignUpScreen
 
     class Scope(actual: NavigationStackEntry<Screen>) : NavigationStackEntry<Screen> by actual
 
@@ -26,14 +26,7 @@ interface SignUpComponent {
         abstract fun create(@BindsInstance scope: Scope): SignUpComponent
 
         override fun invoke(scope: NavigationStackEntry<Screen>): Screen {
-            return create(Scope(scope)).view
+            return create(Scope(scope)).screen
         }
     }
-}
-
-fun SignUpComponent.Factory.view(scope: NavigationStackEntry<Screen>) = create(SignUpComponent.Scope(scope)).view
-
-@Module
-object SignUpModule {
-    @SignUpScope @Provides fun viewModel(scope: SignUpComponent.Scope) = SignUpViewModel(scope)
 }

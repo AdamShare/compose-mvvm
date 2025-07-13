@@ -10,6 +10,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,38 +21,61 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.share.external.lib.mvvm.navigation.content.Screen
 import com.share.external.lib.mvvm.navigation.content.View
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.stack.NavigationStackScope
+import com.share.external.lib.mvvm.viewmodel.StateProvider
 import com.share.sample.feature.onboarding.signin.signup.SignUpComponent
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.onCompletion
+import timber.log.Timber
 
 @Module
 object SignInViewModule {
     @SignInScope
     @Provides
     fun signInView(emailViewModel: EmailViewModel, scope: SignInComponent.Scope, signUp: SignUpComponent.Factory) =
-        SignInView(emailViewModel = emailViewModel, scope = scope, signUp = signUp)
+        SignInViewProvider(emailViewModel = emailViewModel, navigationScope = scope, signUp = signUp)
+}
+
+class SignInViewProvider(
+    private val emailViewModel: EmailViewModel,
+    private val navigationScope: NavigationStackScope<Screen>,
+    private val signUp: SignUpComponent.Factory,
+) : Screen {
+    override fun create(scope: CoroutineScope) = SignInView(
+        emailViewModel = emailViewModel,
+        navigationScope = navigationScope,
+        signUp = signUp,
+        scope = scope
+    )
 }
 
 class SignInView(
-    private val emailViewModel: EmailViewModel,
-    private val scope: NavigationStackScope<Screen>,
+    emailViewModel: EmailViewModel,
+    private val navigationScope: NavigationStackScope<Screen>,
     private val signUp: SignUpComponent.Factory,
-) :
-    Screen,
+    override val scope: CoroutineScope,
+): View,
     SignInViewListener,
     SignInEmailTextFieldListener by emailViewModel,
-    SignInEmailTextFieldState by emailViewModel {
+    SignInEmailTextFieldState by emailViewModel,
+    StateProvider {
+        init {
+            Timber.tag("SignInView").d("init")
+        }
 
-    override fun create(scope: ViewManagedCoroutineScope) = View {
-        SignInView(listener = this, state = this)
+    override fun onClickSignIn() {
+
     }
 
-    override fun onClickSignIn() {}
-
     override fun onClickSignUp() {
-        scope.push(signUp)
+        navigationScope.push(signUp)
+    }
+
+    override val content: @Composable () -> Unit = {
+        SignInView(listener = this, state = this)
     }
 }
 

@@ -35,7 +35,11 @@ class ScopedViewSwitcher<K : NavigationKey>(private val scope: ManagedCoroutineS
             if (selectedKey != currentProvider?.key) {
                 val scope = ViewLifecycleScope(scope.childManagedScope(selectedKey.analyticsId))
                 val previous = currentProvider
-                currentProvider = ViewScope(content = content(selectedKey, scope), key = selectedKey, scope = scope)
+                currentProvider = ViewScope(
+                    content = content(selectedKey, scope),
+                    key = selectedKey,
+                    scope = scope,
+                )
                 previous?.cancel(awaitChildrenComplete = false, message = "Switched to selected view: $selectedKey")
             }
         } else {
