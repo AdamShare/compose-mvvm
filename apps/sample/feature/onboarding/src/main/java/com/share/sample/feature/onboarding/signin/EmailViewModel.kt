@@ -1,10 +1,10 @@
 package com.share.sample.feature.onboarding.signin
 
 import android.util.Patterns
-import com.share.compose.runtime.derivedStateObservingOf
-import com.share.compose.runtime.mutableStateObservingOf
+import com.share.external.lib.compose.runtime.derivedStateObservingOf
+import com.share.external.lib.compose.runtime.mutableStateObservingOf
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
-import com.share.external.lib.activity.viewmodel.ViewModel
+import com.share.external.lib.compose.state.ViewModel
 
 class EmailViewModel(scope: ManagedCoroutineScope) :
     ViewModel(name = TAG, scope = scope), SignInEmailTextFieldState, SignInEmailTextFieldListener {

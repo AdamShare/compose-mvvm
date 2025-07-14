@@ -1,5 +1,6 @@
 package com.share.external.foundation.coroutines
 
+import co.touchlab.kermit.Logger
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.CancellationException
@@ -8,9 +9,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.job
-import timber.log.Timber
-
-private const val TAG = "CoroutineScopeExt"
 
 /**
  * Creates a child [CoroutineScope] from the calling [CoroutineScope], using a standard [Job] as the parent job. This
@@ -59,19 +57,21 @@ private fun CoroutineScope.childScope(
     childJob: (Job) -> Job,
 ): CoroutineScope {
     val job = childJob(coroutineContext.job)
-    val parentName =
-        (coroutineContext[CoroutineName.Key]?.name ?: "").ifBlank {
+    val parentName = (coroutineContext[CoroutineName.Key]?.name ?: "").ifBlank {
             "parent(${Integer.toHexString(System.identityHashCode(coroutineContext.job))})"
         }
     val childName = "$parentName⇨$name(${Integer.toHexString(System.identityHashCode(job))})"
 
     job.invokeOnCompletion { error ->
         if (error is CancellationException) {
-            Timber.tag(TAG).d(message = "Child scope completed: %s, cancellation: %S", childName, error.message)
+            log.d { "Child scope completed: $childName, cancellation: ${error.message}" }
         } else {
-            Timber.tag(TAG).d(t = error, message = "Child scope completed with error: %s", childName)
+            log.w(error) { "Child scope completed with error: $childName" }
         }
     }
 
+    log.d { "Child scope created: $childName" }
     return CoroutineScope(context + job + CoroutineName(childName))
 }
+
+private val log = Logger.withTag("CoroutineScopeExt")

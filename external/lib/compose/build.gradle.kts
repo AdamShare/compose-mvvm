@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.share.external.lib.mvvm"
+    namespace = "com.share.external.lib.compose"
     compileSdk = 36
 
     defaultConfig {
@@ -25,10 +25,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions { jvmTarget = "11" }
     buildFeatures { compose = true }
 }
 
+kotlin { compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11 } }
 
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
@@ -37,9 +37,9 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.kermit)
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.timber)
 
     implementation(projects.external.foundation.coroutines)
 

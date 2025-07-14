@@ -8,12 +8,14 @@ appcompat = "1.7.1"
 dagger = "2.56.2"
 kotlin = "2.2.0"
 kotlinxCoroutines = "1.10.2"
+kotlinxAtomicFu = "0.29.0"
 ksp = "2.2.0-2.0.2"
 composeBom = "2025.06.01"
 coreKtx = "1.16.0"
 espressoCore = "3.6.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
+kermit = "2.0.6"
 mockk = "1.14.4"
 timber = "5.0.1"
 runtimeAndroid = "1.8.3"
@@ -41,13 +43,16 @@ androidx-window = { group = "androidx.window", name = "window", version.ref = "a
 
 dagger = { group = "com.google.dagger", name = "dagger", version.ref = "dagger"}
 daggerCompiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger"}
+kermit = { group = "co.touchlab", name = "kermit", version.ref = "kermit" }
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
+kotlinx-atomic-fu = { group = "org.jetbrains.kotlinx", name = "atomicfu", version.ref = "kotlinxAtomicFu" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

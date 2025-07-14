@@ -2,15 +2,14 @@ package com.share.external.lib.mvvm.navigation.stack
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
-import com.share.external.lib.mvvm.navigation.content.View
+import co.touchlab.kermit.Logger
+import com.share.external.lib.mvvm.base.View
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
-import com.share.external.lib.mvvm.navigation.content.ViewProvider
-import com.share.external.lib.mvvm.navigation.lifecycle.VisibilityScopedView
-import com.share.external.lib.mvvm.navigation.modal.ModalContainer
-import com.share.external.lib.mvvm.navigation.modal.ModalProperties
+import com.share.external.lib.mvvm.base.ViewProvider
+import com.share.external.lib.compose.modal.ModalContainer
+import com.share.external.lib.compose.modal.ModalProperties
 
 /**
  * Hosts a navigation stack of [View]s and renders the appropriate content based on their [ViewPresentation.Style].
@@ -91,7 +90,7 @@ fun <V> NavigationStackHost(
         }
 
         LaunchedEffect(stack) {
-            stack.logEntries(analyticsId = analyticsId, tag = TAG) {
+            logger.logEntries(entries = stack, analyticsId = analyticsId) {
                 if (fullScreen == it) {
                     "FullScreen"
                 } else if (modal == it) {
@@ -102,4 +101,4 @@ fun <V> NavigationStackHost(
     }
 }
 
-private const val TAG = "NavigationStackHost"
+private val logger = Logger.withTag("NavigationStackHost")

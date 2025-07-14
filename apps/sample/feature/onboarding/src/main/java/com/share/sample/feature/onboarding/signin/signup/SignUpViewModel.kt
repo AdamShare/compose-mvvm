@@ -1,6 +1,6 @@
 package com.share.sample.feature.onboarding.signin.signup
 
-import com.share.external.lib.activity.viewmodel.ViewModel
+import com.share.external.lib.compose.state.ViewModel
 import com.share.external.lib.mvvm.navigation.content.Screen
 import com.share.external.lib.mvvm.navigation.stack.NavigationStackEntry
 import dagger.Module

@@ -29,12 +29,13 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions { jvmTarget = "11" }
     buildFeatures {
         buildConfig = true
         compose = true
     }
 }
+
+kotlin { compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11 } }
 
 dependencies {
     ksp(libs.daggerCompiler)
@@ -57,7 +58,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.dagger)
-    implementation(libs.timber)
+    implementation(libs.kermit)
 
     testImplementation(libs.junit)
 

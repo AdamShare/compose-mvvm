@@ -7,15 +7,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.vector.Path
+import co.touchlab.kermit.Logger
 import com.share.external.foundation.coroutines.MainImmediateScope
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
-import com.share.external.lib.mvvm.navigation.content.ViewProvider
-import com.share.external.lib.mvvm.navigation.lifecycle.VisibilityScopedView
+import com.share.external.lib.mvvm.base.ViewProvider
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.LinkedHashMap
 
 /**
@@ -73,7 +71,7 @@ open class ViewModelNavigationStack<V>(
 
     internal fun push(key: NavigationKey, viewProvider: V, scope: ManagedCoroutineScope) {
         if (!rootScope.isActive || !scope.isActive) {
-            Timber.tag(TAG).wtf("Scope is not active pushing $key, $viewProvider onto nav stack: $this")
+            logger.a { "Scope is not active pushing $key, $viewProvider onto nav stack: $this" }
             return
         }
         if (providers.keys.lastOrNull() == key) {
@@ -161,33 +159,9 @@ open class ViewModelNavigationStack<V>(
     }
 
     companion object {
-        const val TAG = "NavigationStack"
+        private val logger = Logger.withTag("NavigationStack")
     }
 }
-
-fun <T: NavigationKey> List<T>.logEntries(
-    analyticsId: String,
-    tag: String,
-    metadata: (T) -> String? = { null },
-) {
-    Timber.tag(tag)
-        .d(
-            "%s",
-            object {
-                override fun toString(): String = buildString {
-                    append("Backstack $analyticsId[")
-                    this@logEntries.forEachIndexed { i, provider ->
-                        append("{${provider.analyticsId}")
-                        metadata(provider)?.let { append(": $it") }
-                        append("}")
-                        if (i < size - 1) append(" ⇨ ")
-                    }
-                    append("]")
-                }
-            },
-        )
-}
-
 
 private fun <K, V>LinkedHashMap<K, V>.removeAllAfter(key: K, inclusive: Boolean = false): List<V> {
     if (!containsKey(key)) {
@@ -236,5 +210,22 @@ fun <K, V> LinkedHashMap<K, V>.removeLast(): V? {
         if (isEmpty()) null else sequencedValues().removeLast()
     } else {
         keys.lastOrNull()?.let { remove(key = it) }
+    }
+}
+
+fun <T: NavigationKey> Logger.logEntries(
+    entries: List<T>,
+    analyticsId: String,
+    metadata: (T) -> String? = { null },
+) = d {
+    buildString {
+        append("Backstack $analyticsId[")
+        entries.forEachIndexed { i, provider ->
+            append("{${provider.analyticsId}")
+            metadata(provider)?.let { append(": $it") }
+            append("}")
+            if (i < entries.size - 1) append(" ⇨ ")
+        }
+        append("]")
     }
 }

@@ -8,7 +8,7 @@ import com.share.external.lib.mvvm.navigation.content.NavigationKey
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
 import com.share.external.lib.mvvm.navigation.lifecycle.DefaultViewModelStoreOwner
 import com.share.external.lib.mvvm.navigation.lifecycle.LocalOwnersProvider
-import com.share.external.lib.mvvm.navigation.content.ViewProvider
+import com.share.external.lib.mvvm.base.ViewProvider
 import com.share.external.lib.mvvm.navigation.lifecycle.VisibilityScopedView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +19,6 @@ import kotlinx.coroutines.Dispatchers
  *
  * This class ensures that:
  * - The [view] has a retained [ViewModelStore] scoped to its lifecycle.
- * - Lifecycle visibility is tracked via [ViewAppearanceEvents].
  * - Coroutine scope is tied to the view's appearance and cancelled appropriately.
  *
  * @param view The view instance to be hosted.

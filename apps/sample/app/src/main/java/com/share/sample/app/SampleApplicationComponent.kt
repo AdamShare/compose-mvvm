@@ -1,18 +1,22 @@
 package com.share.sample.app
 
 import android.app.Application
-import com.share.external.lib.activity.application.ApplicationCoroutineScopeModule
-import com.share.external.lib.activity.application.Injectable
-import com.share.sample.app.activity.SampleActivityViewModelComponent
+import com.share.external.lib.activity.application.ApplicationCoroutineScopeProvider
+import com.share.external.lib.activity.inject.Injectable
+import com.share.sample.app.main.MainViewComponent
 import dagger.Component
 import dagger.Module
 import javax.inject.Singleton
 
 @Singleton
-@Component(dependencies = [Application::class], modules = [SampleApplicationModule::class])
+@Component(
+    dependencies = [Application::class, ApplicationCoroutineScopeProvider::class],
+    modules = [SampleApplicationModule::class]
+)
 interface SampleApplicationComponent : Injectable<SampleApplication> {
-    @Component.Factory interface Factory : (Application) -> SampleApplicationComponent
+    @Component.Factory
+    interface Factory : (Application, ApplicationCoroutineScopeProvider) -> SampleApplicationComponent
 }
 
-@Module(subcomponents = [SampleActivityViewModelComponent::class], includes = [ApplicationCoroutineScopeModule::class])
+@Module(subcomponents = [MainViewComponent::class])
 object SampleApplicationModule

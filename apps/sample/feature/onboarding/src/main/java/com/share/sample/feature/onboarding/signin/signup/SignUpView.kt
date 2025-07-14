@@ -16,12 +16,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.share.external.lib.activity.calculateWindowSizeClass
-import com.share.external.lib.activity.hasCompactSize
+import com.share.external.lib.activity.compose.calculateWindowSizeClass
+import com.share.external.lib.activity.compose.hasCompactSize
 import com.share.external.lib.mvvm.navigation.content.Screen
-import com.share.external.lib.mvvm.navigation.content.View
+import com.share.external.lib.mvvm.base.View
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
-import com.share.external.lib.mvvm.navigation.modal.ModalProperties
+import com.share.external.lib.compose.modal.ModalProperties
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope

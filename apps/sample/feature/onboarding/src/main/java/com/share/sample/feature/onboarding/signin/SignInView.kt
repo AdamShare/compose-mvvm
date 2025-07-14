@@ -10,8 +10,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,16 +18,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.share.external.lib.mvvm.navigation.content.Screen
-import com.share.external.lib.mvvm.navigation.content.View
+import com.share.external.lib.mvvm.base.View
 import com.share.external.lib.mvvm.navigation.stack.NavigationStackScope
-import com.share.compose.state.StateProvider
+import com.share.external.lib.compose.state.StateProvider
 import com.share.sample.feature.onboarding.signin.signup.SignUpComponent
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.onCompletion
-import timber.log.Timber
 
 @Module
 object SignInViewModule {
@@ -62,9 +57,6 @@ class SignInView(
     SignInEmailTextFieldListener by emailViewModel,
     SignInEmailTextFieldState by emailViewModel,
     StateProvider {
-        init {
-            Timber.tag("SignInView").d("init")
-        }
 
     override fun onClickSignIn() {
 

@@ -25,9 +25,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions { jvmTarget = "11" }
     buildFeatures { compose = true }
 }
+
+kotlin { compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11 } }
 
 dependencies {
     implementation(libs.androidx.activity.compose)
@@ -41,8 +42,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.window)
+    implementation(libs.kermit)
     implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.timber)
 
     implementation(projects.external.foundation.coroutines)
     implementation(projects.external.lib.compose)

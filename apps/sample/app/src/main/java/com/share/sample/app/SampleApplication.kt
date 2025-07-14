@@ -1,23 +1,16 @@
 package com.share.sample.app
 
 import android.app.Application
-import com.share.external.lib.activity.application.ApplicationCoroutineScope
-import com.share.external.lib.activity.application.inject
-import com.share.sample.app.activity.SampleActivityViewModelComponent
+import com.share.external.lib.activity.application.ApplicationCoroutineScopeProvider
+import com.share.sample.app.main.MainViewComponent
 import javax.inject.Inject
-import timber.log.Timber
 
-class SampleApplication : Application(), SampleActivityViewModelComponent.Application {
-    @Inject lateinit var applicationCoroutineScope: ApplicationCoroutineScope
-    @Inject override lateinit var sampleActivityViewModelComponent: SampleActivityViewModelComponent.Factory
+class SampleApplication : Application(), ApplicationCoroutineScopeProvider {
+    @Inject lateinit var sampleActivityViewModelComponent: MainViewComponent.Factory
 
     override fun onCreate() {
         super.onCreate()
 
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
-        }
-
-        DaggerSampleApplicationComponent.factory().inject(this)
+        DaggerSampleApplicationComponent.factory().invoke(this, this).inject(this)
     }
 }

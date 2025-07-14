@@ -1,9 +1,8 @@
 package com.share.sample.feature.onboarding
 
-import androidx.compose.runtime.Composable
 import com.share.external.lib.mvvm.navigation.content.Screen
-import com.share.external.lib.mvvm.navigation.content.View
-import com.share.external.lib.mvvm.navigation.content.ViewProvider
+import com.share.external.lib.mvvm.base.View
+import com.share.external.lib.mvvm.base.ViewProvider
 import com.share.external.lib.mvvm.navigation.stack.NavigationStackHost
 import com.share.external.lib.mvvm.navigation.stack.ViewModelNavigationStack
 import com.share.sample.feature.onboarding.signin.SignInComponent

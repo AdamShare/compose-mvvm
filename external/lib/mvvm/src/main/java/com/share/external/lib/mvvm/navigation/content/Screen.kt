@@ -1,11 +1,9 @@
 package com.share.external.lib.mvvm.navigation.content
 
-import com.share.external.lib.mvvm.navigation.content.ViewProvider
+import com.share.external.lib.mvvm.base.ViewProvider
 
 /**
- * A compound interface that represents a complete navigation destination, combining both the UI ([View]) and its
- * desired presentation style ([ViewPresentation]).
- *
- * This is the most common interface used for screen definitions in a navigation stack.
+ * A compound interface that represents a complete navigation destination, combining both
+ * the UI ([com.share.external.lib.mvvm.base.View]) and its desired presentation style ([ViewPresentation]).
  */
 interface Screen : ViewProvider, ViewPresentation

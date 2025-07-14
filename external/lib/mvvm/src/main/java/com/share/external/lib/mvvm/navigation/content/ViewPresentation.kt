@@ -1,10 +1,10 @@
 package com.share.external.lib.mvvm.navigation.content
 
 import androidx.compose.runtime.Composable
-import com.share.external.lib.mvvm.navigation.modal.ModalProperties
+import com.share.external.lib.compose.modal.ModalProperties
 
 /**
- * Describes how a [View] prefers to be presented: full-screen or as a modal.
+ * Describes how a [com.share.external.lib.mvvm.base.View] prefers to be presented: full-screen or as a modal.
  *
  * Used by navigation hosts to determine how to render views in a stack, allowing different types of transitions,
  * overlays, or layout constraints.

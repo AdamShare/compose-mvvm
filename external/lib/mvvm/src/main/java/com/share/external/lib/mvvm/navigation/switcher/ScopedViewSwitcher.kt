@@ -8,7 +8,7 @@ import androidx.compose.runtime.setValue
 import com.share.external.foundation.coroutines.MainImmediateScope
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
-import com.share.external.lib.mvvm.navigation.content.ViewProvider
+import com.share.external.lib.mvvm.base.ViewProvider
 import com.share.external.lib.mvvm.navigation.stack.ViewProviderViewModelStoreContentProvider
 import kotlinx.coroutines.launch
 

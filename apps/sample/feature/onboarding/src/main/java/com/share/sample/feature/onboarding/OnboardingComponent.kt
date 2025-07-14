@@ -1,8 +1,7 @@
 package com.share.sample.feature.onboarding
 
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
-import com.share.external.lib.mvvm.navigation.content.View
-import com.share.external.lib.mvvm.navigation.content.ViewProvider
+import com.share.external.lib.mvvm.base.ViewProvider
 import com.share.sample.feature.onboarding.signin.SignInComponent
 import dagger.BindsInstance
 import dagger.Module
