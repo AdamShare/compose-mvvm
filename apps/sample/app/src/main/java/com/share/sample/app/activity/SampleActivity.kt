@@ -5,11 +5,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.CompositionLocalProvider
 import com.share.compose.context.LocalViewContext
+import com.share.compose.foundation.layout.LocalDecorViewProperties
 import com.share.external.lib.activity.rememberActivityViewContext
 import com.share.external.lib.activity.ActivityComponentInject
 import com.share.external.lib.activity.ViewModelComponentActivity
-import com.share.external.lib.mvvm.navigation.modal.LocalDecorViewProperties
-import com.share.external.lib.mvvm.navigation.modal.decorViewProperties
+import com.share.external.lib.activity.decorViewProperties
 
 interface SampleActivityComponentInject :
     ActivityComponentInject<

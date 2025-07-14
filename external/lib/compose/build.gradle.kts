@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.share.external.lib.compose"
+    namespace = "com.share.external.lib.mvvm"
     compileSdk = 36
 
     defaultConfig {
@@ -31,13 +31,15 @@ android {
 
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.material3.window)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.timber)
-    implementation(libs.androidx.runtime.android)
 
     implementation(projects.external.foundation.coroutines)
 

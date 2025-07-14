@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.share.compose.foundation.layout.LocalDecorViewProperties
 
 /**
  * Root container for presenting modal content with background scrim, keyboard insets, and dismiss handling.

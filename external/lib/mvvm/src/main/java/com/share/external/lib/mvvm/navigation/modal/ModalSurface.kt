@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.share.compose.foundation.layout.LocalDecorViewProperties
 
 /**
  * Core composable that renders a modal surface constrained by [ModalProperties].

@@ -8,8 +8,8 @@ import kotlinx.coroutines.CoroutineScope
  * A factory for creating new [CoroutineScope] instances with a specific name and optional context. This is typically
  * used to produce child scopes within a parent scope.
  *
- * Implementations might choose different strategies for job creation (e.g. using a [SupervisorJob] vs a standard [Job])
- * or context merging.
+ * Implementations might choose different strategies for job creation
+ * (e.g. using a [kotlinx.coroutines.SupervisorJob] vs a standard [kotlinx.coroutines.Job]) or context merging.
  */
 interface CoroutineScopeFactory {
     /**

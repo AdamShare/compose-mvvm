@@ -43,7 +43,7 @@ data class ModalProperties(
     val minVerticalPadding: Dp = 40.dp,
 
     /** Range (as a fraction of parent width) that the modal’s width can occupy. */
-    val widthRatioRange: ClosedRange<Float> = 0.4f..1.0f,
+    val widthRatioRange: ClosedRange<Float> = 0.0f..1.0f,
 
     /** Range (as a fraction of parent height) that the modal’s height can occupy. */
     val heightRatioRange: ClosedRange<Float> = 0.0f..1.0f,

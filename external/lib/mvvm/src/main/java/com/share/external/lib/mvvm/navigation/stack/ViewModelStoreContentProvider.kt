@@ -7,15 +7,15 @@ import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.lifecycle.VisibilityScopedView
 
 /**
- * A container that bridges a [view] and its associated [ViewModelStore], [CoroutineScope], and [SaveableStateHolder]
+ * A container that bridges a [view] and its associated [androidx.lifecycle.ViewModelStore], [kotlinx.coroutines.CoroutineScope], and [SaveableStateHolder]
  * into a reusable composition host.
  *
  * This interface ensures that each screen or modal view receives correct lifecycle ownership and state management
  * support within a Compose navigation context.
  *
  * Implementations must ensure:
- * - A retained [CoroutineScope] for view-related logic.
- * - Correct scoping of [ViewModelStoreOwner] and [SaveableStateHolder] via [LocalOwnersProvider].
+ * - A retained [kotlinx.coroutines.CoroutineScope] for view-related logic.
+ * - Correct scoping of [androidx.lifecycle.ViewModelStoreOwner] and [SaveableStateHolder] via [LocalOwnersProvider].
  *
  * @param V The view type being hosted.
  */
@@ -24,8 +24,8 @@ interface ViewModelStoreContentProvider<V> : ManagedCoroutineScope {
     val view: V
 
     /**
-     * Provides the necessary local owners ([ViewModelStoreOwner], [SaveableStateHolder], etc.) and lifecycle visibility
-     * context for [view] composition.
+     * Provides the necessary local owners ([androidx.lifecycle.ViewModelStoreOwner], [SaveableStateHolder], etc.)
+     * and lifecycle visibility context for [view] composition.
      *
      * This should be called from within a composable scope to wrap the [view]'s UI logic.
      *
