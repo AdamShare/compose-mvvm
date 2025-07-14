@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.share.sample.feature.onboarding"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24
@@ -36,6 +36,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(projects.external.foundation.coroutines)
+    implementation(projects.external.lib.activity)
     implementation(projects.external.lib.compose)
     implementation(projects.external.lib.mvvm)
 

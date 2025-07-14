@@ -8,8 +8,7 @@ import androidx.compose.runtime.setValue
 import com.share.external.foundation.coroutines.MainImmediateScope
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScope
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewProvider
+import com.share.external.lib.mvvm.navigation.content.ViewProvider
 import com.share.external.lib.mvvm.navigation.stack.ViewProviderViewModelStoreContentProvider
 import kotlinx.coroutines.launch
 
@@ -33,7 +32,7 @@ class ScopedViewSwitcher<K : NavigationKey>(private val scope: ManagedCoroutineS
         val selectedKey = selected
         if (selectedKey != null) {
             if (selectedKey != currentProvider?.key) {
-                val scope = ViewLifecycleScope(scope.childManagedScope(selectedKey.analyticsId))
+                val scope = scope.childManagedScope(selectedKey.analyticsId)
                 val previous = currentProvider
                 currentProvider = ViewScope(
                     content = content(selectedKey, scope),
@@ -55,6 +54,6 @@ class ScopedViewSwitcher<K : NavigationKey>(private val scope: ManagedCoroutineS
         currentProvider = null
     }
 
-    private class ViewScope<K>(content: ViewProvider, val key: K, scope: ViewLifecycleScope) :
+    private class ViewScope<K>(content: ViewProvider, val key: K, scope: ManagedCoroutineScope) :
         ViewProviderViewModelStoreContentProvider<ViewProvider>(viewProvider = content, scope = scope)
 }

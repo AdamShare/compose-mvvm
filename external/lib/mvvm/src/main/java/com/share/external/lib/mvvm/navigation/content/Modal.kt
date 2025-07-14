@@ -1,7 +1,7 @@
 package com.share.external.lib.mvvm.navigation.content
 
 import androidx.compose.runtime.Composable
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewProvider
+import com.share.external.lib.mvvm.navigation.content.ViewProvider
 import com.share.external.lib.mvvm.navigation.modal.ModalProperties
 import kotlinx.coroutines.CoroutineScope
 
@@ -34,5 +34,5 @@ class Modal(
         viewProvider = ViewProvider { View(content) }
     )
 
-    @Composable override fun preferredPresentationStyle(): ViewPresentation.Style = presentation
+    override val preferredPresentationStyle = @Composable { presentation }
 }

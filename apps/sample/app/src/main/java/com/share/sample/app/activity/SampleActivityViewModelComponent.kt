@@ -1,10 +1,10 @@
 package com.share.sample.app.activity
 
-import com.share.external.lib.mvvm.activity.ActivityComponentProvider
-import com.share.external.lib.mvvm.activity.ActivityViewModelComponent
-import com.share.external.lib.mvvm.activity.ActivityViewModelComponentProvider
-import com.share.external.lib.mvvm.activity.ActivityViewModelCoroutineScope
-import com.share.external.lib.mvvm.application.ApplicationCoroutineScope
+import com.share.external.lib.activity.ActivityComponentProvider
+import com.share.external.lib.activity.ActivityViewModelComponent
+import com.share.external.lib.activity.ActivityViewModelComponentProvider
+import com.share.external.lib.activity.ActivityViewModelCoroutineScope
+import com.share.external.lib.activity.application.ApplicationCoroutineScope
 import com.share.sample.feature.onboarding.OnboardingComponent
 import dagger.Module
 import dagger.Provides

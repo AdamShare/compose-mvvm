@@ -1,8 +1,8 @@
 package com.share.sample.app
 
 import android.app.Application
-import com.share.external.lib.mvvm.application.ApplicationCoroutineScopeModule
-import com.share.external.lib.mvvm.application.Injectable
+import com.share.external.lib.activity.application.ApplicationCoroutineScopeModule
+import com.share.external.lib.activity.application.Injectable
 import com.share.sample.app.activity.SampleActivityViewModelComponent
 import dagger.Component
 import dagger.Module

@@ -1,6 +1,6 @@
 package com.share.external.lib.mvvm.navigation.content
 
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewProvider
+import com.share.external.lib.mvvm.navigation.content.ViewProvider
 
 /**
  * A compound interface that represents a complete navigation destination, combining both the UI ([View]) and its

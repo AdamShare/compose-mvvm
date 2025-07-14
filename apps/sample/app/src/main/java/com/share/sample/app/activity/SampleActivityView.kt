@@ -4,7 +4,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.share.external.lib.mvvm.navigation.content.View
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewProvider
+import com.share.external.lib.mvvm.navigation.content.ViewProvider
 import com.share.sample.feature.onboarding.OnboardingComponent
 
 class SampleActivityView(

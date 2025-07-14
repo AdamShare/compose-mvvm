@@ -4,8 +4,10 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.CompositionLocalProvider
-import com.share.external.lib.mvvm.activity.ActivityComponentInject
-import com.share.external.lib.mvvm.activity.ViewModelComponentActivity
+import com.share.compose.context.LocalViewContext
+import com.share.external.lib.activity.rememberActivityViewContext
+import com.share.external.lib.activity.ActivityComponentInject
+import com.share.external.lib.activity.ViewModelComponentActivity
 import com.share.external.lib.mvvm.navigation.modal.LocalDecorViewProperties
 import com.share.external.lib.mvvm.navigation.modal.decorViewProperties
 
@@ -27,7 +29,10 @@ class SampleActivity :
         inject()
         enableEdgeToEdge()
         setContent {
-            CompositionLocalProvider(LocalDecorViewProperties provides decorViewProperties()) {
+            CompositionLocalProvider(
+                LocalDecorViewProperties provides decorViewProperties(),
+                LocalViewContext provides rememberActivityViewContext()
+                ) {
                 viewModelComponent.view.content()
             }
         }

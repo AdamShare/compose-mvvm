@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.share.external.foundation.coroutines"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24

@@ -3,7 +3,7 @@ package com.share.external.lib.mvvm.navigation.switcher
 import androidx.compose.runtime.Composable
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewProvider
+import com.share.external.lib.mvvm.navigation.content.ViewProvider
 
 interface ViewSwitcher<K : NavigationKey> {
     var selected: K?

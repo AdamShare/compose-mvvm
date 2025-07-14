@@ -8,9 +8,7 @@ import com.share.external.lib.mvvm.navigation.content.NavigationKey
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
 import com.share.external.lib.mvvm.navigation.lifecycle.DefaultViewModelStoreOwner
 import com.share.external.lib.mvvm.navigation.lifecycle.LocalOwnersProvider
-import com.share.external.lib.mvvm.navigation.lifecycle.ObserveViewVisibility
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScope
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewProvider
+import com.share.external.lib.mvvm.navigation.content.ViewProvider
 import com.share.external.lib.mvvm.navigation.lifecycle.VisibilityScopedView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +28,7 @@ import kotlinx.coroutines.Dispatchers
 @Immutable
 internal open class ViewProviderViewModelStoreContentProvider<V>(
     protected val viewProvider: V,
-    protected val scope: ViewLifecycleScope,
+    private val scope: ManagedCoroutineScope,
 ) : ManagedCoroutineScope by scope,
     ViewModelStoreContentProvider<VisibilityScopedView<V>>
         where V: ViewProvider {
@@ -39,7 +37,7 @@ internal open class ViewProviderViewModelStoreContentProvider<V>(
     private val owner = DefaultViewModelStoreOwner()
 
     override val view: VisibilityScopedView<V> = VisibilityScopedView(
-        scopeFactory = { scope.create(tag, Dispatchers.Main.immediate)  },
+        scopeFactory = { scope.create(name = tag, context = Dispatchers.Main.immediate)  },
         viewProvider = viewProvider
     )
 
@@ -50,10 +48,7 @@ internal open class ViewProviderViewModelStoreContentProvider<V>(
 
     @Composable
     override fun LocalOwnersProvider(saveableStateHolder: SaveableStateHolder, content: @Composable () -> Unit) {
-        owner.LocalOwnersProvider(saveableStateHolder) {
-            scope.viewAppearanceEvents.ObserveViewVisibility()
-            content()
-        }
+        owner.LocalOwnersProvider(saveableStateHolder, content)
     }
 }
 
@@ -61,11 +56,10 @@ internal open class ViewProviderViewModelStoreContentProvider<V>(
 internal open class ViewPresentationProviderViewModelStoreContentProvider<V>(
     navigationKey: NavigationKey,
     viewProvider: V,
-    scope: ViewLifecycleScope,
+    scope: ManagedCoroutineScope,
 ) : ViewProviderViewModelStoreContentProvider<V>(
     viewProvider = viewProvider,
     scope = scope,
 ), NavigationKey by navigationKey, ViewPresentation where V: ViewProvider, V: ViewPresentation {
-    @Composable
-    override fun preferredPresentationStyle(): ViewPresentation.Style = viewProvider.preferredPresentationStyle()
+    override val preferredPresentationStyle = viewProvider.preferredPresentationStyle
 }

@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.share.sample.app"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.share.sample.app"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -44,6 +44,8 @@ dependencies {
 
     implementation(projects.apps.sample.feature.onboarding)
     implementation(projects.external.foundation.coroutines)
+    implementation(projects.external.lib.activity)
+    implementation(projects.external.lib.compose)
     implementation(projects.external.lib.mvvm)
 
     implementation(libs.androidx.activity.compose)

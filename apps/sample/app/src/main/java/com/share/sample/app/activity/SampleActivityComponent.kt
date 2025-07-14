@@ -1,9 +1,9 @@
 package com.share.sample.app.activity
 
-import com.share.external.lib.mvvm.activity.ActivityComponentFactory
-import com.share.external.lib.mvvm.activity.ActivityScope
-import com.share.external.lib.mvvm.activity.ComponentActivityModule
-import com.share.external.lib.mvvm.application.Injectable
+import com.share.external.lib.activity.ActivityComponentFactory
+import com.share.external.lib.activity.ActivityScope
+import com.share.external.lib.activity.ComponentActivityModule
+import com.share.external.lib.activity.application.Injectable
 import dagger.Module
 import dagger.Subcomponent
 

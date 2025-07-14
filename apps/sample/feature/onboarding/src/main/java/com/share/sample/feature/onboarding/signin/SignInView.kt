@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.share.external.lib.mvvm.navigation.content.Screen
 import com.share.external.lib.mvvm.navigation.content.View
 import com.share.external.lib.mvvm.navigation.stack.NavigationStackScope
-import com.share.external.lib.mvvm.viewmodel.StateProvider
+import com.share.compose.state.StateProvider
 import com.share.sample.feature.onboarding.signin.signup.SignUpComponent
 import dagger.Module
 import dagger.Provides

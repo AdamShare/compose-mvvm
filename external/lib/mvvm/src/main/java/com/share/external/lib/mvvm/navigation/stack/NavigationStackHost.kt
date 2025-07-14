@@ -7,7 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import com.share.external.lib.mvvm.navigation.content.View
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewProvider
+import com.share.external.lib.mvvm.navigation.content.ViewProvider
 import com.share.external.lib.mvvm.navigation.lifecycle.VisibilityScopedView
 import com.share.external.lib.mvvm.navigation.modal.ModalContainer
 import com.share.external.lib.mvvm.navigation.modal.ModalProperties

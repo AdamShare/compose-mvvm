@@ -1,9 +1,8 @@
 package com.share.sample.feature.onboarding.signin.signup
 
+import com.share.external.lib.activity.viewmodel.ViewModel
 import com.share.external.lib.mvvm.navigation.content.Screen
 import com.share.external.lib.mvvm.navigation.stack.NavigationStackEntry
-import com.share.external.lib.mvvm.viewmodel.ViewLifecycleViewModel
-import com.share.external.lib.mvvm.viewmodel.ViewModel
 import dagger.Module
 import dagger.Provides
 
@@ -15,7 +14,7 @@ object SignUpViewModelModule {
 }
 
 class SignUpViewModel(private val navigationContext: NavigationStackEntry<Screen>) :
-    ViewLifecycleViewModel(
+    ViewModel(
         name = TAG,
         scope = navigationContext,
     ), SignUpViewListener {

@@ -12,8 +12,7 @@ import com.share.external.foundation.coroutines.MainImmediateScope
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewLifecycleScope
-import com.share.external.lib.mvvm.navigation.lifecycle.ViewProvider
+import com.share.external.lib.mvvm.navigation.content.ViewProvider
 import com.share.external.lib.mvvm.navigation.lifecycle.VisibilityScopedView
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -31,7 +30,6 @@ import java.util.LinkedHashMap
  * - Pushes views onto the stack with [push], removing and cancelling existing entries with matching keys.
  * - Provides [pop], [popTo], and [removeAll] operations for typical back stack navigation.
  * - Defers cancellation logic (e.g., ViewModel teardown) until the transaction is complete using [transactionFinished].
- * - Uses [ViewLifecycleScope] to automatically remove entries when their lifecycle completes.
  *
  * @param V The view type managed by the stack.
  * @param rootScope The parent coroutine scope for all views in the stack.
@@ -73,7 +71,7 @@ open class ViewModelNavigationStack<V>(
 
     fun rootNavigationScope(): NavigationStackScope<V> = NavigationStackContext(scope = rootScope, stack = this)
 
-    internal fun push(key: NavigationKey, viewProvider: V, scope: ViewLifecycleScope) {
+    internal fun push(key: NavigationKey, viewProvider: V, scope: ManagedCoroutineScope) {
         if (!rootScope.isActive || !scope.isActive) {
             Timber.tag(TAG).wtf("Scope is not active pushing $key, $viewProvider onto nav stack: $this")
             return
@@ -114,7 +112,7 @@ open class ViewModelNavigationStack<V>(
         val removed = providers.removeAllAfter(key, inclusive)
         return if (removed.isNotEmpty()) {
             transactionFinished.add {
-                removed.asReversed().forEach {
+                removed.forEach {
                     it.cancel(
                         awaitChildrenComplete = true,
                         message = "Popped from back stack to: $key inclusive: $inclusive",
@@ -195,9 +193,9 @@ private fun <K, V>LinkedHashMap<K, V>.removeAllAfter(key: K, inclusive: Boolean 
     if (!containsKey(key)) {
         return listOf()
     }
+    val removed = mutableListOf<V>()
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-        val removed = mutableListOf<V>()
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
         val reversedEntrySet = sequencedEntrySet().reversed().iterator()
         var element = reversedEntrySet.next()
         while (element.key != key) {
@@ -209,22 +207,27 @@ private fun <K, V>LinkedHashMap<K, V>.removeAllAfter(key: K, inclusive: Boolean 
             removed.add(element.value)
             reversedEntrySet.remove()
         }
-        return removed.asReversed()
+        removed
     } else {
-        val entries = entries
-        val removed = mutableListOf<V>()
-        val reversedEntrySet = entries.reversed().iterator()
-        var element = reversedEntrySet.next()
-        while (element.key != key) {
-            removed.add(element.value)
-            entries.remove(element = element)
-            element = reversedEntrySet.next()
+        val iterator = entries.iterator()
+
+        while (iterator.hasNext()) {
+            val entry = iterator.next()
+            if (entry.key == key) {
+                if (inclusive) {
+                    removed.add(entry.value)
+                    iterator.remove()
+                }
+                break
+            }
         }
-        if (inclusive) {
-            removed.add(element.value)
-            entries.remove(element = element)
+
+        while (iterator.hasNext()) {
+            removed.add(iterator.next().value)
+            iterator.remove()
         }
-        return removed.asReversed()
+
+        removed.asReversed()
     }
 }
 
@@ -232,6 +235,6 @@ fun <K, V> LinkedHashMap<K, V>.removeLast(): V? {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
         if (isEmpty()) null else sequencedValues().removeLast()
     } else {
-        keys.lastOrNull()?.let { remove(it) }
+        keys.lastOrNull()?.let { remove(key = it) }
     }
 }

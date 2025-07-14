@@ -1,8 +1,8 @@
 package com.share.sample.app
 
 import android.app.Application
-import com.share.external.lib.mvvm.application.ApplicationCoroutineScope
-import com.share.external.lib.mvvm.application.inject
+import com.share.external.lib.activity.application.ApplicationCoroutineScope
+import com.share.external.lib.activity.application.inject
 import com.share.sample.app.activity.SampleActivityViewModelComponent
 import javax.inject.Inject
 import timber.log.Timber

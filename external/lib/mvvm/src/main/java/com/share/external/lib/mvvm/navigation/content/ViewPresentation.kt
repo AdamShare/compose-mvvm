@@ -16,7 +16,7 @@ interface ViewPresentation {
      * The default implementation returns [Style.FullScreen], but this can be overridden to return a [Style.Modal] with
      * custom [ModalProperties].
      */
-    @Composable fun preferredPresentationStyle(): Style = Style.FullScreen
+    val preferredPresentationStyle: @Composable () -> Style get() = Style.Default
 
     /** Defines the visual presentation mode for a view. */
     sealed interface Style {
@@ -28,5 +28,9 @@ interface ViewPresentation {
          * [ModalProperties].
          */
         data class Modal(val properties: ModalProperties? = ModalProperties()) : Style
+
+        companion object {
+            val Default = @Composable { FullScreen }
+        }
     }
 }

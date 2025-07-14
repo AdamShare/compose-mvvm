@@ -4,7 +4,7 @@ import android.util.Patterns
 import com.share.compose.runtime.derivedStateObservingOf
 import com.share.compose.runtime.mutableStateObservingOf
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
-import com.share.external.lib.mvvm.viewmodel.ViewModel
+import com.share.external.lib.activity.viewmodel.ViewModel
 
 class EmailViewModel(scope: ManagedCoroutineScope) :
     ViewModel(name = TAG, scope = scope), SignInEmailTextFieldState, SignInEmailTextFieldListener {
