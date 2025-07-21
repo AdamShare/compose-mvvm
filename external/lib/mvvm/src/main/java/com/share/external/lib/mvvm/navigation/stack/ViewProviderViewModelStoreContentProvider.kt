@@ -36,7 +36,7 @@ internal open class ViewProviderViewModelStoreContentProvider<V>(
     private val owner = DefaultViewModelStoreOwner()
 
     override val view: VisibilityScopedView<V> = VisibilityScopedView(
-        scopeFactory = { scope.create(name = tag, context = Dispatchers.Main.immediate)  },
+        scopeFactory = { scope.create(name = tag + "Visibility", context = Dispatchers.Main.immediate)  },
         viewProvider = viewProvider
     )
 

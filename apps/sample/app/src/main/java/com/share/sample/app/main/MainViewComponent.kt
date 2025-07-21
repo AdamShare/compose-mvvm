@@ -3,8 +3,6 @@ package com.share.sample.app.main
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.sample.feature.onboarding.OnboardingComponent
 import dagger.BindsInstance
-import dagger.Module
-import dagger.Provides
 import dagger.Subcomponent
 import javax.inject.Scope
 
@@ -24,18 +22,6 @@ interface MainViewComponent {
             return create(scope = MainViewProviderScope(parent = parent))
         }
     }
-}
-
-@Module(subcomponents = [OnboardingComponent::class])
-object MainViewModule {
-    @MainViewScope
-    @Provides
-    fun pageNavigationController(scope: MainViewProviderScope) = MainViewNavigationController(scope = scope)
-
-    @MainViewScope
-    @Provides
-    fun view(onboarding: OnboardingComponent.Factory, navigationController: MainViewNavigationController) =
-        MainView(onboarding = onboarding, navigationController = navigationController)
 }
 
 class MainViewProviderScope(parent: ManagedCoroutineScope) :
