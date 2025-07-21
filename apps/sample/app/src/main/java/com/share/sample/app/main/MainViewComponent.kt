@@ -10,10 +10,7 @@ import javax.inject.Scope
 
 @MainViewScope
 @Subcomponent(modules = [MainViewModule::class])
-interface MainViewComponent {
-    val navigationController: MainViewNavigationController
-    val onboarding: OnboardingComponent.Factory
-
+interface MainViewComponent: MainViewDependency {
     @Subcomponent.Factory
     abstract class Factory {
         abstract fun create(@BindsInstance scope: MainViewProviderScope): MainViewComponent

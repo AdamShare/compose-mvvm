@@ -26,7 +26,7 @@ class VisibilityScopedView<V>(
                 } else {
                     val scope = scopeFactory()
                     currentScope = scope
-                    currentView.value = viewProvider.create(scope)
+                    currentView.value = viewProvider.onViewAppear(scope)
                     currentView
                 }
             },

@@ -32,7 +32,7 @@ object SignUpViewModule {
 }
 
 class SignUpScreen(private val viewModel: SignUpViewModel) : Screen {
-    override fun create(scope: CoroutineScope) = SignUpView(listener = viewModel)
+    override fun onViewAppear(scope: CoroutineScope) = SignUpView(listener = viewModel)
 
     override val preferredPresentationStyle get() = @Composable {
         val compact = calculateWindowSizeClass().hasCompactSize()

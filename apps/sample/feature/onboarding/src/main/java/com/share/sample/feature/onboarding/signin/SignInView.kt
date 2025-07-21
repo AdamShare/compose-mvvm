@@ -39,7 +39,7 @@ class SignInViewProvider(
     private val navigationScope: NavigationStackScope<Screen>,
     private val signUp: SignUpComponent.Factory,
 ) : Screen {
-    override fun create(scope: CoroutineScope) = SignInView(
+    override fun onViewAppear(scope: CoroutineScope) = SignInView(
         emailViewModel = emailViewModel,
         navigationScope = navigationScope,
         signUp = signUp,

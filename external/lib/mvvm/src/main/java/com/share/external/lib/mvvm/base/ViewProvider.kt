@@ -12,5 +12,5 @@ fun interface ViewProvider {
      * Scope will cancel when the view is out of scope and a new scope is provided on each call.
      * Similar conceptually to [androidx.lifecycle.compose.collectAsStateWithLifecycle].
      */
-    fun create(scope: CoroutineScope): View
+    fun onViewAppear(scope: CoroutineScope): View
 }

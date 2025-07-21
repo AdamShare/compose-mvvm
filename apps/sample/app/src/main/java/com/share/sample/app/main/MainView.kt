@@ -7,7 +7,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.compose.runtime.LoggingStateChangeObserver
@@ -20,7 +19,6 @@ import com.share.sample.feature.onboarding.OnboardingComponent
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @Module(subcomponents = [OnboardingComponent::class])
 object MainViewModule {
@@ -29,16 +27,25 @@ object MainViewModule {
     fun navigationController(scope: MainViewProviderScope) = MainViewNavigationController(scope = scope)
 }
 
-class MainViewProvider(
-    application: SampleApplication,
-    parentScope: ManagedCoroutineScope
-) : ViewProvider {
-    private val component = application.sampleActivityViewModelComponent(parent = parentScope)
+interface MainViewDependency {
+    val navigationController: MainViewNavigationController
+    val onboarding: OnboardingComponent.Factory
+}
 
-    override fun create(scope: CoroutineScope) =
+class MainViewProvider(
+    private val dependency: MainViewDependency,
+) : ViewProvider {
+    constructor(
+        application: SampleApplication,
+        parentScope: ManagedCoroutineScope
+    ): this(
+        dependency = application.sampleActivityViewModelComponent(parent = parentScope)
+    )
+
+    override fun onViewAppear(scope: CoroutineScope) =
         MainView(
-            navigationController = component.navigationController,
-            onboarding = component.onboarding,
+            navigationController = dependency.navigationController,
+            onboarding = dependency.onboarding,
             scope = scope
         )
 }

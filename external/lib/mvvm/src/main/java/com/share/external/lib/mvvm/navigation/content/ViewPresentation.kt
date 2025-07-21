@@ -1,6 +1,7 @@
 package com.share.external.lib.mvvm.navigation.content
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import com.share.external.lib.compose.modal.ModalProperties
 
 /**
@@ -9,6 +10,7 @@ import com.share.external.lib.compose.modal.ModalProperties
  * Used by navigation hosts to determine how to render views in a stack, allowing different types of transitions,
  * overlays, or layout constraints.
  */
+@Stable
 interface ViewPresentation {
     /**
      * Returns the preferred [Style] in which this view should be presented.
