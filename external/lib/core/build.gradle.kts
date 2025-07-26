@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.share.external.lib.mvvm"
+    namespace = "com.share.external.lib.core"
     compileSdk = 36
 
     defaultConfig {
@@ -31,7 +31,6 @@ android {
 kotlin { compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11 } }
 
 dependencies {
-    implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -46,8 +45,6 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
 
     implementation(projects.external.foundation.coroutines)
-    implementation(projects.external.lib.compose)
-    implementation(projects.external.lib.core)
 
     testImplementation(libs.junit)
 

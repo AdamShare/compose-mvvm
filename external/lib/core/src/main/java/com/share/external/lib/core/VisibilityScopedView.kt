@@ -1,11 +1,9 @@
-package com.share.external.lib.mvvm.navigation.lifecycle
+package com.share.external.lib.core
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
-import com.share.external.lib.compose.context.viewVisibilityObserver
-import com.share.external.lib.mvvm.base.View
-import com.share.external.lib.mvvm.base.ViewProvider
+import com.share.external.lib.core.context.viewVisibilityObserver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 

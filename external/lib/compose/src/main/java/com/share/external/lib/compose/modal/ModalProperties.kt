@@ -1,7 +1,9 @@
 package com.share.external.lib.compose.modal
 
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -68,4 +70,7 @@ data class ModalProperties(
 
     /** Opacity of the scrim (background dimming layer) behind the modal. */
     val scrimAlpha: Float = 0.20f,
+
+    /** Shape of the modal surface. */
+    val shape: Shape = RoundedCornerShape(16.dp),
 )

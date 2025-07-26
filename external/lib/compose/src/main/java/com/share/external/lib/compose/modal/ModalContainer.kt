@@ -37,31 +37,25 @@ import com.share.external.lib.compose.foundation.layout.LocalDecorViewProperties
  * @param content Foreground modal content to be displayed in a surface.
  */
 @Composable
-fun ModalContainer(onDismiss: () -> Unit, properties: ModalProperties, content: @Composable () -> Unit) {
-    Box(
-        modifier =
-            Modifier.zIndex(1f)
-                .fillMaxSize()
-                .background(color = Color(red = 0f, green = 0f, blue = 0f, alpha = properties.scrimAlpha))
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() },
-                    enabled = properties.dismissOnClickOutside,
-                    onClick = onDismiss,
-                )
-    )
-
-    val imeBottomInset = WindowInsets.ime.getBottom(LocalDensity.current)
-    val imeSafeSpace = LocalDecorViewProperties.current.height - imeBottomInset.dp
-    Box(
-        modifier =
-            Modifier.zIndex(2f).fillMaxSize().run {
-                if (imeSafeSpace > properties.imeResizingMinHeightThreshold) {
-                    imePadding()
-                } else this
-            },
-        contentAlignment = properties.contentAlignment,
-    ) {
-        ModalSurface(properties = properties) { content.invoke() }
+fun ModalContainer(
+    onDismiss: () -> Unit,
+    properties: ModalProperties?,
+    content: @Composable () -> Unit
+) {
+    if (properties != null) {
+        Box(
+            modifier =
+                Modifier.zIndex(1f)
+                    .fillMaxSize()
+                    .background(color = Color(red = 0f, green = 0f, blue = 0f, alpha = properties.scrimAlpha))
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        enabled = properties.dismissOnClickOutside,
+                        onClick = onDismiss,
+                    )
+        )
     }
+
+    ModalSurface(properties = properties) { content.invoke() }
 }

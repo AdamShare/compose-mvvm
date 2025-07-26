@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
-import com.share.external.lib.mvvm.navigation.lifecycle.VisibilityScopedView
 
 /**
  * A container that bridges a [view] and its associated [androidx.lifecycle.ViewModelStore], [kotlinx.coroutines.CoroutineScope], and [SaveableStateHolder]

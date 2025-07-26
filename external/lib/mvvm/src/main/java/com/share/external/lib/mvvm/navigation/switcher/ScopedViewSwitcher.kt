@@ -7,10 +7,9 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
-import com.share.external.lib.mvvm.base.ViewProvider
+import com.share.external.lib.core.ViewProvider
 import com.share.external.lib.mvvm.navigation.stack.ViewProviderViewModelStoreContentProvider
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class ScopedViewSwitcher<K : NavigationKey>(private val scope: ManagedCoroutineScope, defaultKey: K? = null) :
     ViewSwitcher<K> {

@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.share.external.lib.mvvm.navigation.content.Screen
-import com.share.external.lib.mvvm.base.View
+import com.share.external.lib.core.View
 import com.share.external.lib.mvvm.navigation.stack.NavigationStackScope
 import com.share.external.lib.compose.state.StateProvider
 import com.share.sample.feature.onboarding.signin.signup.SignUpComponent

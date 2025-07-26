@@ -1,8 +1,8 @@
 package com.share.sample.feature.onboarding
 
 import com.share.external.lib.mvvm.navigation.content.Screen
-import com.share.external.lib.mvvm.base.View
-import com.share.external.lib.mvvm.base.ViewProvider
+import com.share.external.lib.core.View
+import com.share.external.lib.core.ViewProvider
 import com.share.external.lib.mvvm.navigation.stack.NavigationStackHost
 import com.share.external.lib.mvvm.navigation.stack.ViewModelNavigationStack
 import com.share.sample.feature.onboarding.signin.SignInComponent
@@ -14,8 +14,15 @@ import kotlinx.coroutines.CoroutineScope
 object OnboardingViewModule {
     @OnboardingScope
     @Provides
-    fun onboardingViewProvider(scope: OnboardingComponent.Scope, signIn: SignInComponent.Factory) =
-        OnboardingViewProvider(navigationStack = ViewModelNavigationStack(scope, initialStack = { it.push(signIn) }))
+    fun onboardingViewProvider(
+        scope: OnboardingComponent.Scope,
+        signIn: SignInComponent.Factory
+    ) = OnboardingViewProvider(
+        navigationStack = ViewModelNavigationStack(
+            rootScope = scope,
+            initialStack = { it.push(signIn) }
+        )
+    )
 }
 
 class OnboardingViewProvider(private val navigationStack: ViewModelNavigationStack<Screen>) : ViewProvider {

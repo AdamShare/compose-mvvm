@@ -12,8 +12,8 @@ import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.activity.Main
 import com.share.external.lib.compose.runtime.LoggingStateChangeObserver
 import com.share.external.lib.compose.state.StateProvider
-import com.share.external.lib.mvvm.base.View
-import com.share.external.lib.mvvm.base.ViewProvider
+import com.share.external.lib.core.View
+import com.share.external.lib.core.ViewProvider
 import com.share.external.lib.mvvm.navigation.switcher.ViewSwitcher
 import com.share.sample.app.SampleApplication
 import com.share.sample.app.theme.MainTheme
@@ -40,9 +40,9 @@ class MainViewProvider(
 ) : ViewProvider {
     constructor(
         application: SampleApplication,
-        parentScope: ManagedCoroutineScope
+        coroutineScope: CoroutineScope
     ): this(
-        dependency = application.sampleActivityViewModelComponent(parent = parentScope)
+        dependency = application.sampleActivityViewModelComponent(coroutineScope = coroutineScope)
     )
 
     override fun onViewAppear(scope: CoroutineScope) =

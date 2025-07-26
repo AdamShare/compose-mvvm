@@ -1,4 +1,4 @@
-package com.share.external.lib.compose.context
+package com.share.external.lib.core.context
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi

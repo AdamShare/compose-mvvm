@@ -53,6 +53,7 @@ dependencies {
 
     implementation(projects.external.foundation.coroutines)
     implementation(projects.external.lib.compose)
+    implementation(projects.external.lib.core)
     implementation(projects.external.lib.mvvm)
 
     testImplementation(libs.junit)

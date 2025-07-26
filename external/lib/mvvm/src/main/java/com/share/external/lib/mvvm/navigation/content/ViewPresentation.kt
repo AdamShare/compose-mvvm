@@ -5,7 +5,7 @@ import androidx.compose.runtime.Stable
 import com.share.external.lib.compose.modal.ModalProperties
 
 /**
- * Describes how a [com.share.external.lib.mvvm.base.View] prefers to be presented: full-screen or as a modal.
+ * Describes how a [com.share.external.lib.core.View] prefers to be presented: full-screen or as a modal.
  *
  * Used by navigation hosts to determine how to render views in a stack, allowing different types of transitions,
  * overlays, or layout constraints.

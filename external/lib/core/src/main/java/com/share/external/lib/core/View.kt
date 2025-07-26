@@ -1,6 +1,6 @@
 @file:Suppress("MaximumLineLength")
 
-package com.share.external.lib.mvvm.base
+package com.share.external.lib.core
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable

@@ -1,6 +1,5 @@
-package com.share.external.lib.compose.context
+package com.share.external.lib.core.context
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -29,7 +28,7 @@ import kotlinx.coroutines.flow.drop
  * @param onVisible Called when the view becomes visible (initial composition or `ON_RESUME`).
  * @param onHidden Called when the view is no longer visible (disposed or `ON_PAUSE`, excluding configuration changes).
  */
-@SuppressLint("RememberReturnType")
+@Suppress("RememberReturnType")
 @Composable
 fun <R> viewVisibilityObserver(onVisible: () -> R, onHidden: () -> Unit): R {
     val visible = remember {

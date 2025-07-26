@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.share.external.lib.activity.compose.calculateWindowSizeClass
 import com.share.external.lib.activity.compose.hasCompactSize
 import com.share.external.lib.mvvm.navigation.content.Screen
-import com.share.external.lib.mvvm.base.View
+import com.share.external.lib.core.View
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
 import com.share.external.lib.compose.modal.ModalProperties
 import dagger.Module
@@ -28,7 +28,13 @@ import kotlinx.coroutines.CoroutineScope
 
 @Module
 object SignUpViewModule {
-    @SignUpScope @Provides fun screen(viewModel: SignUpViewModel) = SignUpScreen(viewModel = viewModel)
+    @SignUpScope
+    @Provides
+    fun screen(
+        viewModel: SignUpViewModel
+    ) = SignUpScreen(
+        viewModel = viewModel,
+    )
 }
 
 class SignUpScreen(private val viewModel: SignUpViewModel) : Screen {

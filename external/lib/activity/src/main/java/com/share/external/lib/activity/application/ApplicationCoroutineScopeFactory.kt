@@ -10,11 +10,15 @@ import kotlin.coroutines.CoroutineContext
 
 interface ApplicationCoroutineScopeFactory: CoroutineScopeFactory {
     override fun create(name: String, context: CoroutineContext): CoroutineScope {
-        return CoroutineScope(
-            context = SupervisorJob() + Dispatchers.Default + CoroutineName("Application")
-        ).childSupervisorJobScope(
+        return applicationScope.childSupervisorJobScope(
             name = name,
             context = context
+        )
+    }
+
+    companion object {
+        private val applicationScope = CoroutineScope(
+            context = SupervisorJob() + Dispatchers.Default + CoroutineName("Application")
         )
     }
 }

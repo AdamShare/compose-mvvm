@@ -5,9 +5,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import co.touchlab.kermit.Logger
-import com.share.external.lib.mvvm.base.View
+import com.share.external.lib.core.View
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
-import com.share.external.lib.mvvm.base.ViewProvider
+import com.share.external.lib.core.ViewProvider
 import com.share.external.lib.compose.modal.ModalContainer
 import com.share.external.lib.compose.modal.ModalProperties
 
@@ -48,52 +48,54 @@ fun <V> NavigationStackHost(
     navigationStack.run {
         val saveableStateHolder = rememberSaveableStateHolder()
 
-        var fullScreen: ViewPresentationProviderViewModelStoreContentProvider<V>? = null
-        var modal: ViewPresentationProviderViewModelStoreContentProvider<V>? = null
+        var backing: ViewPresentationProviderViewModelStoreContentProvider<V>? = null
+        var last: ViewPresentationProviderViewModelStoreContentProvider<V>? = null
         var properties: ModalProperties? = null
 
         for (provider in navigationStack.stack.asReversed()) {
             when (val displayMode = provider.preferredPresentationStyle()) {
                 ViewPresentation.Style.FullScreen -> {
-                    fullScreen = provider
+                    if (last == null) {
+                        last = provider
+                    } else {
+                        backing = provider
+                    }
                     break
                 }
                 is ViewPresentation.Style.Modal -> {
-                    if (modal == null) {
-                        modal = provider
+                    if (last == null) {
+                        last = provider
                         properties = displayMode.properties
                     }
                 }
             }
         }
 
-        if (backHandlerEnabled && (fullScreen ?: modal) != null) {
+        if (backHandlerEnabled && last != null) {
             BackHandler(onBack = ::pop)
         }
 
-        fullScreen?.run {
-            LocalOwnersProvider(saveableStateHolder = saveableStateHolder, content = view.content)
-        } ?: defaultContent()
-
-        modal?.run {
+        backing?.run {
             LocalOwnersProvider(
                 saveableStateHolder = saveableStateHolder,
-                content =
-                    if (properties != null) {
-                        {
-                            ModalContainer(onDismiss = ::pop, properties = properties, content = view.content)
-                        }
-                    } else {
-                        view.content
-                    },
+                content = view.content
             )
         }
 
+        last?.run {
+            LocalOwnersProvider(
+                saveableStateHolder = saveableStateHolder,
+            ) {
+                // Always display last view in modal container to keep view size changes in the same context.
+                ModalContainer(onDismiss = ::pop, properties = properties, content = view.content)
+            }
+        } ?: defaultContent()
+
         LaunchedEffect(stack) {
             logger.logEntries(entries = stack, analyticsId = analyticsId) {
-                if (fullScreen == it) {
+                if (backing == it || (backing == null && last == it)) {
                     "FullScreen"
-                } else if (modal == it) {
+                } else if (last == it) {
                     "Modal"
                 } else null
             }

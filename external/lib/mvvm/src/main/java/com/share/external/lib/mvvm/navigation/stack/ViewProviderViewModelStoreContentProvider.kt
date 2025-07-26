@@ -8,8 +8,8 @@ import com.share.external.lib.mvvm.navigation.content.NavigationKey
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
 import com.share.external.lib.mvvm.navigation.lifecycle.DefaultViewModelStoreOwner
 import com.share.external.lib.mvvm.navigation.lifecycle.LocalOwnersProvider
-import com.share.external.lib.mvvm.base.ViewProvider
-import com.share.external.lib.mvvm.navigation.lifecycle.VisibilityScopedView
+import com.share.external.lib.core.ViewProvider
+import com.share.external.lib.core.VisibilityScopedView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 

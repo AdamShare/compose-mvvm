@@ -3,7 +3,7 @@ package com.share.external.lib.mvvm.navigation.stack
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
-import com.share.external.lib.mvvm.base.ViewProvider
+import com.share.external.lib.core.ViewProvider
 
 interface NavigationStack<V>: NavigationBackStack {
     /**
@@ -13,14 +13,12 @@ interface NavigationStack<V>: NavigationBackStack {
     fun push(key: NavigationKey, content: (NavigationStackEntry<V>) -> V)
 
     fun <T> push(content: T) where T : NavigationKey, T : (NavigationStackEntry<V>) -> V {
-        push(content, content)
+        push(key = content, content = content)
     }
 }
 
 /**
  * Entry‑level navigation API used by feature modules to display new screens.
- *
- * @param V The type produced by the [content] factory, typically a `ComposableProvider` or another view abstraction.
  */
 interface NavigationStackScope<V> : NavigationStack<V>, ManagedCoroutineScope
 
@@ -31,8 +29,15 @@ internal open class NavigationStackContext<V>(
     NavigationBackStack by stack,
     NavigationStackScope<V> where V: ViewProvider, V: ViewPresentation {
     override fun push(key: NavigationKey, content: (NavigationStackEntry<V>) -> V) {
-        val context =
-            NavigationStackEntryContext(key = key, scope = childManagedScope(key.analyticsId), stack = stack)
-        stack.push(key = key, viewProvider = content(context), scope = context)
+        val context = NavigationStackEntryContext(
+            key = key,
+            scope = childManagedScope(key.analyticsId),
+            stack = stack
+        )
+        stack.push(
+            key = key,
+            scope = context,
+            viewProvider = content(context),
+        )
     }
 }

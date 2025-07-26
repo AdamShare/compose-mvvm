@@ -1,8 +1,8 @@
 package com.share.external.lib.mvvm.navigation.content
 
 import androidx.compose.runtime.Composable
-import com.share.external.lib.mvvm.base.View
-import com.share.external.lib.mvvm.base.ViewProvider
+import com.share.external.lib.core.View
+import com.share.external.lib.core.ViewProvider
 import com.share.external.lib.compose.modal.ModalProperties
 import kotlinx.coroutines.CoroutineScope
 
