@@ -1,5 +1,6 @@
 package com.share.external.foundation.coroutines.test
 
+import kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -11,6 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.withTimeoutOrNull
 
+@OptIn(ExperimentalForInheritanceCoroutinesApi::class)
 class TestFlow<T>(private val actual: MutableStateFlow<List<T>>) : MutableStateFlow<List<T>> by actual {
     private val current = AtomicInteger(0)
 

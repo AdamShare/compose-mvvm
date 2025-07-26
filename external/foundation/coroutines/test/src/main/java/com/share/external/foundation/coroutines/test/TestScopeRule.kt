@@ -14,7 +14,10 @@ import kotlinx.coroutines.test.setMain
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
-/** A JUnit [TestRule] that sets the Main dispatcher to [testDispatcher] for the duration of the test. */
+/**
+ * A JUnit [org.junit.rules.TestRule] that sets the Main dispatcher
+ * to [testDispatcher] for the duration of the test.
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 class TestScopeRule
 private constructor(

@@ -1,7 +1,6 @@
 package com.share.sample.app.main
 
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
-import com.share.sample.feature.onboarding.OnboardingComponent
 import dagger.BindsInstance
 import dagger.Subcomponent
 import javax.inject.Scope

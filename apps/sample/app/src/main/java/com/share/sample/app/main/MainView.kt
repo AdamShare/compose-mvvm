@@ -9,10 +9,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
+import com.share.external.lib.activity.Main
 import com.share.external.lib.compose.runtime.LoggingStateChangeObserver
 import com.share.external.lib.compose.state.StateProvider
 import com.share.external.lib.mvvm.base.View
 import com.share.external.lib.mvvm.base.ViewProvider
+import com.share.external.lib.mvvm.navigation.switcher.ViewSwitcher
 import com.share.sample.app.SampleApplication
 import com.share.sample.app.theme.MainTheme
 import com.share.sample.feature.onboarding.OnboardingComponent
@@ -32,6 +34,7 @@ interface MainViewDependency {
     val onboarding: OnboardingComponent.Factory
 }
 
+@Main(application = SampleApplication::class)
 class MainViewProvider(
     private val dependency: MainViewDependency,
 ) : ViewProvider {
@@ -45,14 +48,14 @@ class MainViewProvider(
     override fun onViewAppear(scope: CoroutineScope) =
         MainView(
             navigationController = dependency.navigationController,
-            onboarding = dependency.onboarding,
+            onboarding = { dependency.onboarding(scope = OnboardingComponent.Scope(actual = it)) },
             scope = scope
         )
 }
 
 class MainView(
-    private val navigationController: MainViewNavigationController,
-    private val onboarding: OnboardingComponent.Factory,
+    private val navigationController: ViewSwitcher<ActivityViewRoute>,
+    private val onboarding: (ManagedCoroutineScope) -> ViewProvider,
     override val scope: CoroutineScope,
 ) : View, StateProvider, LoggingStateChangeObserver {
     override val content: @Composable () -> Unit = {
@@ -73,9 +76,7 @@ class MainView(
                                     }
                                 }
 
-                            ActivityViewRoute.LoggedOut -> {
-                                onboarding(scope = OnboardingComponent.Scope(actual = scope))
-                            }
+                            ActivityViewRoute.LoggedOut -> onboarding(scope)
                         }
                     }
                 }

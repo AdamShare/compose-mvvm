@@ -8,11 +8,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.setValue
 import co.touchlab.kermit.Logger
-import com.share.external.foundation.coroutines.MainImmediateScope
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
 import com.share.external.lib.mvvm.base.ViewProvider
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.LinkedHashMap
 
@@ -61,9 +61,9 @@ open class ViewModelNavigationStack<V>(
             initialStack(rootNavigationScope())
         }
 
-        rootScope.invokeOnCompletion {
-            // Parent scope could complete off main thread.
-            MainImmediateScope().launch { removeAll() }
+        // Parent scope could complete off main thread.
+        rootScope.invokeOnCompletion(Dispatchers.Main.immediate) {
+            removeAll()
         }
     }
 
@@ -88,7 +88,7 @@ open class ViewModelNavigationStack<V>(
         transactionFinished.add {
             previous?.cancel(awaitChildrenComplete = true, message = "Pushed new content for key: $key")
 
-            scope.invokeOnCompletion { MainImmediateScope().launch { remove(key) } }
+            scope.invokeOnCompletion(Dispatchers.Main.immediate) { remove(key) }
         }
 
         // run lazy view after provider created and set in position to avoid out of order entries from a recursive call

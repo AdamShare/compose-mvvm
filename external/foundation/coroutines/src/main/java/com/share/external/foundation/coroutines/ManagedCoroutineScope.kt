@@ -1,8 +1,5 @@
 package com.share.external.foundation.coroutines
 
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlinx.coroutines.CompletionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.Job
@@ -10,6 +7,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * A [CoroutineScope] manager that supports hierarchical child scopes and optionally defers its own cancellation until
@@ -79,7 +78,10 @@ interface ManagedCoroutineScope : CoroutineScopeFactory {
      * @param handler The callback to invoke upon job completion or cancellation.
      * @return A [DisposableHandle] that can be used to unregister the handler if needed.
      */
-    fun invokeOnCompletion(handler: CompletionHandler): DisposableHandle
+    fun invokeOnCompletion(
+        context: CoroutineContext = EmptyCoroutineContext,
+        handler: (cause: Throwable?) -> Unit,
+        ): DisposableHandle
 
     /**
      * Creates a new [ManagedCoroutineScope] as a child of this scope.
@@ -142,8 +144,8 @@ private class ManagedCoroutineScopeImpl(private val actual: CoroutineScope) : Ma
     override val isActive: Boolean
         get() = actual.isActive
 
-    override fun invokeOnCompletion(handler: CompletionHandler): DisposableHandle {
-        return job.invokeOnCompletion(handler)
+    override fun invokeOnCompletion(context: CoroutineContext, handler: (cause: Throwable?) -> Unit): DisposableHandle {
+        return job.invokeOnCompletion(context = context, handler = handler)
     }
 
     override fun childManagedScope(name: String, context: CoroutineContext): ManagedCoroutineScope {

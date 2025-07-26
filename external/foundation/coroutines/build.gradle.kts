@@ -28,7 +28,7 @@ android {
 kotlin { compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11 } }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
+    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kermit)
 
     testImplementation(libs.junit)

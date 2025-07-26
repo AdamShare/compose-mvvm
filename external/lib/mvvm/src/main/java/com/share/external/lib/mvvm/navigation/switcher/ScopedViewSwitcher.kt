@@ -5,11 +5,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
-import com.share.external.foundation.coroutines.MainImmediateScope
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
 import com.share.external.lib.mvvm.base.ViewProvider
 import com.share.external.lib.mvvm.navigation.stack.ViewProviderViewModelStoreContentProvider
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ScopedViewSwitcher<K : NavigationKey>(private val scope: ManagedCoroutineScope, defaultKey: K? = null) :
@@ -19,9 +19,8 @@ class ScopedViewSwitcher<K : NavigationKey>(private val scope: ManagedCoroutineS
     override var selected: K? by mutableStateOf(defaultKey)
 
     init {
-        scope.invokeOnCompletion {
-            // Parent scope could complete off main thread.
-            MainImmediateScope().launch { clear() }
+        scope.invokeOnCompletion(Dispatchers.Main.immediate) {
+            clear()
         }
     }
 
