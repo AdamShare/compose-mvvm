@@ -12,9 +12,6 @@ import com.share.external.lib.core.View
 import com.share.external.lib.core.ViewProvider
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
 
-
-
-
 @Composable
 fun <V> NavigationStackHost(
     name: String,
@@ -58,52 +55,40 @@ fun NavigationStackHost(
 ) {
     val saveableStateHolder = rememberSaveableStateHolder()
 
-    var backing: ViewPresentationScopedViewProvider? = null
-    var last: ViewPresentationScopedViewProvider? = null
-    var properties: ModalProperties? = null
+    val visibleStack = mutableMapOf<ViewPresentationScopedViewProvider, ModalProperties?>()
 
     for (provider in stack.asReversed()) {
         when (val displayMode = provider.preferredPresentationStyle()) {
             ViewPresentation.Style.FullScreen -> {
-                if (last == null) {
-                    last = provider
-                } else {
-                    backing = provider
-                }
+                visibleStack[provider] = null
                 break
             }
             is ViewPresentation.Style.Modal -> {
-                if (last == null) {
-                    last = provider
-                    properties = displayMode.properties
+                if (visibleStack.isEmpty()) {
+                    visibleStack[provider] = displayMode.properties
                 }
             }
         }
     }
 
-    if (backHandlerEnabled && last != null) {
+    if (visibleStack.isEmpty()) {
+        defaultContent()
+    } else if (backHandlerEnabled) {
         BackHandler(onBack = onBack)
     }
 
-    backing?.run { key(id) {
-        content(saveableStateHolder)
-    } }
-
-    last?.run {
-            // Always display last view in modal container to keep view size changes in the same context.
-        key(id) {
-            ModalContainer(onDismiss = onBack, properties = properties) {
-                content(saveableStateHolder)
+    visibleStack.forEach {
+        key(it.key) {
+            ModalContainer(onDismiss = onBack, properties = it.value) {
+                it.key.content(saveableStateHolder)
             }
         }
-    } ?: defaultContent()
+    }
 
     LaunchedEffect(stack) {
         logger.logEntries(entries = stack, name = name) {
-            if (backing == it || (backing == null && last == it)) {
-                "FullScreen"
-            } else if (last == it) {
-                "Modal"
+            if (visibleStack.contains(it)) {
+                visibleStack[it]?.let { "Modal" } ?: "FullScreen"
             } else null
         }
     }
