@@ -10,12 +10,12 @@ class MainViewNavigationController(scope: ManagedCoroutineScope) :
 
 sealed interface ActivityViewRoute : NavigationKey {
     data object LoggedOut : ActivityViewRoute {
-        override val analyticsId: String
+        override val name: String
             get() = "LoggedOut"
     }
 
     data class LoggedIn(val user: String) : ActivityViewRoute {
-        override val analyticsId: String
+        override val name: String
             get() = "LoggedIn"
     }
 }

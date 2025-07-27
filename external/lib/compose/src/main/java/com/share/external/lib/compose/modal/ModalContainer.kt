@@ -47,7 +47,14 @@ fun ModalContainer(
             modifier =
                 Modifier.zIndex(1f)
                     .fillMaxSize()
-                    .background(color = Color(red = 0f, green = 0f, blue = 0f, alpha = properties.scrimAlpha))
+                    .background(
+                        color = Color(
+                            red = 0f,
+                            green = 0f,
+                            blue = 0f,
+                            alpha = properties.scrimAlpha
+                        )
+                    )
                     .clickable(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() },
@@ -57,5 +64,8 @@ fun ModalContainer(
         )
     }
 
-    ModalSurface(properties = properties) { content.invoke() }
+    ModalSurface(
+        properties = properties,
+        content = content
+    )
 }

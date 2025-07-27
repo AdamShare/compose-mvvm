@@ -31,7 +31,7 @@ internal open class NavigationStackContext<V>(
     override fun push(key: NavigationKey, content: (NavigationStackEntry<V>) -> V) {
         val context = NavigationStackEntryContext(
             key = key,
-            scope = childManagedScope(key.analyticsId),
+            scope = childManagedScope(key.name),
             stack = stack
         )
         stack.push(

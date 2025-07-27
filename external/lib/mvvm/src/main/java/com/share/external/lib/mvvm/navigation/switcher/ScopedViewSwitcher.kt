@@ -2,13 +2,15 @@ package com.share.external.lib.mvvm.navigation.switcher
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
 import com.share.external.lib.core.ViewProvider
-import com.share.external.lib.mvvm.navigation.stack.ViewProviderViewModelStoreContentProvider
+import com.share.external.lib.mvvm.navigation.stack.ScopedViewProvider
+import com.share.external.lib.mvvm.navigation.stack.VisibilityScopedViewProvider
 import kotlinx.coroutines.Dispatchers
 
 class ScopedViewSwitcher<K : NavigationKey>(private val scope: ManagedCoroutineScope, defaultKey: K? = null) :
@@ -30,7 +32,7 @@ class ScopedViewSwitcher<K : NavigationKey>(private val scope: ManagedCoroutineS
         val selectedKey = selected
         if (selectedKey != null) {
             if (selectedKey != currentProvider?.key) {
-                val scope = scope.childManagedScope(selectedKey.analyticsId)
+                val scope = scope.childManagedScope(selectedKey.name)
                 val previous = currentProvider
                 currentProvider = ViewScope(
                     content = content(selectedKey, scope),
@@ -44,7 +46,11 @@ class ScopedViewSwitcher<K : NavigationKey>(private val scope: ManagedCoroutineS
             currentProvider = null
         }
 
-        currentProvider?.apply { LocalOwnersProvider(saveableStateHolder) { view.content() } }
+        currentProvider?.apply {
+            key(id) {
+                content(saveableStateHolder)
+            }
+        }
     }
 
     private fun clear() {
@@ -53,5 +59,5 @@ class ScopedViewSwitcher<K : NavigationKey>(private val scope: ManagedCoroutineS
     }
 
     private class ViewScope<K>(content: ViewProvider, val key: K, scope: ManagedCoroutineScope) :
-        ViewProviderViewModelStoreContentProvider<ViewProvider>(viewProvider = content, scope = scope)
+        VisibilityScopedViewProvider<ViewProvider>(viewProvider = content, scope = scope)
 }

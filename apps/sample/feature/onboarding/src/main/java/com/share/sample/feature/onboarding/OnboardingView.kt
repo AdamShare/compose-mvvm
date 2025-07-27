@@ -28,9 +28,9 @@ object OnboardingViewModule {
 class OnboardingViewProvider(private val navigationStack: ViewModelNavigationStack<Screen>) : ViewProvider {
     override fun onViewAppear(scope: CoroutineScope) = View {
         NavigationStackHost(
-            analyticsId = "OnboardingNavigationStackHost",
+            name = "OnboardingNavigationStackHost",
             backHandlerEnabled = navigationStack.size > 1,
-            navigationStack = navigationStack,
+            stack = navigationStack,
         ) {}
     }
 }

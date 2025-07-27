@@ -49,7 +49,6 @@ class DefaultViewModelStoreOwner : ViewModelStoreOwner, HasDefaultViewModelProvi
     private val defaultFactory by lazy {
         SavedStateViewModelFactory(application = null, owner = this, defaultArgs = null)
     }
-    internal val id = UUID.randomUUID().toString()
     private val lifecycleRegistry = LifecycleRegistry(this)
     private val savedStateRegistryController = SavedStateRegistryController.create(this)
     override val viewModelStore: ViewModelStore = ViewModelStore()
@@ -106,11 +105,11 @@ class DefaultViewModelStoreOwner : ViewModelStoreOwner, HasDefaultViewModelProvi
  */
 @Composable
 fun DefaultViewModelStoreOwner.LocalOwnersProvider(
-    saveableStateHolder: SaveableStateHolder = rememberSaveableStateHolder(),
+    saveableStateHolder: SaveableStateHolder,
     content: @Composable () -> Unit,
 ) {
-    key(id) {
         val currentLifecycleOwner = LocalLifecycleOwner.current
+
         DisposableEffect(this, currentLifecycleOwner) {
             val observer = LifecycleEventObserver { _, event -> onParentStateChange(event.targetState) }
             currentLifecycleOwner.lifecycle.addObserver(observer)
@@ -124,7 +123,6 @@ fun DefaultViewModelStoreOwner.LocalOwnersProvider(
         ) {
             saveableStateHolder.SaveableStateProvider(content)
         }
-    }
 }
 
 /**

@@ -16,7 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import java.util.LinkedHashMap
 
 /**
- * Concrete, mutable navigation stack that manages [ViewModelStoreContentProvider] instances keyed by [NavigationKey].
+ * Concrete, mutable navigation stack that manages [ScopedViewProvider] instances keyed by [NavigationKey].
  *
  * Backed by a [DoublyLinkedMap], this stack integrates tightly with Compose to drive screen transitions,
  * modal overlays, and scoped lifecycle management.
@@ -32,7 +32,7 @@ import java.util.LinkedHashMap
  * @param rootScope The parent coroutine scope for all views in the stack.
  * @param initialStack Optional lambda to prepopulate the stack in a single transaction.
  *
- * @see ViewModelStoreContentProvider
+ * @see ScopedViewProvider
  * @see NavigationKey
  * @see transaction
  */
@@ -41,15 +41,15 @@ open class ViewModelNavigationStack<V>(
     private val rootScope: ManagedCoroutineScope,
     initialStack: (NavigationStack<V>) -> Unit = {},
 ) : NavigationBackStack where V: ViewProvider, V: ViewPresentation {
-    private val providers = linkedMapOf<NavigationKey, ViewPresentationProviderViewModelStoreContentProvider<V>>()
+    private val providers = linkedMapOf<NavigationKey, NavigationVisibilityScopedViewProvider<V>>()
 
-    internal var stack: List<ViewPresentationProviderViewModelStoreContentProvider<V>> by
+    var stack: List<ViewPresentationScopedViewProvider> by
         mutableStateOf(value = providers.values.toList(), policy = neverEqualPolicy())
         private set
 
-    override val size: Int by derivedStateOf { stack.size }
+    val last by derivedStateOf { stack.lastOrNull() }
 
-    internal val last by derivedStateOf { stack.lastOrNull() }
+    override val size: Int by derivedStateOf { stack.size }
 
     private var shouldUpdateState: Boolean = false
     private var transactionRefCount: Int = 0
@@ -77,7 +77,7 @@ open class ViewModelNavigationStack<V>(
             return
         }
         val previous = providers[key]
-        val provider = ViewPresentationProviderViewModelStoreContentProvider(
+        val provider = NavigationVisibilityScopedViewProvider(
             navigationKey = key,
             viewProvider = viewProvider,
             scope = scope,
@@ -89,9 +89,6 @@ open class ViewModelNavigationStack<V>(
 
             scope.invokeOnCompletion(Dispatchers.Main.immediate) { remove(key) }
         }
-
-        // run lazy view after provider created and set in position to avoid out of order entries from a recursive call
-        provider.view
 
         updateState()
     }
@@ -212,15 +209,15 @@ fun <K, V> LinkedHashMap<K, V>.removeLast(): V? {
     }
 }
 
-fun <T: NavigationKey> Logger.logEntries(
+fun <T: ScopedViewProvider> Logger.logEntries(
     entries: List<T>,
-    analyticsId: String,
+    name: String,
     metadata: (T) -> String? = { null },
 ) = d {
     buildString {
-        append("Backstack $analyticsId[")
+        append("Backstack $name[")
         entries.forEachIndexed { i, provider ->
-            append("{${provider.analyticsId}")
+            append("{${provider.name}")
             metadata(provider)?.let { append(": $it") }
             append("}")
             if (i < entries.size - 1) append(" ⇨ ")

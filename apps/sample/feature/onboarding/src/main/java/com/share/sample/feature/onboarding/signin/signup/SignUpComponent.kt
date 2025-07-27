@@ -20,7 +20,7 @@ interface SignUpComponent {
 
     @Subcomponent.Factory
     abstract class Factory : NavigationViewFactory<Screen> {
-        override val analyticsId: String
+        override val name: String
             get() = "SignUp"
 
         abstract fun create(@BindsInstance scope: Scope): SignUpComponent
