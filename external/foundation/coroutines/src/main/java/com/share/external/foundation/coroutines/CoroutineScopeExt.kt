@@ -64,13 +64,15 @@ private fun CoroutineScope.childScope(
 
     job.invokeOnCompletion { error ->
         if (error is CancellationException) {
-            log.d { "Child scope completed: $childName, cancellation: ${error.message}" }
+            log.d { "$childName cancellation: ${error.message}" }
+        } else if (error != null) {
+            log.w(error) { "$childName completed with error" }
         } else {
-            log.w(error) { "Child scope completed with error: $childName" }
+            log.d { "$childName completed" }
         }
     }
 
-    log.d { "Child scope created: $childName" }
+    log.d { "$childName created" }
     return CoroutineScope(context + job + CoroutineName(childName))
 }
 

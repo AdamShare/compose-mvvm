@@ -4,8 +4,6 @@ import com.share.external.lib.mvvm.navigation.content.Screen
 import com.share.external.lib.mvvm.navigation.stack.NavigationStackEntry
 import com.share.external.lib.mvvm.navigation.stack.NavigationViewFactory
 import dagger.BindsInstance
-import dagger.Module
-import dagger.Provides
 import dagger.Subcomponent
 import javax.inject.Scope
 

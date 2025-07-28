@@ -15,6 +15,7 @@ import com.share.external.lib.compose.state.StateProvider
 import com.share.external.lib.core.View
 import com.share.external.lib.core.ViewProvider
 import com.share.external.lib.mvvm.navigation.switcher.ViewSwitcher
+import com.share.external.lib.mvvm.navigation.switcher.ViewSwitcherHost
 import com.share.sample.app.SampleApplication
 import com.share.sample.app.theme.MainTheme
 import com.share.sample.feature.onboarding.OnboardingComponent
@@ -26,11 +27,11 @@ import kotlinx.coroutines.CoroutineScope
 object MainViewModule {
     @MainViewScope
     @Provides
-    fun navigationController(scope: MainViewProviderScope) = MainViewNavigationController(scope = scope)
+    fun switcher(scope: MainViewProviderScope) = MainViewSwitcher(scope = scope)
 }
 
 interface MainViewDependency {
-    val navigationController: MainViewNavigationController
+    val viewSwitcher: MainViewSwitcher
     val onboarding: OnboardingComponent.Factory
 }
 
@@ -47,14 +48,14 @@ class MainViewProvider(
 
     override fun onViewAppear(scope: CoroutineScope) =
         MainView(
-            navigationController = dependency.navigationController,
+            viewSwitcher = dependency.viewSwitcher,
             onboarding = { dependency.onboarding(scope = OnboardingComponent.Scope(actual = it)) },
             scope = scope
         )
 }
 
 class MainView(
-    private val navigationController: ViewSwitcher<ActivityViewRoute>,
+    private val viewSwitcher: ViewSwitcher<ActivityViewRoute>,
     private val onboarding: (ManagedCoroutineScope) -> ViewProvider,
     override val scope: CoroutineScope,
 ) : View, StateProvider, LoggingStateChangeObserver {
@@ -62,14 +63,14 @@ class MainView(
         MainTheme {
             Scaffold(modifier = Modifier.fillMaxSize()) {
                 Box(modifier = Modifier.padding(paddingValues = it)) {
-                    navigationController.Content { route, scope ->
+                    ViewSwitcherHost(switcher = viewSwitcher) { route, scope ->
                         when (route) {
                             is ActivityViewRoute.LoggedIn ->
                                 ViewProvider {
                                     View {
                                         Text(text = "Logged in as ${route.user}")
                                         Button(onClick = {
-                                            navigationController.selected = ActivityViewRoute.LoggedOut
+                                            viewSwitcher.onSelect(key = ActivityViewRoute.LoggedOut)
                                         }) {
                                             Text("Log Out")
                                         }

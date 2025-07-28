@@ -10,16 +10,10 @@ import androidx.compose.runtime.setValue
 import co.touchlab.kermit.Logger
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
-import com.share.external.lib.mvvm.navigation.content.ViewPresentation
-import com.share.external.lib.core.ViewProvider
 import kotlinx.coroutines.Dispatchers
-import java.util.LinkedHashMap
 
 /**
  * Concrete, mutable navigation stack that manages [ScopedViewProvider] instances keyed by [NavigationKey].
- *
- * Backed by a [DoublyLinkedMap], this stack integrates tightly with Compose to drive screen transitions,
- * modal overlays, and scoped lifecycle management.
  *
  * ### Features:
  * - State is exposed via [stack], a [mutableStateOf] snapshot-backed map to trigger Compose recomposition.
@@ -31,23 +25,21 @@ import java.util.LinkedHashMap
  * @param V The view type managed by the stack.
  * @param rootScope The parent coroutine scope for all views in the stack.
  * @param initialStack Optional lambda to prepopulate the stack in a single transaction.
- *
  * @see ScopedViewProvider
  * @see NavigationKey
  * @see transaction
  */
 @Stable
-open class ViewModelNavigationStack<V>(
+open class ManagedCoroutineScopeStack<V, E: ManagedCoroutineScope>(
     private val rootScope: ManagedCoroutineScope,
+    private val entryFactory: (key: NavigationKey, scope: ManagedCoroutineScope, viewProvider: V) -> E,
     initialStack: (NavigationStack<V>) -> Unit = {},
-) : NavigationBackStack where V: ViewProvider, V: ViewPresentation {
-    private val providers = linkedMapOf<NavigationKey, NavigationVisibilityScopedViewProvider<V>>()
+) : NavigationBackStack {
+    private val providers = linkedMapOf<NavigationKey, E>()
 
-    var stack: List<ViewPresentationScopedViewProvider> by
+    var stack: List<E> by
         mutableStateOf(value = providers.values.toList(), policy = neverEqualPolicy())
         private set
-
-    val last by derivedStateOf { stack.lastOrNull() }
 
     override val size: Int by derivedStateOf { stack.size }
 
@@ -56,14 +48,10 @@ open class ViewModelNavigationStack<V>(
     private val transactionFinished: MutableList<() -> Unit> = mutableListOf()
 
     init {
-        transaction {
-            initialStack(rootNavigationScope())
-        }
+        transaction { initialStack(rootNavigationScope()) }
 
         // Parent scope could complete off main thread.
-        rootScope.invokeOnCompletion(Dispatchers.Main.immediate) {
-            removeAll()
-        }
+        rootScope.invokeOnCompletion(Dispatchers.Main.immediate) { removeAll() }
     }
 
     fun rootNavigationScope(): NavigationStackScope<V> = NavigationStackContext(scope = rootScope, stack = this)
@@ -77,15 +65,12 @@ open class ViewModelNavigationStack<V>(
             return
         }
         val previous = providers[key]
-        val provider = NavigationVisibilityScopedViewProvider(
-            navigationKey = key,
-            viewProvider = viewProvider,
-            scope = scope,
-        )
+        val provider = entryFactory(key, scope, viewProvider)
         providers[key] = provider
 
         transactionFinished.add {
-            previous?.cancel(awaitChildrenComplete = true, message = "Pushed new content for key: $key")
+            previous
+                ?.cancel(awaitChildrenComplete = true, message = "Pushed new content for key: $key")
 
             scope.invokeOnCompletion(Dispatchers.Main.immediate) { remove(key) }
         }
@@ -159,7 +144,7 @@ open class ViewModelNavigationStack<V>(
     }
 }
 
-private fun <K, V>LinkedHashMap<K, V>.removeAllAfter(key: K, inclusive: Boolean = false): List<V> {
+private fun <K, V> LinkedHashMap<K, V>.removeAllAfter(key: K, inclusive: Boolean = false): List<V> {
     if (!containsKey(key)) {
         return listOf()
     }
@@ -209,15 +194,15 @@ fun <K, V> LinkedHashMap<K, V>.removeLast(): V? {
     }
 }
 
-fun <T: ScopedViewProvider> Logger.logEntries(
+fun <T : NavigationStackEntryViewProvider> Logger.logEntries(
     entries: List<T>,
     name: String,
-    metadata: (T) -> String? = { null },
+    metadata: (T) -> String? = { null }
 ) = d {
     buildString {
         append("Backstack $name[")
         entries.forEachIndexed { i, provider ->
-            append("{${provider.name}")
+            append("{${provider.navigationKey.name}")
             metadata(provider)?.let { append(": $it") }
             append("}")
             if (i < entries.size - 1) append(" ⇨ ")

@@ -8,10 +8,18 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 
 @Stable
-class VisibilityScopedView<V>(
+class VisibilityScopedView(
     private val scopeFactory: () -> CoroutineScope,
-    private val viewProvider: V,
-): View where V: ViewProvider {
+    private val onViewAppear: (CoroutineScope) -> View,
+): View {
+    constructor(
+        scopeFactory: () -> CoroutineScope,
+        viewProvider: ViewProvider,
+        ): this(
+        scopeFactory = scopeFactory,
+        onViewAppear = viewProvider::onViewAppear
+        )
+
     private var currentScope: CoroutineScope? = null
     private val currentView = mutableStateOf<View?>(null)
 
@@ -24,7 +32,7 @@ class VisibilityScopedView<V>(
                 } else {
                     val scope = scopeFactory()
                     currentScope = scope
-                    currentView.value = viewProvider.onViewAppear(scope)
+                    currentView.value = onViewAppear(scope)
                     currentView
                 }
             },

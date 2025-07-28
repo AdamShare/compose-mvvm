@@ -17,13 +17,12 @@ interface NavigationStackEntry<V> : NavigationStackScope<V> {
     fun popUpTo(inclusive: Boolean = false)
 }
 
-internal class NavigationStackEntryContext<V>(
+internal class NavigationStackEntryContext<V, E: ManagedCoroutineScope>(
     private val key: NavigationKey,
     scope: ManagedCoroutineScope,
-    private val stack: ViewModelNavigationStack<V>,
-) : NavigationStackContext<V>(scope = scope, stack = stack),
-    NavigationStackEntry<V>
-        where V: ViewProvider, V: ViewPresentation {
+    private val stack: ManagedCoroutineScopeStack<V, E>,
+) : NavigationStackContext<V, E>(scope = scope, stack = stack),
+    NavigationStackEntry<V> {
     override fun remove() {
         stack.remove(key = key)
     }
