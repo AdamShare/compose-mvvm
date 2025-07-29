@@ -10,6 +10,24 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
+interface ManagedCancellable {
+    /**
+     * Cancels this scope, either immediately or after waiting for all active children to complete.
+     * - If [awaitChildrenComplete] is `false`, or if there are no active children, this function clears all children
+     *   and cancels the parent scope immediately.
+     * - If [awaitChildrenComplete] is `true` and the scope has active children, the parent defers its cancellation
+     *   until all children complete. If a non-blank [message] is provided on the first call, that message is recorded
+     *   for final cancellation.
+     * - Additional or repeated calls while the parent is waiting can override waiting by passing `awaitChildrenComplete
+     *   = false`, unless the scope is already inactive.
+     *
+     * @param awaitChildrenComplete If `true`, postpone cancellation until current children finish.
+     * @param message An optional reason for cancellation; the first non-blank message is retained for final
+     *   cancellation.
+     */
+    fun cancel(awaitChildrenComplete: Boolean = false, message: String = "")
+}
+
 /**
  * A [CoroutineScope] manager that supports hierarchical child scopes and optionally defers its own cancellation until
  * all active child scopes have completed.
@@ -63,7 +81,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * - **Completed**: The job has fully finished for any reason (including normal completion or final cancellation). Once
  *   the scope is completed, [isActive] is always `false`.
  */
-interface ManagedCoroutineScope : CoroutineScopeFactory {
+interface ManagedCoroutineScope : ManagedCancellable, CoroutineScopeFactory {
 
     /**
      * `true` if this scope can still launch coroutines and manage child scopes. Once false, the scope is no longer
@@ -94,22 +112,6 @@ interface ManagedCoroutineScope : CoroutineScopeFactory {
      * @return A new `ManagedCoroutineScope` that may be immediately cancelled if the parent is done.
      */
     fun childManagedScope(name: String, context: CoroutineContext = EmptyCoroutineContext): ManagedCoroutineScope
-
-    /**
-     * Cancels this scope, either immediately or after waiting for all active children to complete.
-     * - If [awaitChildrenComplete] is `false`, or if there are no active children, this function clears all children
-     *   and cancels the parent scope immediately.
-     * - If [awaitChildrenComplete] is `true` and the scope has active children, the parent defers its cancellation
-     *   until all children complete. If a non-blank [message] is provided on the first call, that message is recorded
-     *   for final cancellation.
-     * - Additional or repeated calls while the parent is waiting can override waiting by passing `awaitChildrenComplete
-     *   = false`, unless the scope is already inactive.
-     *
-     * @param awaitChildrenComplete If `true`, postpone cancellation until current children finish.
-     * @param message An optional reason for cancellation; the first non-blank message is retained for final
-     *   cancellation.
-     */
-    fun cancel(awaitChildrenComplete: Boolean = false, message: String = "")
 }
 
 /**

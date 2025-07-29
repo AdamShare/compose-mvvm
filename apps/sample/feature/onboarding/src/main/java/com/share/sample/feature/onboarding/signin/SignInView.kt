@@ -21,6 +21,7 @@ import com.share.external.lib.mvvm.navigation.content.Screen
 import com.share.external.lib.core.View
 import com.share.external.lib.mvvm.navigation.stack.NavigationStackScope
 import com.share.external.lib.compose.state.StateProvider
+import com.share.external.lib.mvvm.navigation.stack.NavigationStackEntry
 import com.share.sample.feature.onboarding.signin.signup.SignUpComponent
 import dagger.Module
 import dagger.Provides
@@ -36,7 +37,7 @@ object SignInViewModule {
 
 class SignInViewProvider(
     private val emailViewModel: EmailViewModel,
-    private val navigationScope: NavigationStackScope<Screen>,
+    private val navigationScope: NavigationStackEntry<Screen>,
     private val signUp: SignUpComponent.Factory,
 ) : Screen {
     override fun onViewAppear(scope: CoroutineScope) = SignInView(
@@ -49,7 +50,7 @@ class SignInViewProvider(
 
 class SignInView(
     emailViewModel: EmailViewModel,
-    private val navigationScope: NavigationStackScope<Screen>,
+    private val navigationScope: NavigationStackEntry<Screen>,
     private val signUp: SignUpComponent.Factory,
     override val scope: CoroutineScope,
 ): View,

@@ -21,7 +21,7 @@ import javax.inject.Scope
 interface SignInComponent {
     val viewProvider: SignInViewProvider
 
-    class Scope(actual: NavigationStackScope<Screen>) : NavigationStackScope<Screen> by actual
+    class Scope(actual: NavigationStackEntry<Screen>) : NavigationStackEntry<Screen> by actual
 
     @Subcomponent.Factory
     abstract class Factory : NavigationViewFactory<Screen> {

@@ -1,6 +1,5 @@
 package com.share.external.lib.mvvm.navigation.stack
 
-import android.os.Build
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -8,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.setValue
 import co.touchlab.kermit.Logger
+import com.share.external.foundation.coroutines.ManagedCancellable
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.mvvm.navigation.content.NavigationKey
 import kotlinx.coroutines.Dispatchers
@@ -30,15 +30,14 @@ import kotlinx.coroutines.Dispatchers
  * @see transaction
  */
 @Stable
-open class ManagedCoroutineScopeStack<V, E: ManagedCoroutineScope>(
+open class ManagedCoroutineScopeStack<V, E: ManagedCancellable>(
     private val rootScope: ManagedCoroutineScope,
     private val entryFactory: (key: NavigationKey, scope: ManagedCoroutineScope, viewProvider: V) -> E,
     initialStack: (NavigationStack<V>) -> Unit = {},
 ) : NavigationBackStack {
     private val providers = linkedMapOf<NavigationKey, E>()
 
-    var stack: List<E> by
-        mutableStateOf(value = providers.values.toList(), policy = neverEqualPolicy())
+    var stack: List<E> by mutableStateOf(value = listOf(), policy = neverEqualPolicy())
         private set
 
     override val size: Int by derivedStateOf { stack.size }
@@ -51,12 +50,12 @@ open class ManagedCoroutineScopeStack<V, E: ManagedCoroutineScope>(
         transaction { initialStack(rootNavigationScope()) }
 
         // Parent scope could complete off main thread.
-        rootScope.invokeOnCompletion(Dispatchers.Main.immediate) { removeAll() }
+        rootScope.invokeOnCompletion(context = Dispatchers.Main.immediate) { removeAll() }
     }
 
-    fun rootNavigationScope(): NavigationStackScope<V> = NavigationStackContext(scope = rootScope, stack = this)
+    fun rootNavigationScope(): NavigationStackScope<V> = NavigationStackScopeImpl(scope = rootScope, stack = this)
 
-    internal fun push(key: NavigationKey, scope: ManagedCoroutineScope, viewProvider: V) {
+    fun push(key: NavigationKey, scope: ManagedCoroutineScope, viewProvider: V) {
         if (!rootScope.isActive || !scope.isActive) {
             logger.a { "Scope is not active pushing $key, $viewProvider onto nav stack: $this" }
             return
@@ -72,7 +71,7 @@ open class ManagedCoroutineScopeStack<V, E: ManagedCoroutineScope>(
             previous
                 ?.cancel(awaitChildrenComplete = true, message = "Pushed new content for key: $key")
 
-            scope.invokeOnCompletion(Dispatchers.Main.immediate) { remove(key) }
+            scope.invokeOnCompletion(context = Dispatchers.Main.immediate) { remove(key) }
         }
 
         updateState()
@@ -144,69 +143,3 @@ open class ManagedCoroutineScopeStack<V, E: ManagedCoroutineScope>(
     }
 }
 
-private fun <K, V> LinkedHashMap<K, V>.removeAllAfter(key: K, inclusive: Boolean = false): List<V> {
-    if (!containsKey(key)) {
-        return listOf()
-    }
-    val removed = mutableListOf<V>()
-
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-        val reversedEntrySet = sequencedEntrySet().reversed().iterator()
-        var element = reversedEntrySet.next()
-        while (element.key != key) {
-            removed.add(element.value)
-            reversedEntrySet.remove()
-            element = reversedEntrySet.next()
-        }
-        if (inclusive) {
-            removed.add(element.value)
-            reversedEntrySet.remove()
-        }
-        removed
-    } else {
-        val iterator = entries.iterator()
-
-        while (iterator.hasNext()) {
-            val entry = iterator.next()
-            if (entry.key == key) {
-                if (inclusive) {
-                    removed.add(entry.value)
-                    iterator.remove()
-                }
-                break
-            }
-        }
-
-        while (iterator.hasNext()) {
-            removed.add(iterator.next().value)
-            iterator.remove()
-        }
-
-        removed.asReversed()
-    }
-}
-
-fun <K, V> LinkedHashMap<K, V>.removeLast(): V? {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-        if (isEmpty()) null else sequencedValues().removeLast()
-    } else {
-        keys.lastOrNull()?.let { remove(key = it) }
-    }
-}
-
-fun <T : NavigationStackEntryViewProvider> Logger.logEntries(
-    entries: List<T>,
-    name: String,
-    metadata: (T) -> String? = { null }
-) = d {
-    buildString {
-        append("Backstack $name[")
-        entries.forEachIndexed { i, provider ->
-            append("{${provider.navigationKey.name}")
-            metadata(provider)?.let { append(": $it") }
-            append("}")
-            if (i < entries.size - 1) append(" ⇨ ")
-        }
-        append("]")
-    }
-}

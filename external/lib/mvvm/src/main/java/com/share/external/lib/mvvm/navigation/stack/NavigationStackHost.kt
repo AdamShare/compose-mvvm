@@ -9,7 +9,6 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import co.touchlab.kermit.Logger
 import com.share.external.lib.compose.modal.ModalContainer
 import com.share.external.lib.compose.modal.ModalProperties
-import com.share.external.lib.core.View
 import com.share.external.lib.core.ViewProvider
 import com.share.external.lib.mvvm.navigation.content.ViewPresentation
 
@@ -30,11 +29,7 @@ fun <V> NavigationStackHost(
 }
 
 /**
- * Hosts a navigation stack of [View]s and renders the appropriate content based on their [ViewPresentation.Style].
- *
- * This composable observes a [ManagedCoroutineScopeStack] and renders at most one full-screen view and one modal view at
- * any given time. Views are presented in order from the top of the stack (i.e., most recently pushed) and updated
- * automatically as the stack changes.
+ * Hosts a navigation stack of and renders the appropriate content based on their [ViewPresentation.Style].
  *
  * ### Behavior
  * - Renders the first view in the stack marked as [ViewPresentation.Style.FullScreen].

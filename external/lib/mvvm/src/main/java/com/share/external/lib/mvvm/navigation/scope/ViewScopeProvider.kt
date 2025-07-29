@@ -2,6 +2,7 @@ package com.share.external.lib.mvvm.navigation.scope
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.saveable.SaveableStateHolder
+import com.share.external.foundation.coroutines.ManagedCancellable
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.core.View
 import com.share.external.lib.core.VisibilityScopedView
@@ -15,7 +16,7 @@ open class ViewScopeProvider(
     val name: String,
     onViewAppear: (CoroutineScope) -> View,
     private val scope: ManagedCoroutineScope,
-) : ManagedCoroutineScope by scope {
+) : ManagedCancellable {
     val id: UUID = UUID.randomUUID()
 
     internal val view = VisibilityScopedView(
