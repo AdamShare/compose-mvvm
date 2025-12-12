@@ -7,7 +7,7 @@ import com.share.external.foundation.coroutines.ManagedCoroutineScope
 import com.share.external.lib.compose.state.ViewModel
 
 class EmailViewModel(scope: ManagedCoroutineScope) :
-    ViewModel(name = TAG, scope = scope), SignInEmailTextFieldState, SignInEmailTextFieldListener {
+    ViewModel(name = TAG, scopeFactory = scope), SignInEmailTextFieldState, SignInEmailTextFieldListener {
     override var email by mutableStateObservingOf("")
         private set
 

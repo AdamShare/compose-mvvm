@@ -24,15 +24,15 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures { compose = true }
 }
 
 kotlin {
     compilerOptions {
-        jvmTarget.value(JvmTarget.JVM_11)
+        jvmTarget.value(JvmTarget.JVM_17)
     }
 }
 
@@ -53,8 +53,7 @@ dependencies {
 
     implementation(projects.external.foundation.coroutines)
     implementation(projects.external.lib.compose)
-    implementation(projects.external.lib.core)
-    implementation(projects.external.lib.mvvm)
+    implementation(projects.external.lib.view)
 
     testImplementation(libs.junit)
 

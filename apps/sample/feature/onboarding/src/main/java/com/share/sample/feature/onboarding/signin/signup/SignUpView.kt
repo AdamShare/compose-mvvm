@@ -18,9 +18,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.share.external.lib.activity.compose.calculateWindowSizeClass
 import com.share.external.lib.activity.compose.hasCompactSize
-import com.share.external.lib.mvvm.navigation.content.Screen
-import com.share.external.lib.core.View
-import com.share.external.lib.mvvm.navigation.content.ViewPresentation
+import com.share.external.lib.navigation.stack.Screen
+import com.share.external.lib.view.View
+import com.share.external.lib.view.ViewPresentation
 import com.share.external.lib.compose.modal.ModalProperties
 import dagger.Module
 import dagger.Provides

@@ -1,8 +1,8 @@
 package com.share.sample.feature.onboarding.signin.signup
 
-import com.share.external.lib.mvvm.navigation.content.Screen
-import com.share.external.lib.mvvm.navigation.stack.NavigationStackEntry
-import com.share.external.lib.mvvm.navigation.stack.NavigationViewFactory
+import com.share.external.lib.navigation.stack.NavigationStackEntry
+import com.share.external.lib.navigation.stack.NavigationRouteFactory
+import com.share.external.lib.navigation.stack.Screen
 import dagger.BindsInstance
 import dagger.Subcomponent
 import javax.inject.Scope
@@ -14,17 +14,17 @@ import javax.inject.Scope
 interface SignUpComponent {
     val screen: SignUpScreen
 
-    class Scope(actual: NavigationStackEntry<Screen>) : NavigationStackEntry<Screen> by actual
+    class Dependency(val navigationStackEntry: NavigationStackEntry<Screen>)
 
     @Subcomponent.Factory
-    abstract class Factory : NavigationViewFactory<Screen> {
+    abstract class Factory : NavigationRouteFactory<NavigationStackEntry<Screen>, Screen> {
         override val name: String
             get() = "SignUp"
 
-        abstract fun create(@BindsInstance scope: Scope): SignUpComponent
+        abstract fun create(@BindsInstance dependency: Dependency): SignUpComponent
 
-        override fun invoke(scope: NavigationStackEntry<Screen>): Screen {
-            return create(Scope(scope)).screen
+        override fun invoke(navigationStackEntry: NavigationStackEntry<Screen>): Screen {
+            return create(Dependency(navigationStackEntry)).screen
         }
     }
 }

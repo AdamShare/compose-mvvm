@@ -22,8 +22,8 @@ interface DecorViewProperties {
 /**
  * CompositionLocal providing the current [DecorViewProperties].
  *
- * Must be explicitly set using [com.share.external.lib.mvvm.navigation.modal.decorViewProperties]
- * at the root of your composition.
+ * Must be explicitly set at the root of your composition, typically via the activity module's
+ * decorViewProperties extension.
  */
 val LocalDecorViewProperties = staticCompositionLocalOf<DecorViewProperties> { DecorViewPropertiesNotSet }
 

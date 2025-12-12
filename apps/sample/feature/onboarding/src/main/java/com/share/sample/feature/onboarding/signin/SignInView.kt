@@ -17,11 +17,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import com.share.external.lib.mvvm.navigation.content.Screen
-import com.share.external.lib.core.View
-import com.share.external.lib.mvvm.navigation.stack.NavigationStackScope
-import com.share.external.lib.compose.state.StateProvider
-import com.share.external.lib.mvvm.navigation.stack.NavigationStackEntry
+import com.share.external.lib.navigation.stack.NavigationRoute
+import com.share.external.lib.navigation.stack.NavigationStack
+import com.share.external.lib.navigation.stack.Screen
+import com.share.external.lib.navigation.stack.toNavigationRoute
+import com.share.external.lib.view.View
+import com.share.external.lib.view.ViewProvider
 import com.share.sample.feature.onboarding.signin.signup.SignUpComponent
 import dagger.Module
 import dagger.Provides
@@ -31,44 +32,58 @@ import kotlinx.coroutines.CoroutineScope
 object SignInViewModule {
     @SignInScope
     @Provides
-    fun signInView(emailViewModel: EmailViewModel, scope: SignInComponent.Scope, signUp: SignUpComponent.Factory) =
-        SignInViewProvider(emailViewModel = emailViewModel, navigationScope = scope, signUp = signUp)
+    fun signInView(
+        emailViewModel: EmailViewModel,
+        signInViewModel: SignInViewModel,
+        dependency: SignInComponent.Dependency,
+        signUp: SignUpComponent.Factory
+    ) = SignInViewProvider(
+        emailViewModel = emailViewModel,
+        signInViewModel = signInViewModel,
+        navigationStack = dependency.navigationStackEntry,
+        signUpRoute = signUp.toNavigationRoute()
+    )
 }
 
 class SignInViewProvider(
     private val emailViewModel: EmailViewModel,
-    private val navigationScope: NavigationStackEntry<Screen>,
-    private val signUp: SignUpComponent.Factory,
+    private val signInViewModel: SignInViewModel,
+    private val navigationStack: NavigationStack<Screen>,
+    private val signUpRoute: NavigationRoute<Screen>,
 ) : Screen {
-    override fun onViewAppear(scope: CoroutineScope) = SignInView(
-        emailViewModel = emailViewModel,
-        navigationScope = navigationScope,
-        signUp = signUp,
-        scope = scope
-    )
+    override fun onViewAppear(scope: CoroutineScope) = View {
+        SignInViewContent(
+            emailState = emailViewModel,
+            onEmailValueChange = emailViewModel::onEmailValueChange,
+            onClickSignIn = signInViewModel::signIn,
+            onClickSignUp = { navigationStack.push(signUpRoute) }
+        )
+    }
 }
 
-class SignInView(
-    emailViewModel: EmailViewModel,
-    private val navigationScope: NavigationStackEntry<Screen>,
-    private val signUp: SignUpComponent.Factory,
-    override val scope: CoroutineScope,
-): View,
-    SignInViewListener,
-    SignInEmailTextFieldListener by emailViewModel,
-    SignInEmailTextFieldState by emailViewModel,
-    StateProvider {
+@Composable
+private fun SignInViewContent(
+    emailState: SignInEmailTextFieldState,
+    onEmailValueChange: (String) -> Unit,
+    onClickSignIn: () -> Unit,
+    onClickSignUp: () -> Unit
+) {
+    Column(
+        modifier = Modifier.background(Color.White).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Box(modifier = Modifier.fillMaxWidth().weight(weight = 1f, fill = true), contentAlignment = Alignment.Center) {
+            SignInEmailTextField(
+                listener = object : SignInEmailTextFieldListener {
+                    override fun onEmailValueChange(value: String) = onEmailValueChange(value)
+                },
+                state = emailState
+            )
+        }
 
-    override fun onClickSignIn() {
+        Button(modifier = Modifier.fillMaxWidth(), onClick = onClickSignIn) { Text(text = "Sign In") }
 
-    }
-
-    override fun onClickSignUp() {
-        navigationScope.push(signUp)
-    }
-
-    override val content: @Composable () -> Unit = {
-        SignInView(listener = this, state = this)
+        Button(modifier = Modifier.fillMaxWidth(), onClick = onClickSignUp) { Text(text = "Sign Up") }
     }
 }
 

@@ -1,11 +1,13 @@
 package com.share.sample.feature.onboarding
 
-import com.share.external.lib.mvvm.navigation.content.Screen
-import com.share.external.lib.core.View
-import com.share.external.lib.core.ViewProvider
-import com.share.external.lib.mvvm.navigation.stack.NavigationStackHost
-import com.share.external.lib.mvvm.navigation.stack.ManagedCoroutineScopeStack
-import com.share.external.lib.mvvm.navigation.stack.ModalNavigationStack
+import com.share.external.foundation.coroutines.ManagedCoroutineScope
+import com.share.external.lib.navigation.stack.ModalNavigationStack
+import com.share.external.lib.navigation.stack.NavigationRoute
+import com.share.external.lib.navigation.stack.NavigationStackHost
+import com.share.external.lib.navigation.stack.Screen
+import com.share.external.lib.navigation.stack.toNavigationRoute
+import com.share.external.lib.view.View
+import com.share.external.lib.view.ViewProvider
 import com.share.sample.feature.onboarding.signin.SignInComponent
 import dagger.Module
 import dagger.Provides
@@ -16,17 +18,23 @@ object OnboardingViewModule {
     @OnboardingScope
     @Provides
     fun onboardingViewProvider(
-        scope: OnboardingComponent.Scope,
+        dependency: OnboardingComponent.Dependency,
         signIn: SignInComponent.Factory
     ) = OnboardingViewProvider(
-        navigationStack = ModalNavigationStack(
-            rootScope = scope,
-            initialStack = { it.push(signIn) }
-        )
+        scope = dependency.scope,
+        signInRoute = signIn.toNavigationRoute()
     )
 }
 
-class OnboardingViewProvider(private val navigationStack: ModalNavigationStack<Screen>) : ViewProvider {
+class OnboardingViewProvider(
+    scope: ManagedCoroutineScope,
+    signInRoute: NavigationRoute<Screen>,
+) : ViewProvider {
+    val navigationStack = ModalNavigationStack(
+        rootScope = scope,
+        initialStack = { it.push(signInRoute) }
+    )
+
     override fun onViewAppear(scope: CoroutineScope) = View {
         NavigationStackHost(
             name = "OnboardingNavigationStackHost",

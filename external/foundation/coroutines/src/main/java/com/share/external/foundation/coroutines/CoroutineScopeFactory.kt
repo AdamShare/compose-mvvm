@@ -11,13 +11,21 @@ import kotlinx.coroutines.CoroutineScope
  * Implementations might choose different strategies for job creation
  * (e.g. using a [kotlinx.coroutines.SupervisorJob] vs a standard [kotlinx.coroutines.Job]) or context merging.
  */
-interface CoroutineScopeFactory {
+fun interface CoroutineScopeFactory {
     /**
      * Creates a new [CoroutineScope] with a given [name] and [context].
      *
      * @param name A human-readable label for debugging or logging.
-     * @param context Additional [CoroutineContext] elements, defaulting to [EmptyCoroutineContext].
+     * @param context Additional [CoroutineContext] elements.
      * @return A new [CoroutineScope] instance.
      */
-    fun create(name: String, context: CoroutineContext = EmptyCoroutineContext): CoroutineScope
+    fun create(name: String, context: CoroutineContext): CoroutineScope
+
+    /**
+     * Creates a new [CoroutineScope] with a given [name] and [EmptyCoroutineContext].
+     *
+     * @param name A human-readable label for debugging or logging.
+     * @return A new [CoroutineScope] instance.
+     */
+    fun create(name: String): CoroutineScope = create(name, EmptyCoroutineContext)
 }

@@ -2,15 +2,15 @@ package com.share.sample.app
 
 import android.app.Application
 import com.share.external.lib.activity.application.ApplicationCoroutineScopeFactory
-import com.share.sample.app.main.MainViewComponent
-import javax.inject.Inject
+import com.share.sample.integrations.main.DaggerSampleApplicationComponent
+import com.share.sample.integrations.main.SampleApplicationComponent
 
 class SampleApplication : Application(), ApplicationCoroutineScopeFactory {
-    @Inject lateinit var sampleActivityViewModelComponent: MainViewComponent.Factory
+    lateinit var component: SampleApplicationComponent
+        private set
 
     override fun onCreate() {
         super.onCreate()
-
-        DaggerSampleApplicationComponent.factory().invoke(this, this).inject(this)
+        component = DaggerSampleApplicationComponent.factory().invoke(this, this)
     }
 }

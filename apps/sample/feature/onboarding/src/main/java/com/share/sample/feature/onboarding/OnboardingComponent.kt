@@ -1,7 +1,7 @@
 package com.share.sample.feature.onboarding
 
 import com.share.external.foundation.coroutines.ManagedCoroutineScope
-import com.share.external.lib.core.ViewProvider
+import com.share.external.lib.view.ViewProvider
 import com.share.sample.feature.onboarding.signin.SignInComponent
 import dagger.BindsInstance
 import dagger.Module
@@ -15,14 +15,14 @@ import javax.inject.Scope
 interface OnboardingComponent {
     val viewProvider: OnboardingViewProvider
 
-    class Scope(actual: ManagedCoroutineScope) : ManagedCoroutineScope by actual
+    class Dependency(val scope: ManagedCoroutineScope)
 
     @Subcomponent.Factory
-    abstract class Factory {
-        abstract fun create(@BindsInstance scope: Scope): OnboardingComponent
+    abstract class Factory: (ManagedCoroutineScope) -> ViewProvider  {
+        abstract fun create(@BindsInstance dependency: Dependency): OnboardingComponent
 
-        operator fun invoke(scope: ManagedCoroutineScope): ViewProvider {
-            return create(Scope(scope)).viewProvider
+        override operator fun invoke(scope: ManagedCoroutineScope): ViewProvider {
+            return create(Dependency(scope)).viewProvider
         }
     }
 }

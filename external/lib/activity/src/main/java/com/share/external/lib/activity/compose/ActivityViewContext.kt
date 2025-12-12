@@ -6,10 +6,19 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import com.share.external.lib.core.context.ViewContext
+import com.share.external.lib.view.context.ViewContext
 import kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 
+/**
+ * Creates and remembers an [ActivityViewContext] tied to this Activity's lifecycle.
+ *
+ * The returned context tracks:
+ * - Foreground state (ON_RESUME → visible, ON_PAUSE → not visible)
+ * - Configuration change detection to prevent premature cleanup
+ *
+ * @return A [ViewContext] that reflects this Activity's visibility state.
+ */
 @Composable
 fun ComponentActivity.rememberActivityViewContext(): ViewContext {
     return remember(this) {
@@ -19,6 +28,17 @@ fun ComponentActivity.rememberActivityViewContext(): ViewContext {
     }
 }
 
+/**
+ * A [ViewContext] implementation that bridges Activity lifecycle events to view visibility.
+ *
+ * This class observes the Activity's lifecycle and updates [foregroundStateFlow] accordingly:
+ * - ON_RESUME: Sets foreground state to `true`
+ * - ON_PAUSE: Sets foreground state to `false` (unless changing configurations)
+ * - ON_DESTROY: Removes the lifecycle observer
+ *
+ * @param activity The Activity to observe.
+ * @param isVisible Initial visibility state, defaults to `true`.
+ */
 @OptIn(ExperimentalForInheritanceCoroutinesApi::class)
 class ActivityViewContext(
     private val activity: ComponentActivity,
