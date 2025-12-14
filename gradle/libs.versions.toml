@@ -5,8 +5,10 @@ androidxLifecycle = "2.10.0"
 androidxMaterial3 = "1.4.0"
 androidxWindow = "1.5.1"
 coil = "2.7.0"
+composeMultiplatform = "1.7.3"
 dagger = "2.57.2"
 kotlin = "2.2.21"
+metro = "0.7.0"
 kotlinxCoroutines = "1.10.2"
 kotlinxAtomicFu = "0.29.0"
 kotlinxSerialization = "1.9.0"
@@ -43,6 +45,8 @@ androidx-window = { group = "androidx.window", name = "window", version.ref = "a
 dagger = { group = "com.google.dagger", name = "dagger", version.ref = "dagger"}
 daggerCompiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger"}
 kermit = { group = "co.touchlab", name = "kermit", version.ref = "kermit" }
+metro-runtime = { group = "dev.zacsweers.metro", name = "metro-runtime", version.ref = "metro" }
+metro-compiler = { group = "dev.zacsweers.metro", name = "metro-compiler-ksp", version.ref = "metro" }
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 kotlinx-atomic-fu = { group = "org.jetbrains.kotlinx", name = "atomicfu", version.ref = "kotlinxAtomicFu" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
@@ -62,9 +66,11 @@ ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serializatio
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
