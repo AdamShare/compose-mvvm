@@ -1,5 +1,7 @@
 package com.getbackcompose.foundation.coroutines
 
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.Job
@@ -123,7 +125,7 @@ interface ManagedCoroutineScope : ManagedCancellable, CoroutineScopeFactory {
 fun ManagedCoroutineScope(actual: CoroutineScope): ManagedCoroutineScope = ManagedCoroutineScopeImpl(actual)
 
 /** Private implementation of [ManagedCoroutineScope]. Exposes no public API outside the interface. */
-private class ManagedCoroutineScopeImpl(private val actual: CoroutineScope) : ManagedCoroutineScope {
+private class ManagedCoroutineScopeImpl(private val actual: CoroutineScope) : ManagedCoroutineScope, SynchronizedObject() {
 
     // region Configuration / State
 
@@ -154,7 +156,7 @@ private class ManagedCoroutineScopeImpl(private val actual: CoroutineScope) : Ma
         // Create a child scope using the factory method from the interface
         val child = ManagedCoroutineScopeImpl(create(name = name, context = context))
 
-        synchronized(activeChildren) {
+        synchronized(this) {
             // If this scope is inactive, immediately cancel the child.
             if (!isActive || job.isCompleted) {
                 val reason =
@@ -182,7 +184,7 @@ private class ManagedCoroutineScopeImpl(private val actual: CoroutineScope) : Ma
         }
 
         val cancel =
-            synchronized(activeChildren) {
+            synchronized(this) {
                 // If we want to wait for children, and we actually have children:
                 if (awaitChildrenComplete && activeChildren.isNotEmpty()) {
                     // Only set up waiting once
@@ -224,7 +226,7 @@ private class ManagedCoroutineScopeImpl(private val actual: CoroutineScope) : Ma
 
     private fun unregisterChild(child: ManagedCoroutineScopeImpl) {
         val cancel =
-            synchronized(activeChildren) {
+            synchronized(this) {
                 activeChildren.remove(child)
 
                 // If we were waiting for children and none remain, cancel now

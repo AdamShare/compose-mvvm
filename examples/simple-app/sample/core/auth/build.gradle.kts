@@ -15,6 +15,12 @@ kotlin {
 
     jvm("desktop")
 
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
+    wasmJs { browser() }
+
     sourceSets {
         commonMain.dependencies {
             api(projects.examples.shared.sample.core.auth)

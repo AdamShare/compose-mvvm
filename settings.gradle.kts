@@ -21,6 +21,28 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        exclusiveContent {
+            forRepository {
+                ivy("https://nodejs.org/dist/") {
+                    name = "Node Distributions at $url"
+                    patternLayout { artifact("v[revision]/[artifact](-v[revision]-[classifier]).[ext]") }
+                    metadataSources { artifact() }
+                    content { includeModule("org.nodejs", "node") }
+                }
+            }
+            filter { includeGroup("org.nodejs") }
+        }
+        exclusiveContent {
+            forRepository {
+                ivy("https://github.com/yarnpkg/yarn/releases/download") {
+                    name = "Yarn Distributions at $url"
+                    patternLayout { artifact("v[revision]/[artifact]-v[revision].[ext]") }
+                    metadataSources { artifact() }
+                    content { includeModule("com.yarnpkg", "yarn") }
+                }
+            }
+            filter { includeGroup("com.yarnpkg") }
+        }
     }
 }
 
@@ -55,6 +77,9 @@ include(":examples:dagger-app:sample:integrations:main")
 
 // Example apps - Simple (No DI, manual wiring)
 include(":examples:simple-app:sample:app")
+include(":examples:simple-app:sample:desktop")
+include(":examples:simple-app:sample:ios")
+include(":examples:simple-app:sample:wasmJs")
 include(":examples:simple-app:sample:core:auth")
 include(":examples:simple-app:sample:core:data")
 include(":examples:simple-app:sample:feature:details")
@@ -66,6 +91,9 @@ include(":examples:simple-app:sample:feature:profile")
 
 // Example apps - Metro (KMP DI)
 include(":examples:metro-app:sample:app")
+include(":examples:metro-app:sample:desktop")
+include(":examples:metro-app:sample:ios")
+include(":examples:metro-app:sample:wasmJs")
 include(":examples:metro-app:sample:core:auth")
 include(":examples:metro-app:sample:core:data")
 include(":examples:metro-app:sample:feature:details")

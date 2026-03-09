@@ -6,8 +6,7 @@ import com.getbackcompose.foundation.coroutines.ManagedCancellable
 import com.getbackcompose.foundation.coroutines.ManagedCoroutineScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import java.lang.ref.WeakReference
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 /**
  * Manages a view's lifecycle scope and its integration with Compose's saveable state system.
@@ -38,7 +37,7 @@ open class ViewScopeProvider(
     /**
      * Unique identifier for this provider instance, used as a key for [SaveableStateHolder].
      */
-    val id: UUID = UUID.randomUUID()
+    val id: Uuid = Uuid.random()
 
     /**
      * The visibility-scoped view managed by this provider.
@@ -48,7 +47,7 @@ open class ViewScopeProvider(
         scopeFactory = { scope.create(name = name + "Visibility", context = Dispatchers.Main.immediate) },
     )
 
-    private var saveableStateHolderRef: WeakReference<SaveableStateHolder>? = null
+    private var saveableStateHolderRef: SaveableStateHolder? = null
 
     /**
      * Associates this provider with a [SaveableStateHolder] for state preservation.
@@ -59,15 +58,12 @@ open class ViewScopeProvider(
      * @param saveableStateHolder The holder to associate with this provider.
      */
     fun setSaveableStateHolder(saveableStateHolder: SaveableStateHolder) {
-        saveableStateHolderRef = WeakReference(saveableStateHolder)
+        saveableStateHolderRef = saveableStateHolder
     }
 
     override fun cancel(awaitChildrenComplete: Boolean, message: String) {
-        saveableStateHolderRef?.run {
-            get()?.removeState(id)
-            clear()
-            saveableStateHolderRef = null
-        }
+        saveableStateHolderRef?.removeState(id)
+        saveableStateHolderRef = null
         scope.cancel(awaitChildrenComplete = awaitChildrenComplete, message = message)
     }
 

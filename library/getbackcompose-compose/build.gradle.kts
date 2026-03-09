@@ -34,6 +34,7 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.library.getbackcomposeFoundation)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.atomicfu)
             implementation(libs.kermit)
             implementation(compose.runtime)
             implementation(compose.foundation)

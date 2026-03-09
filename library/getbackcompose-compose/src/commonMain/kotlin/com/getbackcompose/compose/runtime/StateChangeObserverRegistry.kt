@@ -1,15 +1,16 @@
 package com.getbackcompose.compose.runtime
 
-import java.util.concurrent.ConcurrentHashMap
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
 
 /**
  * Internal registry for coordinating [StateChangeObserver] instances and tracking property state.
  *
  * This maintains per-observer property maps and ensures lazy, thread-safe state snapshotting.
  */
-internal object StateChangeObserverRegistry {
+internal object StateChangeObserverRegistry : SynchronizedObject() {
 
-    private val registry = ConcurrentHashMap<StateChangeObserver, ObserverState>()
+    private val registry = mutableMapOf<StateChangeObserver, ObserverState>()
 
     /**
      * Sentinel used to represent an uninitialized property within the registry. Useful for detecting first-time
@@ -25,9 +26,11 @@ internal object StateChangeObserverRegistry {
      * @param observer The observer to register.
      */
     fun register(observer: StateChangeObserver) {
-        if (registry.containsKey(observer)) return
-        registry[observer] = ObserverState(observer = observer)
-        observer.addCloseable { registry.remove(observer) }
+        synchronized(this) {
+            if (registry.containsKey(observer)) return
+            registry[observer] = ObserverState(observer = observer)
+        }
+        observer.addCloseable(AutoCloseable { synchronized(this) { registry.remove(observer) } })
     }
 
     /**
@@ -42,26 +45,24 @@ internal object StateChangeObserverRegistry {
      * @param value The new value to record.
      */
     fun logUpdatedState(observer: StateChangeObserver, propertyName: String, value: Any?) {
-        val state = registry.getOrPut(observer) { ObserverState(observer = observer) }
-        val properties: Map<String, Any?>
-        val isUpdate: Boolean
-
-        synchronized(state.properties) {
-            isUpdate = propertyName in state.properties
+        val result = synchronized(this) {
+            val state = registry.getOrPut(observer) { ObserverState(observer = observer) }
+            val isUpdate = propertyName in state.properties
             state.properties[propertyName] = value
-            properties = state.properties.toMap()
+            Triple(state.observerId, isUpdate, state.properties.toMap())
         }
+        val (observerId, isUpdate, properties) = result
 
         if (isUpdate) {
             observer.onValueChanged(
-                instanceId = state.observerId,
+                instanceId = observerId,
                 propertyName = propertyName,
                 value = value,
                 state = properties,
             )
         } else {
             observer.onInitialValue(
-                instanceId = state.observerId,
+                instanceId = observerId,
                 propertyName = propertyName,
                 value = value,
                 state = properties,
@@ -77,7 +78,7 @@ internal object StateChangeObserverRegistry {
 }
 
 /** Generates a string representation of an instance in the format `ClassName@HexIdentity`. */
-fun Any.instanceId(): String = "${javaClass.simpleName}@${identityHexString()}"
+fun Any.instanceId(): String = "${this::class.simpleName}@${identityHexString()}"
 
-/** Computes the identity-based hex string (same as Object.toString()). */
-fun Any.identityHexString(): String = Integer.toHexString(System.identityHashCode(this))
+/** Computes the identity-based hex string. */
+fun Any.identityHexString(): String = hashCode().toUInt().toString(16)

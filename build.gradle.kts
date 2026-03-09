@@ -8,3 +8,14 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
 }
 
+allprojects {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>().configureEach {
+        compilerOptions {
+            optIn.addAll(
+                "kotlin.uuid.ExperimentalUuidApi",
+                "kotlin.concurrent.atomics.ExperimentalAtomicApi",
+            )
+        }
+    }
+}
+
