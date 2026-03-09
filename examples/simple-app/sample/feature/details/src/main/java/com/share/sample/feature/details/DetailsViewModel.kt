@@ -7,25 +7,10 @@ import com.share.sample.core.data.model.FeedItem
 import com.share.sample.core.data.model.Genre
 import com.share.sample.core.data.model.MediaType
 import com.share.sample.core.data.repository.FavoritesRepository
-import dagger.Module
-import dagger.Provides
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-
-@Module
-object DetailsViewModelModule {
-    @DetailsScope
-    @Provides
-    fun viewModel(dependency: DetailsComponent.Dependency, favoritesRepository: FavoritesRepository) =
-        DetailsViewModel(
-            scopeFactory = dependency.navigationScope,
-            feedItem = dependency.feedItem,
-            mediaType = dependency.mediaType,
-            favoritesRepository = favoritesRepository
-        )
-}
 
 /**
  * ViewModel for the details screen.

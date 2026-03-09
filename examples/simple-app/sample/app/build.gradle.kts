@@ -1,15 +1,14 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
 
 android {
-    namespace = "com.share.sample.app"
+    namespace = "com.share.sample.simple.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.share.sample.app"
+        applicationId = "com.share.sample.simple.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -43,6 +42,10 @@ dependencies {
     // Feature modules
     implementation(projects.examples.simpleApp.sample.feature.main)
     implementation(projects.examples.simpleApp.sample.feature.onboarding)
+    implementation(projects.examples.simpleApp.sample.feature.home)
+    implementation(projects.examples.simpleApp.sample.feature.favorites)
+    implementation(projects.examples.simpleApp.sample.feature.details)
+    implementation(projects.examples.simpleApp.sample.feature.profile)
     implementation(projects.examples.simpleApp.sample.core.auth)
     implementation(projects.examples.simpleApp.sample.core.data)
 
@@ -50,6 +53,8 @@ dependencies {
     implementation(projects.library.getbackcomposeActivity)
     implementation(projects.library.getbackcomposeCompose)
     implementation(projects.library.getbackcomposeCore)
+    implementation(projects.library.getbackcomposeNavigationStack)
+    implementation(projects.library.getbackcomposeNavigationSwitcher)
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)

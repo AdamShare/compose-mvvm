@@ -1,15 +1,15 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.metro)
 }
 
 android {
-    namespace = "com.share.sample.app"
+    namespace = "com.share.sample.metro.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.share.sample.app"
+        applicationId = "com.share.sample.metro.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -41,6 +41,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(projects.examples.metroApp.sample.integrations.main)
+    implementation(projects.examples.shared.sample.core.auth)
+    implementation(projects.examples.shared.sample.core.data)
     implementation(projects.library.getbackcomposeFoundation)
     implementation(projects.library.getbackcomposeActivity)
     implementation(projects.library.getbackcomposeCompose)

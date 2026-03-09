@@ -29,42 +29,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.getbackcompose.core.View
 import com.getbackcompose.navigation.stack.NavigationRoute
 import com.getbackcompose.navigation.stack.NavigationStack
 import com.getbackcompose.navigation.stack.Screen
-import com.getbackcompose.navigation.stack.toNavigationRoute
-import com.getbackcompose.core.View
-import com.getbackcompose.core.ViewProvider
 import com.share.sample.core.data.api.ArtistResult
 import com.share.sample.core.data.model.Creator
 import com.share.sample.core.data.model.FeedItem
-import com.share.sample.feature.details.DetailsComponent
-import dagger.Module
-import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
-
-@Module
-object ViewAllCreatorViewModule {
-    @ViewAllCreatorScope
-    @Provides
-    fun viewAllCreatorViewProvider(
-        dependency: ViewAllCreatorComponent.Dependency,
-        detailsFactory: DetailsComponent.Factory,
-    ) = ViewAllCreatorViewProvider(
-        creator = dependency.creator,
-        detailsRouteFactory = { feedItem ->
-            detailsFactory.toNavigationRoute { scope ->
-                DetailsComponent.Dependency(
-                    navigationScope = scope,
-                    feedItem = feedItem,
-                    mediaType = feedItem.mediaType
-                )
-            }
-        },
-        items = dependency.items,
-        navigationStack = dependency.navigationScope,
-    )
-}
 
 class ViewAllCreatorViewProvider(
     private val creator: Creator,

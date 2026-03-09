@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import com.getbackcompose.activity.ViewModelComponentActivity
 import com.share.sample.app.SampleApplication
-import com.share.sample.integrations.main.MainViewComponent
 import com.share.sample.integrations.main.MainViewProvider
 import kotlinx.coroutines.CoroutineScope
 

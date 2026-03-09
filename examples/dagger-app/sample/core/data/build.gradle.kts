@@ -1,12 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
-    namespace = "com.share.sample.core.data"
+    namespace = "com.share.sample.dagger.core.data.di"
     compileSdk = 36
 
     defaultConfig {
@@ -30,18 +28,12 @@ kotlin { compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget
 dependencies {
     ksp(libs.daggerCompiler)
 
-    api(projects.library.getbackcomposeCore)
+    // Use shared multiplatform data module for business logic
+    api(projects.examples.shared.sample.core.data)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.dagger)
     implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.kermit)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.android)
-    implementation(libs.ktor.client.content.negotiation)
-    implementation(libs.ktor.client.logging)
-    implementation(libs.ktor.serialization.kotlinx.json)
 
     testImplementation(libs.junit)
 }

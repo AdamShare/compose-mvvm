@@ -1,10 +1,9 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
 }
 
 android {
-    namespace = "com.share.sample.core.auth"
+    namespace = "com.share.sample.simple.core.auth.di"
     compileSdk = 36
 
     defaultConfig {
@@ -26,6 +25,8 @@ android {
 kotlin { compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17 } }
 
 dependencies {
+    // Use shared multiplatform auth module for business logic
+    api(projects.examples.shared.sample.core.auth)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.kotlinx.coroutines.core)

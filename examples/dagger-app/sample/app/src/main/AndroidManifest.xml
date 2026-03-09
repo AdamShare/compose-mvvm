@@ -11,13 +11,13 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name=".SampleApplication"
+        android:name="com.share.sample.app.SampleApplication"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Sample"
         tools:targetApi="31">
         <activity
-            android:name=".activity.MainActivity"
+            android:name="com.share.sample.app.activity.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Sample">
             <intent-filter>

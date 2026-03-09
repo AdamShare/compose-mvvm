@@ -16,72 +16,61 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.getbackcompose.foundation.coroutines.ManagedCoroutineScope
 import com.getbackcompose.compose.runtime.StateProvider
+import com.getbackcompose.core.View
+import com.getbackcompose.core.ViewKey
+import com.getbackcompose.foundation.coroutines.ManagedCoroutineScope
 import com.getbackcompose.navigation.stack.ModalNavigationStack
-import com.getbackcompose.navigation.stack.NavigationStack
+import com.getbackcompose.navigation.stack.NavigationRoute
 import com.getbackcompose.navigation.stack.NavigationStackHost
 import com.getbackcompose.navigation.stack.Screen
-import com.getbackcompose.navigation.stack.toNavigationRoute
 import com.getbackcompose.navigation.switcher.ViewSwitcher
 import com.getbackcompose.navigation.switcher.ViewSwitcherContent
 import com.getbackcompose.navigation.switcher.ViewSwitcherHost
-import com.getbackcompose.core.View
-import com.getbackcompose.core.ViewProvider
 import com.share.sample.core.data.model.Category
-import com.share.sample.feature.details.DetailsComponent
-import dagger.Module
-import dagger.Provides
+import com.share.sample.core.data.repository.FavoritesRepository
+import com.share.sample.core.data.repository.FeedRepository
 import kotlinx.coroutines.CoroutineScope
 
-@Module
-object HomeViewModule {
-    @HomeScope
-    @Provides
-    fun categoryViewSwitcher(dependency: HomeComponent.Dependency) =
-        HomeCategoryViewSwitcher(scope = dependency.scope)
-
-    @HomeScope
-    @Provides
-    fun homeViewProvider(
-        dependency: HomeComponent.Dependency,
-        detailsFactory: DetailsComponent.Factory,
-        categoryFeedFactory: CategoryFeedComponent.Factory,
-        categoryViewSwitcher: HomeCategoryViewSwitcher,
-    ) = HomeViewProvider(
-        scope = dependency.scope,
-        categoryViewSwitcher = categoryViewSwitcher,
-        categoryFeedContent = { category, navigationStack, categoryScope ->
-            categoryFeedFactory(
-                CategoryFeedComponent.Dependency(
-                    category = category,
-                    navigationStack = navigationStack,
-                    detailsRouteFactory = { feedItem ->
-                        detailsFactory.toNavigationRoute { navScope ->
-                            DetailsComponent.Dependency(
-                                navigationScope = navScope,
-                                feedItem = feedItem,
-                                mediaType = category.mediaType
-                            )
-                        }
-                    },
-                ),
-                categoryScope
-            )
-        },
-    )
+enum class HomeRoute : ViewKey {
+    Details
 }
 
 class HomeViewProvider(
     scope: ManagedCoroutineScope,
-    private val categoryViewSwitcher: HomeCategoryViewSwitcher,
-    private val categoryFeedContent: (Category, NavigationStack<Screen>, ManagedCoroutineScope) -> ViewProvider,
+    private val feedRepository: FeedRepository,
+    private val favoritesRepository: FavoritesRepository,
 ) : Screen {
     private val navigationStack = ModalNavigationStack<Screen>(rootScope = scope)
     private val rootNavigationScope = navigationStack.rootNavigationScope()
+    private val categoryViewSwitcher = HomeCategoryViewSwitcher(scope = scope)
 
     private val categoryContent = ViewSwitcherContent<Category> { category, categoryScope ->
-        categoryFeedContent(category, rootNavigationScope, categoryScope)
+        val viewModel = CategoryFeedViewModel(
+            scopeFactory = categoryScope,
+            category = category,
+            feedRepository = feedRepository,
+        )
+
+        CategoryFeedViewProvider(
+            navigationStack = rootNavigationScope,
+            detailsRouteFactory = { feedItem ->
+                NavigationRoute(
+                    key = HomeRoute.Details,
+                    factory = { navScope ->
+                        com.share.sample.feature.details.DetailsViewProvider(
+                            feedItem = feedItem,
+                            mediaType = category.mediaType,
+                            navigationStack = navScope,
+                            favoritesRepository = favoritesRepository,
+                            feedRepository = feedRepository,
+                            managedScope = navScope
+                        )
+                    }
+                )
+            },
+            viewModel = viewModel,
+        )
     }
 
     override fun onViewAppear(scope: CoroutineScope) = HomeView(

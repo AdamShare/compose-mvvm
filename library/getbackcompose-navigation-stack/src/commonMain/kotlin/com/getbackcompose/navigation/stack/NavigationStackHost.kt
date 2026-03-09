@@ -1,8 +1,9 @@
 package com.getbackcompose.navigation.stack
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
@@ -25,6 +26,7 @@ import com.getbackcompose.core.ViewProvider
  *
  * @see NavigationStackHost for the primary implementation
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun <V> NavigationStackHost(
     name: String,
@@ -54,6 +56,7 @@ fun <V> NavigationStackHost(
  * - Preserves state across recompositions for all rendered views using [rememberSaveableStateHolder].
  * - Logs view appearance state changes using [name] for debugging or analytics purposes.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun NavigationStackHost(
     name: String,

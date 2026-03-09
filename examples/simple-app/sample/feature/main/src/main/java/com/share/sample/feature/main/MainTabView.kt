@@ -20,46 +20,51 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.getbackcompose.compose.runtime.StateProvider
+import com.getbackcompose.foundation.coroutines.ManagedCoroutineScope
 import com.getbackcompose.navigation.switcher.ViewSwitcher
 import com.getbackcompose.navigation.switcher.ViewSwitcherContent
 import com.getbackcompose.navigation.switcher.ViewSwitcherHost
 import com.getbackcompose.core.View
 import com.getbackcompose.core.ViewProvider
-import com.share.sample.feature.favorites.FavoritesComponent
-import com.share.sample.feature.home.HomeComponent
-import com.share.sample.feature.profile.ProfileComponent
-import dagger.Module
-import dagger.Provides
+import com.share.sample.core.auth.AuthRepository
+import com.share.sample.core.data.repository.FavoritesRepository
+import com.share.sample.core.data.repository.FeedRepository
+import com.share.sample.feature.favorites.FavoritesViewProvider
+import com.share.sample.feature.home.HomeViewProvider
+import com.share.sample.feature.profile.ProfileViewProvider
+import com.share.sample.feature.profile.ProfileViewModel
 import kotlinx.coroutines.CoroutineScope
 
-@Module
-object MainTabViewModule {
-    @MainTabScope
-    @Provides
-    fun viewSwitcher(scope: MainTabComponent.Scope) = MainTabViewSwitcher(scope = scope)
+class MainTabViewProvider(
+    scope: ManagedCoroutineScope,
+    private val authRepository: AuthRepository,
+    private val feedRepository: FeedRepository,
+    private val favoritesRepository: FavoritesRepository,
+) : ViewProvider {
+    private val viewSwitcher = MainTabViewSwitcher(scope = scope)
 
-    @MainTabScope
-    @Provides
-    fun mainTabViewProvider(
-        favorites: FavoritesComponent.Factory,
-        home: HomeComponent.Factory,
-        profile: ProfileComponent.Factory,
-        viewSwitcher: MainTabViewSwitcher,
-    ) = MainTabViewProvider(
-        viewSwitcher = viewSwitcher
-    ) { route, tabScope ->
+    private val content = ViewSwitcherContent<TabRoute> { route, tabScope ->
         when (route) {
-            TabRoute.Favorites -> favorites(tabScope)
-            TabRoute.Home -> home(tabScope)
-            TabRoute.Profile -> profile(tabScope)
+            TabRoute.Favorites -> FavoritesViewProvider(
+                scope = tabScope,
+                favoritesRepository = favoritesRepository,
+                feedRepository = feedRepository
+            )
+            TabRoute.Home -> HomeViewProvider(
+                scope = tabScope,
+                feedRepository = feedRepository,
+                favoritesRepository = favoritesRepository
+            )
+            TabRoute.Profile -> {
+                val profileViewModel = ProfileViewModel(
+                    scopeFactory = tabScope,
+                    authRepository = authRepository
+                )
+                ProfileViewProvider(viewModel = profileViewModel)
+            }
         }
     }
-}
 
-class MainTabViewProvider(
-    private val viewSwitcher: MainTabViewSwitcher,
-    private val content: ViewSwitcherContent<TabRoute>,
-) : ViewProvider {
     override fun onViewAppear(scope: CoroutineScope) = MainTabView(
         viewSwitcher = viewSwitcher,
         tabBarSwitcherContent = content,

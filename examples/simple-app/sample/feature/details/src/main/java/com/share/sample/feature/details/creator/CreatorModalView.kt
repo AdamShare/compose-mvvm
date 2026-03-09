@@ -39,58 +39,31 @@ import com.getbackcompose.compose.runtime.collectAsState
 import com.getbackcompose.navigation.stack.NavigationRoute
 import com.getbackcompose.navigation.stack.NavigationStack
 import com.getbackcompose.navigation.stack.Screen
-import com.getbackcompose.navigation.stack.toNavigationRoute
 import com.getbackcompose.core.View
+import com.getbackcompose.core.ViewKey
 import com.getbackcompose.core.ViewPresentation
 import com.share.sample.core.data.api.ArtistResult
 import com.share.sample.core.data.model.Creator
 import com.share.sample.core.data.model.FeedItem
 import com.share.sample.core.data.model.MediaType
-import com.share.sample.feature.details.DetailsComponent
-import com.share.sample.feature.details.creator.viewall.ViewAllCreatorComponent
-import dagger.Module
-import dagger.Provides
+import com.share.sample.core.data.repository.FavoritesRepository
+import com.share.sample.core.data.repository.FeedRepository
 import kotlinx.coroutines.CoroutineScope
 
-@Module
-object CreatorModalViewModule {
-    @CreatorModalScope
-    @Provides
-    fun creatorModalViewProvider(
-        dependency: CreatorModalComponent.Dependency,
-        detailsFactory: DetailsComponent.Factory,
-        viewModel: CreatorModalViewModel,
-        viewAllFactory: ViewAllCreatorComponent.Factory
-    ) = CreatorModalViewProvider(
-        detailsRouteFactory = { feedItem, mediaType ->
-            detailsFactory.toNavigationRoute { scope ->
-                DetailsComponent.Dependency(
-                    navigationScope = scope,
-                    feedItem = feedItem,
-                    mediaType = mediaType
-                )
-            }
-        },
-        navigationStack = dependency.navigationScope,
-        viewModel = viewModel,
-        viewAllRouteFactory = { creator, items, mediaType ->
-            viewAllFactory.toNavigationRoute { scope ->
-                ViewAllCreatorComponent.Dependency(
-                    navigationScope = scope,
-                    creator = creator,
-                    items = items,
-                    mediaType = mediaType,
-                )
-            }
-        },
-    )
+/**
+ * Routes for the creator modal navigation.
+ */
+enum class CreatorModalRoute : ViewKey {
+    Details,
+    ViewAllCreator
 }
 
 class CreatorModalViewProvider(
-    private val detailsRouteFactory: (FeedItem, MediaType) -> NavigationRoute<Screen>,
     private val navigationStack: NavigationStack<Screen>,
+    private val feedRepository: FeedRepository,
+    private val favoritesRepository: FavoritesRepository,
+    private val managedScope: com.getbackcompose.foundation.coroutines.ManagedCoroutineScope,
     private val viewModel: CreatorModalViewModel,
-    private val viewAllRouteFactory: (Creator, List<ArtistResult>, MediaType) -> NavigationRoute<Screen>,
 ) : Screen {
     override val preferredPresentationStyle: @Composable () -> ViewPresentation.Style = {
         ViewPresentation.Style.Modal()
@@ -107,10 +80,50 @@ class CreatorModalViewProvider(
                 state = state,
                 onDismiss = { navigationStack.pop() },
                 onItemClick = { feedItem ->
-                    navigationStack.push(detailsRouteFactory(feedItem, viewModel.mediaType))
+                    navigationStack.push(
+                        NavigationRoute(
+                            key = CreatorModalRoute.Details,
+                            factory = { navScope ->
+                                com.share.sample.feature.details.DetailsViewProvider(
+                                    feedItem = feedItem,
+                                    mediaType = viewModel.mediaType,
+                                    navigationStack = navScope,
+                                    favoritesRepository = favoritesRepository,
+                                    feedRepository = feedRepository,
+                                    managedScope = navScope
+                                )
+                            }
+                        )
+                    )
                 },
                 onViewAllClick = { items ->
-                    navigationStack.push(viewAllRouteFactory(viewModel.creator, items, viewModel.mediaType))
+                    navigationStack.push(
+                        NavigationRoute(
+                            key = CreatorModalRoute.ViewAllCreator,
+                            factory = { navScope ->
+                                com.share.sample.feature.details.creator.viewall.ViewAllCreatorViewProvider(
+                                    creator = viewModel.creator,
+                                    detailsRouteFactory = { feedItem ->
+                                        NavigationRoute(
+                                            key = CreatorModalRoute.Details,
+                                            factory = { detailsNavScope ->
+                                                com.share.sample.feature.details.DetailsViewProvider(
+                                                    feedItem = feedItem,
+                                                    mediaType = feedItem.mediaType,
+                                                    navigationStack = detailsNavScope,
+                                                    favoritesRepository = favoritesRepository,
+                                                    feedRepository = feedRepository,
+                                                    managedScope = detailsNavScope
+                                                )
+                                            }
+                                        )
+                                    },
+                                    items = items,
+                                    navigationStack = navScope
+                                )
+                            }
+                        )
+                    )
                 }
             )
         }

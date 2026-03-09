@@ -40,58 +40,43 @@ import com.getbackcompose.compose.runtime.collectAsState
 import com.getbackcompose.navigation.stack.NavigationRoute
 import com.getbackcompose.navigation.stack.NavigationStack
 import com.getbackcompose.navigation.stack.Screen
-import com.getbackcompose.navigation.stack.toNavigationRoute
 import com.getbackcompose.core.View
-import com.getbackcompose.core.ViewProvider
 import com.share.sample.core.data.model.Creator
 import com.share.sample.core.data.model.FeedItem
 import com.share.sample.core.data.model.Genre
 import com.share.sample.core.data.model.MediaType
-import com.share.sample.feature.details.creator.CreatorModalComponent
-import com.share.sample.feature.details.genre.GenreComponent
-import dagger.Module
-import dagger.Provides
+import com.share.sample.core.data.repository.FavoritesRepository
+import com.share.sample.core.data.repository.FeedRepository
+import com.share.sample.feature.details.creator.CreatorModalViewProvider
+import com.share.sample.feature.details.creator.CreatorModalViewModel
+import com.share.sample.feature.details.creator.viewall.ViewAllCreatorViewProvider
+import com.share.sample.feature.details.genre.GenreViewProvider
 import kotlinx.coroutines.CoroutineScope
 
-@Module
-object DetailsViewModule {
-    @DetailsScope
-    @Provides
-    fun detailsViewProvider(
-        dependency: DetailsComponent.Dependency,
-        viewModel: DetailsViewModel,
-        creatorModalFactory: CreatorModalComponent.Factory,
-        genreFactory: GenreComponent.Factory,
-    ) = DetailsViewProvider(
-        navigationStack = dependency.navigationScope,
-        viewModel = viewModel,
-        creatorModalRouteFactory = { creator, mediaType ->
-            creatorModalFactory.toNavigationRoute { scope ->
-                CreatorModalComponent.Dependency(
-                    navigationScope = scope,
-                    creator = creator,
-                    mediaType = mediaType,
-                )
-            }
-        },
-        genreRouteFactory = { genre ->
-            genreFactory.toNavigationRoute { scope ->
-                GenreComponent.Dependency(
-                    navigationScope = scope,
-                    genre = genre
-                )
-            }
-        },
-    )
+/**
+ * Routes for the details navigation.
+ */
+enum class DetailsRoute : com.getbackcompose.core.ViewKey {
+    CreatorModal,
+    Genre
 }
 
 class DetailsViewProvider(
-    private val creatorModalRouteFactory: (Creator, MediaType) -> NavigationRoute<Screen>,
-    private val genreRouteFactory: (Genre) -> NavigationRoute<Screen>,
+    private val feedItem: FeedItem,
+    private val mediaType: MediaType,
     private val navigationStack: NavigationStack<Screen>,
-    private val viewModel: DetailsViewModel,
+    private val favoritesRepository: FavoritesRepository,
+    private val feedRepository: FeedRepository,
+    private val managedScope: com.getbackcompose.foundation.coroutines.ManagedCoroutineScope,
 ) : Screen {
     override fun onViewAppear(scope: CoroutineScope): View {
+        val viewModel = DetailsViewModel(
+            scopeFactory = managedScope,
+            feedItem = feedItem,
+            mediaType = mediaType,
+            favoritesRepository = favoritesRepository
+        )
+
         val isFavorite by viewModel.isFavorite().collectAsState(scope)
 
         return View {
@@ -103,10 +88,39 @@ class DetailsViewProvider(
                 onBackClick = { navigationStack.pop() },
                 onFavoriteClick = { viewModel.toggleFavorite() },
                 onCreatorClick = { creator ->
-                    navigationStack.push(creatorModalRouteFactory(creator, viewModel.mediaType))
+                    navigationStack.push(
+                        NavigationRoute(
+                            key = DetailsRoute.CreatorModal,
+                            factory = { navScope ->
+                                val creatorViewModel = CreatorModalViewModel(
+                                    scopeFactory = navScope,
+                                    creator = creator,
+                                    mediaType = mediaType,
+                                    feedRepository = feedRepository
+                                )
+                                CreatorModalViewProvider(
+                                    navigationStack = navScope,
+                                    feedRepository = feedRepository,
+                                    favoritesRepository = favoritesRepository,
+                                    managedScope = navScope,
+                                    viewModel = creatorViewModel
+                                )
+                            }
+                        )
+                    )
                 },
                 onGenreClick = { genre ->
-                    navigationStack.push(genreRouteFactory(genre))
+                    navigationStack.push(
+                        NavigationRoute(
+                            key = DetailsRoute.Genre,
+                            factory = { navScope ->
+                                GenreViewProvider(
+                                    navigationStack = navScope,
+                                    genre = genre
+                                )
+                            }
+                        )
+                    )
                 }
             )
         }

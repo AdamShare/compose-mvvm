@@ -3,7 +3,10 @@ package com.share.sample.app
 import android.app.Application
 import com.getbackcompose.activity.application.ApplicationCoroutineScopeFactory
 import com.share.sample.core.auth.AuthRepository
-import com.share.sample.core.data.AppleFeedClient
+import com.share.sample.core.auth.di.AuthDependencies
+import com.share.sample.core.data.di.DataDependencies
+import com.share.sample.core.data.repository.FavoritesRepository
+import com.share.sample.core.data.repository.FeedRepository
 
 /**
  * Simple application class with manual dependency wiring.
@@ -11,18 +14,16 @@ import com.share.sample.core.data.AppleFeedClient
  */
 class SampleApplication : Application(), ApplicationCoroutineScopeFactory {
 
-    // Singleton dependencies
-    lateinit var authRepository: AuthRepository
-        private set
+    // Core singleton dependencies
+    val authRepository: AuthRepository by lazy {
+        AuthDependencies.provideAuthRepository(this)
+    }
 
-    lateinit var feedClient: AppleFeedClient
-        private set
+    val feedRepository: FeedRepository by lazy {
+        DataDependencies.provideFeedRepository()
+    }
 
-    override fun onCreate() {
-        super.onCreate()
-
-        // Manually create singleton dependencies
-        authRepository = AuthRepository()
-        feedClient = AppleFeedClient()
+    val favoritesRepository: FavoritesRepository by lazy {
+        DataDependencies.provideFavoritesRepository(this)
     }
 }

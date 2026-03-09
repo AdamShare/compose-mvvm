@@ -4,20 +4,10 @@ import com.getbackcompose.foundation.coroutines.CoroutineScopeFactory
 import com.getbackcompose.compose.state.ViewModel
 import com.share.sample.core.auth.AuthRepository
 import com.share.sample.core.auth.AuthState
-import dagger.Module
-import dagger.Provides
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-
-@Module
-object ProfileViewModelModule {
-    @ProfileScope
-    @Provides
-    fun viewModel(scope: ProfileComponent.Scope, authRepository: AuthRepository) =
-        ProfileViewModel(scopeFactory = scope, authRepository = authRepository)
-}
 
 /**
  * ViewModel for the profile screen.

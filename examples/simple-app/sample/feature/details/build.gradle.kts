@@ -1,11 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
 
 android {
-    namespace = "com.share.sample.feature.details"
+    namespace = "com.share.sample.simple.feature.details"
     compileSdk = 36
 
     defaultConfig {

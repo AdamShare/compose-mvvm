@@ -2,15 +2,16 @@ package com.share.sample.app
 
 import android.app.Application
 import com.getbackcompose.activity.application.ApplicationCoroutineScopeFactory
-import com.share.sample.integrations.main.DaggerSampleApplicationComponent
-import com.share.sample.integrations.main.SampleApplicationComponent
+import com.share.sample.core.auth.AndroidCredentialsStorage
+import com.share.sample.core.data.repository.AndroidFavoritesStorage
+import com.share.sample.integrations.main.SampleApplicationGraph
+import dev.zacsweers.metro.createGraphFactory
 
 class SampleApplication : Application(), ApplicationCoroutineScopeFactory {
-    lateinit var component: SampleApplicationComponent
-        private set
-
-    override fun onCreate() {
-        super.onCreate()
-        component = DaggerSampleApplicationComponent.factory().invoke(this, this)
+    val graph by lazy {
+        createGraphFactory<SampleApplicationGraph.Factory>().create(
+            credentialsStorage = AndroidCredentialsStorage(this),
+            favoritesStorage = AndroidFavoritesStorage(this),
+        )
     }
 }

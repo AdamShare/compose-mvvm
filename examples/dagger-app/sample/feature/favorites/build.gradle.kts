@@ -1,12 +1,11 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = "com.share.sample.feature.favorites"
+    namespace = "com.share.sample.dagger.feature.favorites"
     compileSdk = 36
 
     defaultConfig {

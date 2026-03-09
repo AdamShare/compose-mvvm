@@ -1,11 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
 
 android {
-    namespace = "com.share.sample.feature.onboarding"
+    namespace = "com.share.sample.simple.feature.onboarding"
     compileSdk = 36
 
     defaultConfig {

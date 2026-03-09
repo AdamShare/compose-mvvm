@@ -22,23 +22,19 @@ import com.getbackcompose.navigation.stack.Screen
 import com.getbackcompose.core.View
 import com.getbackcompose.core.ViewPresentation
 import com.getbackcompose.compose.modal.ModalProperties
-import dagger.Module
-import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
 
-@Module
-object SignUpViewModule {
-    @SignUpScope
-    @Provides
-    fun screen(
-        viewModel: SignUpViewModel
-    ) = SignUpScreen(
-        viewModel = viewModel,
-    )
-}
-
-class SignUpScreen(private val viewModel: SignUpViewModel) : Screen {
-    override fun onViewAppear(scope: CoroutineScope) = SignUpView(listener = viewModel)
+class SignUpScreen(
+    private val navigationStack: com.getbackcompose.navigation.stack.NavigationStack<Screen>,
+    private val authRepository: com.share.sample.core.auth.AuthRepository
+) : Screen {
+    override fun onViewAppear(scope: CoroutineScope): View {
+        val viewModel = SignUpViewModel(
+            authRepository = authRepository,
+            scope = navigationStack as com.getbackcompose.navigation.stack.NavigationStackEntry<Screen>
+        )
+        return SignUpView(listener = viewModel)
+    }
 
     override val preferredPresentationStyle get() = @Composable {
         val compact = calculateWindowSizeClass().hasCompactSize()

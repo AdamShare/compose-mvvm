@@ -2,9 +2,9 @@ package com.share.sample.integrations.main
 
 import android.app.Application
 import com.getbackcompose.activity.application.ApplicationCoroutineScopeFactory
-import com.share.sample.core.auth.AuthModule
+import com.share.sample.core.auth.di.AuthModule
 import com.share.sample.core.auth.AuthRepository
-import com.share.sample.core.data.DataModule
+import com.share.sample.core.data.di.DataModule
 import com.share.sample.core.data.repository.FavoritesRepository
 import com.share.sample.core.data.repository.FeedRepository
 import dagger.Component

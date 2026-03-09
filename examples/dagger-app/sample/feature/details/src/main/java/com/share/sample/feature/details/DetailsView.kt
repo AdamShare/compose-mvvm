@@ -42,7 +42,6 @@ import com.getbackcompose.navigation.stack.NavigationStack
 import com.getbackcompose.navigation.stack.Screen
 import com.getbackcompose.navigation.stack.toNavigationRoute
 import com.getbackcompose.core.View
-import com.getbackcompose.core.ViewProvider
 import com.share.sample.core.data.model.Creator
 import com.share.sample.core.data.model.FeedItem
 import com.share.sample.core.data.model.Genre

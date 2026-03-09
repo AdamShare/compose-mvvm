@@ -20,44 +20,51 @@ import androidx.compose.ui.unit.dp
 import com.getbackcompose.navigation.stack.NavigationRoute
 import com.getbackcompose.navigation.stack.NavigationStack
 import com.getbackcompose.navigation.stack.Screen
-import com.getbackcompose.navigation.stack.toNavigationRoute
 import com.getbackcompose.core.View
 import com.getbackcompose.core.ViewProvider
-import com.share.sample.feature.onboarding.signin.signup.SignUpComponent
-import dagger.Module
-import dagger.Provides
+import com.share.sample.core.auth.AuthRepository
+import com.share.sample.feature.onboarding.signin.signup.SignUpScreen
 import kotlinx.coroutines.CoroutineScope
 
-@Module
-object SignInViewModule {
-    @SignInScope
-    @Provides
-    fun signInView(
-        emailViewModel: EmailViewModel,
-        signInViewModel: SignInViewModel,
-        dependency: SignInComponent.Dependency,
-        signUp: SignUpComponent.Factory
-    ) = SignInViewProvider(
-        emailViewModel = emailViewModel,
-        signInViewModel = signInViewModel,
-        navigationStack = dependency.navigationStackEntry,
-        signUpRoute = signUp.toNavigationRoute()
-    )
+/**
+ * Routes for the sign-in navigation.
+ */
+enum class SignInRoute : com.getbackcompose.core.ViewKey {
+    SignUp
 }
 
 class SignInViewProvider(
-    private val emailViewModel: EmailViewModel,
-    private val signInViewModel: SignInViewModel,
+    private val authRepository: AuthRepository,
     private val navigationStack: NavigationStack<Screen>,
-    private val signUpRoute: NavigationRoute<Screen>,
+    private val managedScope: com.getbackcompose.foundation.coroutines.ManagedCoroutineScope,
 ) : Screen {
-    override fun onViewAppear(scope: CoroutineScope) = View {
-        SignInViewContent(
-            emailState = emailViewModel,
-            onEmailValueChange = emailViewModel::onEmailValueChange,
-            onClickSignIn = signInViewModel::signIn,
-            onClickSignUp = { navigationStack.push(signUpRoute) }
+    override fun onViewAppear(scope: CoroutineScope): View {
+        val emailViewModel = EmailViewModel(scope = managedScope)
+        val signInViewModel = SignInViewModel(
+            emailViewModel = emailViewModel,
+            authRepository = authRepository
         )
+
+        return View {
+            SignInViewContent(
+                emailState = emailViewModel,
+                onEmailValueChange = emailViewModel::onEmailValueChange,
+                onClickSignIn = signInViewModel::signIn,
+                onClickSignUp = {
+                    navigationStack.push(
+                        NavigationRoute(
+                            key = SignInRoute.SignUp,
+                            factory = { navScope ->
+                                SignUpScreen(
+                                    navigationStack = navScope,
+                                    authRepository = authRepository
+                                )
+                            }
+                        )
+                    )
+                }
+            )
+        }
     }
 }
 

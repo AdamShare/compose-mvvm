@@ -32,56 +32,43 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.getbackcompose.foundation.coroutines.ManagedCoroutineScope
-import com.getbackcompose.compose.runtime.StateProvider
 import com.getbackcompose.compose.runtime.collectAsState
+import com.getbackcompose.core.View
+import com.getbackcompose.core.ViewKey
+import com.getbackcompose.core.ViewProvider
+import com.getbackcompose.foundation.coroutines.ManagedCoroutineScope
 import com.getbackcompose.navigation.stack.ModalNavigationStack
 import com.getbackcompose.navigation.stack.NavigationRoute
-import com.getbackcompose.navigation.stack.NavigationStack
-import com.getbackcompose.navigation.stack.NavigationStackEntry
 import com.getbackcompose.navigation.stack.NavigationStackHost
 import com.getbackcompose.navigation.stack.Screen
-import com.getbackcompose.navigation.stack.toNavigationRoute
-import com.getbackcompose.core.View
-import com.getbackcompose.core.ViewProvider
 import com.share.sample.core.data.model.FeedItem
-import com.share.sample.feature.details.DetailsComponent
-import dagger.Module
-import dagger.Provides
+import com.share.sample.core.data.repository.FavoritesRepository
+import com.share.sample.core.data.repository.FeedRepository
+import com.share.sample.feature.details.DetailsViewProvider
 import kotlinx.coroutines.CoroutineScope
 
-@Module
-object FavoritesViewModule {
-    @FavoritesScope
-    @Provides
-    fun favoritesViewProvider(
-        dependency: FavoritesComponent.Dependency,
-        detailsFactory: DetailsComponent.Factory,
-        viewModel: FavoritesViewModel,
-    ) = FavoritesViewProvider(
-        detailsFactory = { feedItem ->
-            detailsFactory.toNavigationRoute { scope ->
-                DetailsComponent.Dependency(
-                    navigationScope = scope,
-                    feedItem = feedItem,
-                    mediaType = viewModel.getMediaType(feedItem)
-                )
-            }
-        },
-        scope = dependency.scope,
-        viewModel = viewModel,
-        )
+/**
+ * Routes for the favorites navigation.
+ */
+enum class FavoritesRoute : ViewKey {
+    Details
 }
 
 class FavoritesViewProvider(
-    private val detailsFactory: (FeedItem) -> NavigationRoute<Screen>,
     scope: ManagedCoroutineScope,
-    private val viewModel: FavoritesViewModel,
+    private val favoritesRepository: FavoritesRepository,
+    private val feedRepository: FeedRepository,
 ) : ViewProvider {
     private val navigationStack = ModalNavigationStack<Screen>(
         rootScope = scope,
     )
     private val root = navigationStack.rootNavigationScope()
+
+    private val viewModel = FavoritesViewModel(
+        favoritesRepository = favoritesRepository,
+        feedRepository = feedRepository,
+        scopeFactory = scope,
+    )
 
     override fun onViewAppear(scope: CoroutineScope): View {
         val state by viewModel.state.collectAsState(scope)
@@ -95,7 +82,21 @@ class FavoritesViewProvider(
                 FavoritesContent(
                     state = state,
                     onItemClick = { feedItem ->
-                        root.push(detailsFactory(feedItem))
+                        root.push(
+                            NavigationRoute(
+                                key = FavoritesRoute.Details,
+                                factory = { navScope ->
+                                    DetailsViewProvider(
+                                        feedItem = feedItem,
+                                        mediaType = viewModel.getMediaType(feedItem),
+                                        navigationStack = navScope,
+                                        favoritesRepository = favoritesRepository,
+                                        feedRepository = feedRepository,
+                                        managedScope = navScope
+                                    )
+                                }
+                            )
+                        )
                     },
                     onRemoveClick = { itemId ->
                         viewModel.removeFavorite(itemId)

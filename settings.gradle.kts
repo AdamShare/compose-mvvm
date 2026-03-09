@@ -13,6 +13,9 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
@@ -33,6 +36,10 @@ include(":library:getbackcompose-navigation-switcher")
 include(":library:getbackcompose-navigation-multidisplay")
 include(":library:getbackcompose-lifecycle")
 include(":library:getbackcompose-activity")
+
+// Example shared modules - Multiplatform business logic
+include(":examples:shared:sample:core:auth")
+include(":examples:shared:sample:core:data")
 
 // Example apps - Dagger (Android-only, for reference)
 include(":examples:dagger-app:sample:app")

@@ -1,11 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = "com.share.sample.core.auth"
+    namespace = "com.share.sample.dagger.core.auth.di"
     compileSdk = 36
 
     defaultConfig {
@@ -28,6 +27,9 @@ kotlin { compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 dependencies {
     ksp(libs.daggerCompiler)
+
+    // Use shared multiplatform auth module for business logic
+    api(projects.examples.shared.sample.core.auth)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.dagger)
