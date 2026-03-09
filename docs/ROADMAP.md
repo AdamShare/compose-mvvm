@@ -183,3 +183,11 @@ Built-in support for enter/exit animations in `NavigationStackHost` and `ViewSwi
 ### Back Stack Persistence (Optional)
 
 Optional module for apps that need navigation state to survive process death. Would integrate with `SavedStateHandle` while maintaining the architecture's scope model.
+
+---
+
+## Completed
+
+- **Multi-slot ViewProviders** — Implemented in `getbackcompose-navigation-multidisplay` module for top bar / content / bottom bar patterns.
+- **Sample apps** — Three example apps demonstrating Dagger, Metro (KMP DI), and manual injection patterns.
+- **Kotlin Multiplatform** — Core library and example apps support Android, Desktop (JVM), iOS, and WasmJs.

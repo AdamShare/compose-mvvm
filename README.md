@@ -2,6 +2,8 @@
 
 **Get back** the lifecycle-agnostic behavior that Compose was designed for.
 
+A **Kotlin Multiplatform** navigation and scope management library for Compose, targeting Android, Desktop (JVM), iOS, and WebAssembly.
+
 ## Why GetBack?
 
 AndroidX lifecycle components were designed for a stateless world—Views that get destroyed and recreated, Activities that die on rotation, Fragments with complex lifecycle callbacks. The workarounds are familiar:
@@ -19,6 +21,39 @@ Compose doesn't need these restrictions. It's a **stateful UI framework** where 
 - **Visibility-aware lifecycles** - Scopes that cancel when hidden and restart when visible
 - **Type-safe navigation** - Full objects passed between screens, compile-time route safety
 - **DI framework agnostic** - Works with Dagger, Koin, manual injection, or any DI approach
+
+## Quick Start
+
+`VisibilityScopedView` is the cross-platform entry point. It creates a coroutine scope tied to view visibility and wires up a `ViewProvider`:
+
+```kotlin
+// Any platform (Android Activity, Desktop Window, iOS ComposeUIViewController, WasmJs ComposeViewport)
+VisibilityScopedView(
+    scopeFactory = { CoroutineScope(SupervisorJob() + Dispatchers.Main) },
+    onViewAppear = { scope ->
+        // Return a View — scope cancels when hidden, restarts when visible
+        myViewProvider.onViewAppear(scope)
+    }
+).content()
+```
+
+Use `NavigationStackHost` for push/pop navigation and `ViewSwitcherHost` for tab switching:
+
+```kotlin
+// Push/pop navigation
+val navigationStack = ModalNavigationStack<Screen>(rootScope = scope)
+
+NavigationStackHost(stack = navigationStack) { entry ->
+    entry.viewProvider.onViewAppear(entry.scope)
+}
+
+// Tab switching with state retention
+val tabSwitcher = RetainingScopeViewSwitcher<TabRoute>(scope, defaultKey = TabRoute.Home)
+
+ViewSwitcherHost(switcher = tabSwitcher) { route, routeScope ->
+    createTabProvider(route, routeScope)
+}
+```
 
 ## Architecture Overview
 
@@ -311,18 +346,46 @@ Developers familiar with AndroidX Navigation's convention-based approach need to
 - Coroutine scope hierarchies and cancellation
 - The visibility lifecycle model vs Android lifecycle
 
+## Platform Support
+
+Core library modules target all Compose Multiplatform platforms:
+
+| Platform | Status |
+|----------|--------|
+| Android | Supported (minSdk 24) |
+| Desktop (JVM) | Supported |
+| iOS (arm64, x64, simulator) | Supported |
+| WasmJs (browser) | Supported |
+
+Android-specific modules (`getbackcompose-lifecycle`, `getbackcompose-activity`) provide optional AndroidX integration for Activity-based apps.
+
+## Example Apps
+
+Three complete sample apps demonstrate different dependency injection approaches with identical feature sets (onboarding, tabbed home, detail screens with nested navigation, favorites, profile):
+
+| App | DI Approach | Platforms |
+|-----|-------------|-----------|
+| `examples/simple-app` | Manual constructor injection | Android, Desktop, iOS, WasmJs |
+| `examples/metro-app` | [Metro](https://github.com/ZacSweers/metro) (KMP DI) | Android, Desktop, iOS, WasmJs |
+| `examples/dagger-app` | [Dagger 2](https://dagger.dev/) | Android |
+
+Run an example:
+```bash
+./gradlew :examples:simple-app:sample:desktop:run
+./gradlew :examples:metro-app:sample:desktop:run
+```
+
 ## Roadmap
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) for planned features including:
 - Deep link support with hierarchical handling
 - Optional back stack persistence
 - Navigation stack transition animations
-- Multi-slot ViewProviders (top bar / content / bottom bar) for better modal support without requiring separate navigation stacks
-- Sample apps demonstrating different DI patterns (Dagger, Koin, manual injection, no DI)
 
 ## When to Use This Architecture
 
 ### Good Fit
+- Kotlin Multiplatform apps sharing navigation logic across Android, iOS, Desktop, and Web
 - Apps prioritizing compile-time type safety for navigation
 - Apps where navigation state needn't survive process death
 - Apps with deep nested navigation (tabs within tabs, modals with stacks)
