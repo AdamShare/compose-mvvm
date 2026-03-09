@@ -1,55 +1,34 @@
 plugins {
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.kotlin.multiplatform.library)
+    alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.kotlin.compose)
 }
 
-android {
-    namespace = "com.share.sample.simple.feature.onboarding"
-    compileSdk = 36
-
-    defaultConfig {
+kotlin {
+    android {
+        namespace = "com.share.sample.simple.feature.onboarding"
+        compileSdk = 36
         minSdk = 24
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+
+    jvm("desktop")
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation(projects.examples.shared.sample.core.auth)
+            implementation(projects.library.getbackcomposeFoundation)
+            implementation(projects.library.getbackcomposeCompose)
+            implementation(projects.library.getbackcomposeNavigationStack)
+            implementation(projects.library.getbackcomposeCore)
+
+            implementation(compose.material3)
+            implementation(compose.ui)
+            implementation(compose.foundation)
+            implementation(libs.kermit)
+        }
     }
-}
-
-kotlin { compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17 } }
-
-dependencies {
-
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
-
-    implementation(projects.examples.simpleApp.sample.core.auth)
-    implementation(projects.library.getbackcomposeFoundation)
-    implementation(projects.library.getbackcomposeActivity)
-    implementation(projects.library.getbackcomposeCompose)
-    implementation(projects.library.getbackcomposeNavigationStack)
-    implementation(projects.library.getbackcomposeCore)
-
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.material3.window)
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.kermit)
-
-    testImplementation(libs.junit)
 }
