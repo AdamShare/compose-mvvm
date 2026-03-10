@@ -103,6 +103,33 @@ Non-Android platforms use `ViewContext.EMPTY` (always-foreground context).
 - Coil 3.4.0 (KMP image loading in shared modules)
 - Kermit (multiplatform logging)
 
+## Publishing
+
+Published to Maven Central via the [vanniktech gradle-maven-publish-plugin](https://github.com/vanniktech/gradle-maven-publish-plugin).
+
+```bash
+# Publish to local Maven (~/.m2) for testing
+./gradlew publishToMavenLocal
+
+# Publish to Maven Central (requires credentials)
+./gradlew publishAndReleaseToMavenCentral
+```
+
+Group: `com.getbackcompose`, version configured in root `gradle.properties`.
+POM metadata (license, SCM, developer) also in root `gradle.properties`.
+Per-module artifact IDs and descriptions in each module's `gradle.properties`.
+
+Signing is disabled by default (`RELEASE_SIGNING_ENABLED=false` in root `gradle.properties`). Override for release builds.
+
+Required in `~/.gradle/gradle.properties` for Maven Central publishing:
+```properties
+mavenCentralUsername=<sonatype-username>
+mavenCentralPassword=<sonatype-password>
+signing.keyId=<gpg-key-id>
+signing.password=<gpg-passphrase>
+signing.secretKeyRingFile=<path-to-secring.gpg>
+```
+
 ## Conventions
 
 - Library modules have **zero AndroidX dependencies** in core (Android-specific modules are opt-in)
