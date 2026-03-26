@@ -47,7 +47,7 @@ interface CreatorModalComponent {
 
         abstract fun create(@BindsInstance dependency: Dependency): CreatorModalComponent
 
-        override fun invoke(dependency: Dependency): Screen {
+        override fun create(dependency: Dependency): Screen {
             return create(dependency).viewProvider
         }
     }

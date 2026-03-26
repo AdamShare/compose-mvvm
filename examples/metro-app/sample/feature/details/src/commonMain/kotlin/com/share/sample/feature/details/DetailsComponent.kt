@@ -55,7 +55,7 @@ interface DetailsGraph {
 
         abstract fun create(@Provides dependency: Dependency): DetailsGraph
 
-        override fun invoke(dependency: Dependency): Screen {
+        override fun create(dependency: Dependency): Screen {
             return create(dependency).viewProvider
         }
     }

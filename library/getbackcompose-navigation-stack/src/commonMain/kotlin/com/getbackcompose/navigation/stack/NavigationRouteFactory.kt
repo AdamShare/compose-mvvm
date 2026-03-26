@@ -10,18 +10,20 @@ import com.getbackcompose.core.ViewKey
  *
  * @param V The type of view to produce.
  */
-interface NavigationRouteFactory<D, V> : (D) -> V, ViewKey
+interface NavigationRouteFactory<D, V> : ViewKey {
+    fun create(dependency: D): V
+}
 
 fun <D, V> NavigationRouteFactory<D, V>.toNavigationRoute(
     dependency: (NavigationStackEntry<V>) -> D
 ) = NavigationRoute(
     key = this,
     factory = {
-        this(dependency(it))
+        create(dependency(it))
     },
 )
 
 fun <V> NavigationRouteFactory<NavigationStackEntry<V>, V>.toNavigationRoute() = NavigationRoute(
     key = this,
-    factory = { this(it) },
+    factory = { create(it) },
 )

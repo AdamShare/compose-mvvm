@@ -41,7 +41,7 @@ interface SignUpGraph {
 
         abstract fun create(@Provides dependency: Dependency): SignUpGraph
 
-        override fun invoke(navigationStackEntry: NavigationStackEntry<Screen>): Screen {
+        override fun create(navigationStackEntry: NavigationStackEntry<Screen>): Screen {
             return create(Dependency(navigationStackEntry)).screen
         }
     }

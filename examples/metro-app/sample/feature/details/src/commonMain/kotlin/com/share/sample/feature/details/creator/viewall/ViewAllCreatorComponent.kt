@@ -51,7 +51,7 @@ interface ViewAllCreatorGraph {
 
         abstract fun create(@Provides dependency: Dependency): ViewAllCreatorGraph
 
-        override fun invoke(dependency: Dependency): Screen {
+        override fun create(dependency: Dependency): Screen {
             return create(dependency).viewProvider
         }
     }

@@ -42,7 +42,7 @@ interface GenreComponent {
 
         abstract fun create(@BindsInstance dependency: Dependency): GenreComponent
 
-        override fun invoke(dependency: Dependency): Screen {
+        override fun create(dependency: Dependency): Screen {
             return create(dependency).viewProvider
         }
     }

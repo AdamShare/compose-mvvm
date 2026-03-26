@@ -30,7 +30,7 @@ interface SignInComponent {
 
         abstract fun create(@BindsInstance dependency: Dependency): SignInComponent
 
-        override fun invoke(scope: NavigationStackEntry<Screen>): Screen {
+        override fun create(scope: NavigationStackEntry<Screen>): Screen {
             return create(Dependency(scope)).viewProvider
         }
     }

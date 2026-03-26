@@ -23,7 +23,7 @@ interface SignUpComponent {
 
         abstract fun create(@BindsInstance dependency: Dependency): SignUpComponent
 
-        override fun invoke(navigationStackEntry: NavigationStackEntry<Screen>): Screen {
+        override fun create(navigationStackEntry: NavigationStackEntry<Screen>): Screen {
             return create(Dependency(navigationStackEntry)).screen
         }
     }

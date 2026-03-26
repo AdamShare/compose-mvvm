@@ -54,7 +54,7 @@ interface DetailsComponent {
 
         abstract fun create(@BindsInstance dependency: Dependency): DetailsComponent
 
-        override fun invoke(dependency: Dependency): Screen {
+        override fun create(dependency: Dependency): Screen {
             return create(dependency).viewProvider
         }
     }

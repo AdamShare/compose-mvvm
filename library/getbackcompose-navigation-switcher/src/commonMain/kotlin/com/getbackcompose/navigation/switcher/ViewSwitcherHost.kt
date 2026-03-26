@@ -8,7 +8,7 @@ import com.getbackcompose.foundation.coroutines.ManagedCoroutineScope
 import com.getbackcompose.core.ViewKey
 import com.getbackcompose.core.ViewProvider
 
-fun interface ViewSwitcherContent<K>: (K, ManagedCoroutineScope) -> ViewProvider
+typealias ViewSwitcherContent<K> = (K, ManagedCoroutineScope) -> ViewProvider
 
 /**
  * Hosts a [ViewSwitcher] and renders only the currently selected content.

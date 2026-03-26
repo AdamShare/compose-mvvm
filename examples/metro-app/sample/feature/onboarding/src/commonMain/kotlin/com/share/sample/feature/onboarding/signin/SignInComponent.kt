@@ -43,7 +43,7 @@ interface SignInGraph {
 
         abstract fun create(@Provides dependency: Dependency): SignInGraph
 
-        override fun invoke(scope: NavigationStackEntry<Screen>): Screen {
+        override fun create(scope: NavigationStackEntry<Screen>): Screen {
             return create(Dependency(scope)).viewProvider
         }
     }

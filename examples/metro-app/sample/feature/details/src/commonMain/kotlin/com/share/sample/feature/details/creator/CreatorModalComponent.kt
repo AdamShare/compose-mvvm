@@ -52,7 +52,7 @@ interface CreatorModalGraph {
 
         abstract fun create(@Provides dependency: Dependency): CreatorModalGraph
 
-        override fun invoke(dependency: Dependency): Screen {
+        override fun create(dependency: Dependency): Screen {
             return create(dependency).viewProvider
         }
     }
